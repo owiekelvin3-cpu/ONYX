@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ONYX Exchange
 
-## Getting Started
+Production-ready crypto exchange frontend built with Next.js 16, Tailwind CSS 4, and Supabase.
 
-First, run the development server:
+**Live stack:** Next.js App Router · Supabase Auth & Postgres · Vercel
+
+## Features
+
+- Landing page with markets, products, and app download
+- Email registration with full KYC profile fields
+- Dashboard: trade, portfolio, deposit, withdraw, AI bots, copy trading
+- Supabase backend with balances, trades, holdings, deposits, withdrawals
+- Responsive Binance-style UI (dark theme, gold accent)
+
+## Quick start
 
 ```bash
+npm install
+cp .env.example .env.local
+# Fill in Supabase URL and anon key
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon/public key |
+| `NEXT_PUBLIC_APP_NAME` | No | Display name (default: ONYX) |
+| `NEXT_PUBLIC_APP_URL` | No | Canonical URL (auto-set on Vercel) |
 
-## Learn More
+See `.env.example` and `supabase/README.md` for backend setup.
 
-To learn more about Next.js, take a look at the following resources:
+## Supabase auth (production)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+In Supabase Dashboard → **Authentication → URL Configuration**, add:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Site URL:** your Vercel domain (e.g. `https://onyx-exchange.vercel.app`)
+- **Redirect URLs:** `https://your-domain.com/**`
 
-## Deploy on Vercel
+## Deploy to Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/owiekelvin3-cpu/onyx-exchange)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Or via CLI:
+
+```bash
+npx vercel --prod
+```
+
+Set the Supabase env vars in Vercel → Project → Settings → Environment Variables.
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | ESLint |
+
+## Project structure
+
+```
+src/
+  app/           # Pages (landing, auth, dashboard, info pages)
+  components/    # UI, landing, dashboard, auth
+  lib/
+    api/         # Supabase API helpers
+    supabase/    # Client, server, middleware
+supabase/
+  migrations/    # SQL migrations
+```
+
+## License
+
+Private — All rights reserved.

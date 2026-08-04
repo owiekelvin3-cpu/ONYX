@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #0b0e11;
+  --bg-secondary: #181a20;
+  --bg-tertiary: #1e2329;
+  --bg-hover: #2b3139;
+  --border: #2b3139;
+  --border-light: #474d57;
+  --text-primary: #eaecef;
+  --text-secondary: #b7bdc6;
+  --text-tertiary: #848e9c;
+  --brand: #f0b90b;
+  --brand-hover: #fcd535;
+  --brand-text: #0b0e11;
+  --green: #0ecb81;
+  --red: #f6465d;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --breakpoint-xs: 30rem;
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-hover: var(--bg-hover);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-text: var(--brand-text);
+  --color-green: var(--green);
+  --color-red: var(--red);
+  --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+/* Layout helpers */
+.container-app {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .container-app {
+    padding-inline: 1.5rem;
+  }
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-bottom);
+}
+
+.safe-area-top {
+  padding-top: var(--safe-top);
+}
+
+/* Horizontal scroll tabs */
+.scroll-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch-friendly tap targets on mobile */
+@media (max-width: 1023px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 35s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.market-row {
+  transition: background 0.15s;
+}
+.market-row:hover {
+  background: var(--bg-hover);
+}
+
+.nav-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.15s, visibility 0.15s, transform 0.15s;
+}
+.nav-item:hover .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Auth pages — subtle grid like Binance */
+.auth-page {
+  background-color: var(--bg-primary);
+  background-image:
+    linear-gradient(rgba(240, 185, 11, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 185, 11, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.auth-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% -20%,
+    rgba(240, 185, 11, 0.08),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive table wrapper */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-inline: -1rem;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .table-scroll {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
 }
