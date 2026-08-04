@@ -1,0 +1,19 @@
+---
+description: Push to GitHub and deploy to Vercel after completing code changes
+alwaysApply: true
+---
+
+# Deploy when done
+
+After finishing any task that modifies code in this project:
+
+1. Run `npm run build` and fix errors if the build fails.
+2. Commit with a clear message describing the change (only when there are uncommitted changes).
+3. Push to GitHub: `git push origin main`
+4. Deploy to Vercel production: `npx vercel deploy --prod --yes`
+
+Report the commit hash, GitHub repo URL, and live Vercel URL in the final response.
+
+Do not skip push/deploy unless the user explicitly says not to, or git/Vercel auth fails — then explain what they need to do.
+
+Never commit `.env.local` or secrets. `.env.example` is safe to commit.
