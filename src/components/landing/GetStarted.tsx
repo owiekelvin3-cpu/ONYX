@@ -32,23 +32,23 @@ export function GetStarted() {
             </Link>
           </div>
           <div className="bg-bg-primary border border-border rounded-lg p-5 sm:p-8">
-            <h3 className="text-base font-semibold text-text-primary">Your Assets, Protected</h3>
+            <h3 className="text-base font-semibold text-text-primary">Security that&apos;s built in</h3>
             <p className="text-sm text-text-tertiary mt-2 leading-relaxed">
-              Industry-leading security with cold storage for 95% of assets, multi-signature wallets, and real-time monitoring.
+              Your account is protected with encryption, optional 2FA, and session controls you can manage from settings.
             </p>
-            <div className="mt-5 sm:mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+            <ul className="mt-5 sm:mt-6 space-y-3">
               {[
-                { label: "Cold Storage", value: "95%" },
-                { label: "Insurance Fund", value: "$500M" },
-                { label: "Security Audits", value: "Quarterly" },
-                { label: "Compliance", value: "SOC 2" },
+                "Passwords hashed and never stored in plain text",
+                "Two-factor authentication available in settings",
+                "Withdrawals reviewed before they leave the platform",
+                "Support team reachable through the help center",
               ].map((item) => (
-                <div key={item.label} className="bg-bg-secondary border border-border rounded p-3 sm:p-4">
-                  <p className="text-base sm:text-lg font-bold text-text-primary">{item.value}</p>
-                  <p className="text-[11px] text-text-tertiary mt-0.5">{item.label}</p>
-                </div>
+                <li key={item} className="flex gap-2.5 text-sm text-text-secondary">
+                  <span className="text-brand shrink-0 mt-0.5">·</span>
+                  {item}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
       </div>

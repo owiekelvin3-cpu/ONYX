@@ -71,10 +71,10 @@ export const SITE_PAGES: Record<
     title: "About ONYX",
     description: "Learn about Onyx Exchange — our mission, team, and vision.",
     content: [
-      "Onyx Exchange is a global multi-asset trading platform serving over 12 million users across 180+ countries.",
-      "We provide institutional-grade infrastructure for trading crypto, stocks, forex, and derivatives with deep liquidity and industry-leading security.",
-      "Founded with the mission to make professional trading tools accessible to everyone, ONYX processes over $38 billion in daily trading volume.",
-      "Our team consists of veterans from top financial institutions and leading technology companies, united by a commitment to transparency, security, and innovation.",
+      "Onyx Exchange is a multi-asset trading platform for crypto, stocks, forex, and derivatives.",
+      "We built ONYX to keep trading straightforward: clear fees, a single dashboard, and tools that work on desktop and mobile web.",
+      "Security comes first — encrypted sessions, optional two-factor authentication, and careful handling of account data.",
+      "We're a growing team focused on shipping useful features, listening to feedback, and improving the platform over time.",
     ],
   },
   help: {

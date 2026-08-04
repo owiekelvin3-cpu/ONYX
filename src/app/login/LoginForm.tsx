@@ -59,7 +59,7 @@ export default function LoginForm() {
   return (
     <AuthShell
       panelTitle="Welcome back"
-      panelSubtitle="Sign in to manage your portfolio, execute trades, and access institutional-grade tools."
+      panelSubtitle="Sign in to view your portfolio, place trades, and manage your account."
     >
       <AuthCardHeader
         title="Log in"

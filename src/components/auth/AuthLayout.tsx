@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { BRAND, TRUST_ITEMS } from "@/lib/constants";
-import { ArrowLeft, HelpCircle, Shield, Zap } from "lucide-react";
+import { BRAND, PLATFORM_HIGHLIGHTS } from "@/lib/constants";
+import { ArrowLeft, Clock, HelpCircle, Layers, Receipt, Shield } from "lucide-react";
 
-const FEATURES = [
-  { icon: Shield, text: "Bank-grade security & cold storage" },
-  { icon: Zap, text: "Instant access to 500+ markets" },
-];
+const FEATURE_ICONS = [Shield, Receipt, Layers, Clock] as const;
 
 export function AuthShell({
   children,
@@ -52,28 +49,22 @@ export function AuthShell({
             {panelSubtitle ?? BRAND.description}
           </p>
 
-          <ul className="mt-8 space-y-3">
-            {FEATURES.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-3 text-[14px] text-text-secondary">
-                <span className="w-8 h-8 rounded-md bg-brand/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-4 h-4 text-brand" />
-                </span>
-                {text}
-              </li>
-            ))}
+          <ul className="mt-8 space-y-4">
+            {PLATFORM_HIGHLIGHTS.map((item, i) => {
+              const Icon = FEATURE_ICONS[i];
+              return (
+                <li key={item.title} className="flex items-start gap-3">
+                  <span className="w-8 h-8 rounded-md bg-brand/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon className="w-4 h-4 text-brand" strokeWidth={1.75} />
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-medium text-text-primary">{item.title}</p>
+                    <p className="text-[13px] text-text-tertiary mt-0.5 leading-relaxed">{item.desc}</p>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
-
-          <div className="mt-10 grid grid-cols-2 gap-3">
-            {TRUST_ITEMS.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-lg border border-border bg-bg-primary/60 px-4 py-3"
-              >
-                <p className="text-lg font-bold text-text-primary">{item.value}</p>
-                <p className="text-[11px] text-text-tertiary mt-0.5">{item.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </aside>
 

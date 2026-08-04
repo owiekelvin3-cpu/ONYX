@@ -1,9 +1,9 @@
 export const BRAND = {
   name: "ONYX",
   fullName: "Onyx Exchange",
-  tagline: "Buy, Trade & Hold 500+ Assets",
+  tagline: "Trade crypto, stocks & forex in one place",
   description:
-    "The world's leading multi-asset exchange. Trade crypto, stocks, forex, and derivatives with deep liquidity and institutional-grade infrastructure.",
+    "A multi-asset exchange with clear fees, live charts, and the tools you need to buy, sell, and manage a portfolio.",
   domain: "onyx.exchange",
 } as const;
 
@@ -50,11 +50,23 @@ export const PRODUCTS = [
   },
 ] as const;
 
-export const TRUST_ITEMS = [
-  { value: "$38B+", label: "Daily Trading Volume" },
-  { value: "12M+", label: "Registered Users" },
-  { value: "500+", label: "Trading Pairs" },
-  { value: "99.99%", label: "Platform Uptime" },
+export const PLATFORM_HIGHLIGHTS = [
+  {
+    title: "Secure by default",
+    desc: "Two-factor auth, encrypted sessions, and account alerts.",
+  },
+  {
+    title: "Fees you can read",
+    desc: "0.10% spot trading. What you see is what you pay.",
+  },
+  {
+    title: "One dashboard",
+    desc: "Crypto, stocks, and forex without switching platforms.",
+  },
+  {
+    title: "Markets stay open",
+    desc: "Place orders any time — weekends and holidays included.",
+  },
 ] as const;
 
 export const STEPS = [

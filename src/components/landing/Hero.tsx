@@ -20,8 +20,8 @@ export function Hero() {
               {BRAND.tagline}
             </h1>
             <p className="mt-3 sm:mt-4 text-sm sm:text-base text-text-secondary leading-relaxed max-w-md">
-              Join 12M+ users on {BRAND.fullName}. Trade crypto, stocks, forex,
-              and derivatives with the deepest liquidity in the industry.
+              Open an account on {BRAND.fullName} and trade crypto, stocks, and
+              forex from one dashboard — with clear fees and live market data.
             </p>
 
             <div className="mt-6 sm:mt-8 flex flex-col xs:flex-row gap-2 max-w-md">

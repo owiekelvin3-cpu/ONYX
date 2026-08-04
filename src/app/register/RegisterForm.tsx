@@ -180,7 +180,7 @@ export default function RegisterForm() {
   return (
     <AuthShell
       wide
-      panelTitle="Join 12M+ traders"
+      panelTitle="Create your ONYX account"
       panelSubtitle="Open your account in minutes. Trade crypto, stocks, and forex with deep liquidity and low fees."
     >
       <AuthCardHeader
