@@ -43,7 +43,7 @@ In Supabase Dashboard → **Authentication → URL Configuration**, add:
 
 ## Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/owiekelvin3-cpu/onyx-exchange)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/owiekelvin3-cpu/ONYX)
 
 Or via CLI:
 

@@ -1,5 +1,5 @@
 @echo off
-REM One-time setup: authenticate with GitHub and push ONYX Exchange
+REM Push ONYX Exchange to GitHub
 set PATH=%PATH%;%ProgramFiles%\GitHub CLI
 
 echo Checking GitHub auth...
@@ -10,12 +10,9 @@ if errorlevel 1 (
   gh auth login --hostname github.com --git-protocol https --web
 )
 
-echo Creating GitHub repo and pushing...
-gh repo create onyx-exchange --public --source=. --remote=origin --push --description "ONYX Exchange - crypto trading platform"
+echo Pushing to GitHub...
+git remote set-url origin https://github.com/owiekelvin3-cpu/ONYX.git
+git push -u origin main
 
 echo.
-echo Done! Repository: https://github.com/owiekelvin3-cpu/onyx-exchange
-echo.
-echo Connect to Vercel:
-echo   npx vercel link
-echo   npx vercel git connect
+echo Done! Repository: https://github.com/owiekelvin3-cpu/ONYX
