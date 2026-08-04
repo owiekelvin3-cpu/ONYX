@@ -11,7 +11,6 @@ import { AuthInput, AuthSelect } from "@/components/auth/AuthInput";
 import {
   AuthSteps,
   PasswordStrength,
-  formatDobInput,
 } from "@/components/auth/AuthSteps";
 import { Button } from "@/components/ui/Button";
 import {
@@ -32,13 +31,23 @@ const REGISTER_STEPS = [
   { label: "Security" },
 ];
 
-function parseDateOfBirth(value: string): string | null {
-  const match = value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!match) return null;
+/** Latest date allowed — user must be at least 18 */
+function maxBirthDate(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 18);
+  return d.toISOString().slice(0, 10);
+}
 
-  const month = Number(match[1]);
-  const day = Number(match[2]);
-  const year = Number(match[3]);
+function minBirthDate(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 100);
+  return d.toISOString().slice(0, 10);
+}
+
+function parseDateOfBirth(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const [year, month, day] = value.split("-").map(Number);
   const date = new Date(year, month - 1, day);
 
   if (
@@ -49,7 +58,7 @@ function parseDateOfBirth(value: string): string | null {
     return null;
   }
 
-  return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  return value;
 }
 
 function isAtLeast18(isoDate: string): boolean {
@@ -92,10 +101,10 @@ export default function RegisterForm() {
         errors.email = "Enter a valid email";
 
       const parsedDob = parseDateOfBirth(dateOfBirth);
-      if (!dateOfBirth.trim()) errors.dateOfBirth = "Required";
-      else if (!parsedDob) errors.dateOfBirth = "Use mm/dd/yyyy";
+      if (!dateOfBirth) errors.dateOfBirth = "Select your date of birth";
+      else if (!parsedDob) errors.dateOfBirth = "Enter a valid date";
       else if (!isAtLeast18(parsedDob))
-        errors.dateOfBirth = "Must be 18 or older";
+        errors.dateOfBirth = "You must be at least 18 years old";
     }
 
     if (current === 3) {
@@ -230,18 +239,18 @@ export default function RegisterForm() {
             <AuthInput
               id="dateOfBirth"
               label="Date of birth"
-              type="text"
-              placeholder="mm/dd/yyyy"
+              type="date"
               autoComplete="bday"
               icon={<Calendar />}
               value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(formatDobInput(e.target.value))}
-              inputMode="numeric"
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              min={minBirthDate()}
+              max={maxBirthDate()}
               error={fieldErrors.dateOfBirth}
               required
             />
             <p className="text-[12px] text-text-tertiary -mt-2">
-              You must be 18 or older to register.
+              Tap to open the calendar — you must be 18 or older.
             </p>
           </>
         )}

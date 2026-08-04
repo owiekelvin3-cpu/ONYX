@@ -62,6 +62,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
               "focus:outline-none",
               icon ? "pl-2.5 pr-3" : "px-3.5",
               isPassword && "pr-11",
+              type === "date" && "pr-3 [color-scheme:dark] cursor-pointer",
               className
             )}
             {...props}
