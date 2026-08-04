@@ -41,7 +41,6 @@ export const SITE_ROUTES: Record<string, string> = {
   Institutional: "/about",
 
   // Footer — Service
-  Downloads: "/download",
   Fees: "/fees",
   "Trading Rules": "/fees",
   "API Documentation": "/help",
@@ -129,17 +128,6 @@ export const SITE_PAGES: Record<
       "Minimum Withdrawal: $50 USD equivalent.",
       "Trading Rules: All orders are executed at market price for market orders. Limit orders execute when price reaches your specified level.",
       "Market manipulation, wash trading, and abusive order patterns are prohibited and may result in account suspension.",
-    ],
-  },
-  download: {
-    title: "Download the ONYX App",
-    description: "Trade on the go with the ONYX mobile app.",
-    content: [
-      "Take your trading anywhere with the ONYX mobile app for iOS and Android.",
-      "Features: Full spot trading, portfolio management, price alerts, biometric login, and push notifications.",
-      "Download on the App Store or Google Play — search for 'ONYX Exchange'.",
-      "Scan the QR code on our homepage or visit your device's app store to get started.",
-      "Minimum requirements: iOS 14+ or Android 8+.",
     ],
   },
 };

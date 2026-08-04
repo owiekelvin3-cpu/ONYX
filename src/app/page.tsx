@@ -5,7 +5,6 @@ import { TrustBar } from "@/components/landing/TrustBar";
 import { MarketsSection } from "@/components/landing/MarketsSection";
 import { ProductShowcase } from "@/components/landing/ProductShowcase";
 import { GetStarted } from "@/components/landing/GetStarted";
-import { AppDownload } from "@/components/landing/AppDownload";
 import { Footer } from "@/components/landing/Footer";
 
 export default function HomePage() {
@@ -19,7 +18,6 @@ export default function HomePage() {
         <MarketsSection />
         <ProductShowcase />
         <GetStarted />
-        <AppDownload />
       </main>
       <Footer />
     </>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { BRAND, NAV } from "@/lib/constants";
 import { siteRoute } from "@/lib/routes";
 import { Button } from "@/components/ui/Button";
-import { ChevronDown, Globe, Menu, X, Download } from "lucide-react";
+import { ChevronDown, Globe, Menu, X } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Buy Crypto", key: "BuyCrypto" as const },
@@ -69,13 +69,6 @@ export function Header() {
               <Link href="/register">
                 <Button size="sm">Sign Up</Button>
               </Link>
-              <Link
-                href="/download"
-                className="flex items-center gap-1.5 h-8 px-3 text-xs text-text-secondary border border-border rounded hover:border-border-light hover:text-text-primary transition-colors"
-              >
-                <Download className="w-3.5 h-3.5" />
-                App
-              </Link>
             </div>
 
             <div className="flex items-center gap-1.5 ml-auto lg:hidden shrink-0">
@@ -127,9 +120,6 @@ export function Header() {
               ))}
             </nav>
             <div className="p-4 border-t border-border space-y-2">
-              <Link href="/download" onClick={() => setMobileOpen(false)} className="block text-center text-[13px] text-brand py-2">
-                Download App
-              </Link>
               <Link href="/login" onClick={() => setMobileOpen(false)}>
                 <Button variant="outline" className="w-full" size="md">Log In</Button>
               </Link>

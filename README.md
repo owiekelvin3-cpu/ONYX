@@ -6,7 +6,7 @@ Production-ready crypto exchange frontend built with Next.js 16, Tailwind CSS 4,
 
 ## Features
 
-- Landing page with markets, products, and app download
+- Landing page with markets and products
 - Email registration with full KYC profile fields
 - Dashboard: trade, portfolio, deposit, withdraw, AI bots, copy trading
 - Supabase backend with balances, trades, holdings, deposits, withdrawals

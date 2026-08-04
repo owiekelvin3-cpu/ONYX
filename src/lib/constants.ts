@@ -18,7 +18,7 @@ export const NAV = {
 export const FOOTER = {
   About: ["About Us", "Careers", "Press", "Blog", "Community"],
   Products: ["Exchange", "Futures", "Copy Trading", "Earn", "Institutional"],
-  Service: ["Downloads", "Fees", "Trading Rules", "API Documentation"],
+  Service: ["Fees", "Trading Rules", "API Documentation"],
   Support: ["Help Center", "Submit a Request", "Law Enforcement", "Bug Bounty"],
   Legal: ["Terms of Use", "Privacy", "Cookie Preferences"],
 } as const;
