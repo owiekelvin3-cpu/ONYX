@@ -45,9 +45,6 @@ export function Footer() {
           <p className="text-[11px] text-text-tertiary">
             &copy; {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
           </p>
-          <p className="text-[11px] text-text-tertiary max-w-md">
-            Trading digital assets involves substantial risk.
-          </p>
         </div>
       </div>
     </footer>

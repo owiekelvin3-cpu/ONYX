@@ -105,7 +105,7 @@ export function AuthShell({
 
         <footer className="shrink-0 py-4 px-4 safe-area-bottom border-t border-border/40 lg:border-0">
           <p className="text-center text-[11px] text-text-tertiary">
-            &copy; {new Date().getFullYear()} {BRAND.fullName}. Trading involves risk.
+            &copy; {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
           </p>
         </footer>
       </div>

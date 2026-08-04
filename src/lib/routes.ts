@@ -99,7 +99,7 @@ export const SITE_PAGES: Record<
       "By accessing or using Onyx Exchange, you agree to be bound by these Terms of Use.",
       "You must be at least 18 years old and comply with all applicable laws in your jurisdiction to use our services.",
       "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.",
-      "Trading digital assets involves substantial risk of loss. Past performance is not indicative of future results.",
+      "Past performance is not indicative of future results.",
       "ONYX reserves the right to suspend or terminate accounts that violate these terms or engage in fraudulent activity.",
       "We may modify these terms at any time. Continued use of the platform constitutes acceptance of updated terms.",
     ],
