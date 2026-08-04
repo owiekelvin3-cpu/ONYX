@@ -46,11 +46,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
           </p>
           <p className="text-[11px] text-text-tertiary max-w-md">
-            Trading digital assets involves substantial risk.{" "}
-            <Link href="/risk" className="text-brand hover:underline">
-              Read our Risk Warning
-            </Link>
-            .
+            Trading digital assets involves substantial risk.
           </p>
         </div>
       </div>

@@ -20,7 +20,7 @@ export const FOOTER = {
   Products: ["Exchange", "Futures", "Copy Trading", "Earn", "Institutional"],
   Service: ["Downloads", "Fees", "Trading Rules", "API Documentation"],
   Support: ["Help Center", "Submit a Request", "Law Enforcement", "Bug Bounty"],
-  Legal: ["Terms of Use", "Privacy", "Risk Warning", "Cookie Preferences"],
+  Legal: ["Terms of Use", "Privacy", "Cookie Preferences"],
 } as const;
 
 export const PRODUCTS = [

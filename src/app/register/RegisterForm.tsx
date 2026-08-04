@@ -6,11 +6,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
 import { COUNTRIES } from "@/lib/countries";
-import { AuthShell } from "@/components/auth/AuthLayout";
+import { AuthShell, AuthCardHeader } from "@/components/auth/AuthLayout";
 import { AuthInput, AuthSelect } from "@/components/auth/AuthInput";
+import {
+  AuthSteps,
+  PasswordStrength,
+  formatDobInput,
+} from "@/components/auth/AuthSteps";
 import { Button } from "@/components/ui/Button";
 import {
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   Lock,
   Mail,
@@ -18,6 +25,12 @@ import {
   Phone,
   User,
 } from "lucide-react";
+
+const REGISTER_STEPS = [
+  { label: "Account" },
+  { label: "Profile" },
+  { label: "Security" },
+];
 
 function parseDateOfBirth(value: string): string | null {
   const match = value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
@@ -53,6 +66,7 @@ function isAtLeast18(isoDate: string): boolean {
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [step, setStep] = useState(1);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -67,49 +81,49 @@ export default function RegisterForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const strengthScore =
-    password.length === 0
-      ? 0
-      : password.length < 8
-        ? 1
-        : password.length < 12
-          ? 2
-          : 3;
-
-  function validateForm() {
+  function validateStep(current: number) {
     const errors: Record<string, string> = {};
 
-    if (!firstName.trim()) errors.firstName = "First name is required";
-    if (!lastName.trim()) errors.lastName = "Last name is required";
-    if (!email.trim()) errors.email = "Email is required";
+    if (current === 1) {
+      if (!firstName.trim()) errors.firstName = "Required";
+      if (!lastName.trim()) errors.lastName = "Required";
+      if (!email.trim()) errors.email = "Required";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+        errors.email = "Enter a valid email";
 
-    const parsedDob = parseDateOfBirth(dateOfBirth);
-    if (!dateOfBirth.trim()) {
-      errors.dateOfBirth = "Date of birth is required";
-    } else if (!parsedDob) {
-      errors.dateOfBirth = "Use mm/dd/yyyy format";
-    } else if (!isAtLeast18(parsedDob)) {
-      errors.dateOfBirth = "You must be at least 18 years old";
+      const parsedDob = parseDateOfBirth(dateOfBirth);
+      if (!dateOfBirth.trim()) errors.dateOfBirth = "Required";
+      else if (!parsedDob) errors.dateOfBirth = "Use mm/dd/yyyy";
+      else if (!isAtLeast18(parsedDob))
+        errors.dateOfBirth = "Must be 18 or older";
     }
 
-    if (password.length < 8) {
-      errors.password = "Password must be at least 8 characters";
-    }
-    if (password !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
+    if (current === 3) {
+      if (password.length < 8) errors.password = "Min. 8 characters";
+      if (password !== confirmPassword) errors.confirmPassword = "Passwords must match";
     }
 
     setFieldErrors(errors);
-    return { valid: Object.keys(errors).length === 0, parsedDob };
+    return Object.keys(errors).length === 0;
+  }
+
+  function handleNext() {
+    if (validateStep(step)) setStep((s) => Math.min(s + 1, 3));
+  }
+
+  function handleBack() {
+    setFieldErrors({});
+    setStep((s) => Math.max(s - 1, 1));
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!validateStep(3)) return;
+
+    const parsedDob = parseDateOfBirth(dateOfBirth);
+    if (!parsedDob) return;
+
     setError("");
-
-    const { valid, parsedDob } = validateForm();
-    if (!valid || !parsedDob) return;
-
     setLoading(true);
 
     const supabase = createClient();
@@ -155,197 +169,213 @@ export default function RegisterForm() {
   }
 
   return (
-    <AuthShell wide>
-      <h1 className="text-[28px] sm:text-[32px] font-bold text-text-primary tracking-tight mb-2">
-        Create Account
-      </h1>
-      <p className="text-[14px] text-text-tertiary mb-8">
-        Start trading on {BRAND.fullName}
-      </p>
+    <AuthShell
+      wide
+      panelTitle="Join 12M+ traders"
+      panelSubtitle="Open your account in minutes. Trade crypto, stocks, and forex with deep liquidity and low fees."
+    >
+      <AuthCardHeader
+        title="Create account"
+        subtitle={`Start trading on ${BRAND.fullName}`}
+        alternate={{
+          prompt: "Already have an account?",
+          href: "/login",
+          label: "Sign in",
+        }}
+      />
+
+      <AuthSteps steps={REGISTER_STEPS} current={step} />
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <AuthInput
-            id="firstName"
-            label="First name"
-            type="text"
-            placeholder="John"
-            autoComplete="given-name"
-            icon={<User />}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            error={fieldErrors.firstName}
-            required
-          />
-          <AuthInput
-            id="lastName"
-            label="Last name"
-            type="text"
-            placeholder="Doe"
-            autoComplete="family-name"
-            icon={<User />}
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            error={fieldErrors.lastName}
-            required
-          />
-        </div>
-
-        <AuthInput
-          id="email"
-          label="Email"
-          type="email"
-          placeholder="you@example.com"
-          autoComplete="email"
-          icon={<Mail />}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={fieldErrors.email}
-          required
-        />
-
-        <AuthInput
-          id="dateOfBirth"
-          label="Date of birth"
-          type="text"
-          placeholder="mm/dd/yyyy"
-          autoComplete="bday"
-          icon={<Calendar />}
-          value={dateOfBirth}
-          onChange={(e) => setDateOfBirth(e.target.value)}
-          inputMode="numeric"
-          error={fieldErrors.dateOfBirth}
-          required
-        />
-
-        <AuthInput
-          id="phone"
-          label="Phone"
-          type="tel"
-          placeholder="+1 234 567 8900"
-          autoComplete="tel"
-          icon={<Phone />}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-
-        <AuthSelect
-          id="country"
-          label="Country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-        >
-          {COUNTRIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </AuthSelect>
-
-        <AuthInput
-          id="address"
-          label="Address"
-          type="text"
-          placeholder="123 Main Street"
-          autoComplete="street-address"
-          icon={<MapPin />}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-
-        <div>
-          <AuthInput
-            id="password"
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-            icon={<Lock />}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={fieldErrors.password}
-            required
-          />
-          {strengthScore > 0 && (
-            <div className="flex gap-1.5 mt-2.5">
-              {[1, 2, 3].map((level) => (
-                <div
-                  key={level}
-                  className={`h-[3px] flex-1 rounded-full transition-all duration-300 ${
-                    strengthScore >= level
-                      ? strengthScore === 1
-                        ? "bg-red"
-                        : strengthScore === 2
-                          ? "bg-brand"
-                          : "bg-green"
-                      : "bg-border"
-                  }`}
-                />
-              ))}
+        {step === 1 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <AuthInput
+                id="firstName"
+                label="First name"
+                type="text"
+                placeholder="John"
+                autoComplete="given-name"
+                icon={<User />}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                error={fieldErrors.firstName}
+                required
+              />
+              <AuthInput
+                id="lastName"
+                label="Last name"
+                type="text"
+                placeholder="Doe"
+                autoComplete="family-name"
+                icon={<User />}
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                error={fieldErrors.lastName}
+                required
+              />
             </div>
-          )}
-        </div>
+            <AuthInput
+              id="email"
+              label="Email"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              icon={<Mail />}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors.email}
+              required
+            />
+            <AuthInput
+              id="dateOfBirth"
+              label="Date of birth"
+              type="text"
+              placeholder="mm/dd/yyyy"
+              autoComplete="bday"
+              icon={<Calendar />}
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(formatDobInput(e.target.value))}
+              inputMode="numeric"
+              error={fieldErrors.dateOfBirth}
+              required
+            />
+            <p className="text-[12px] text-text-tertiary -mt-2">
+              You must be 18 or older to register.
+            </p>
+          </>
+        )}
 
-        <AuthInput
-          id="confirmPassword"
-          label="Confirm password"
-          type="password"
-          placeholder="••••••••"
-          autoComplete="new-password"
-          icon={<Lock />}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          error={fieldErrors.confirmPassword}
-          required
-        />
+        {step === 2 && (
+          <>
+            <p className="text-[13px] text-text-secondary -mt-2 mb-1">
+              Optional — helps us personalize your experience and comply with regulations.
+            </p>
+            <AuthInput
+              id="phone"
+              label="Phone"
+              type="tel"
+              placeholder="+1 234 567 8900"
+              autoComplete="tel"
+              icon={<Phone />}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <AuthSelect
+              id="country"
+              label="Country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </AuthSelect>
+            <AuthInput
+              id="address"
+              label="Address"
+              type="text"
+              placeholder="123 Main Street"
+              autoComplete="street-address"
+              icon={<MapPin />}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <AuthInput
+              id="password"
+              label="Password"
+              type="password"
+              placeholder="Create a strong password"
+              autoComplete="new-password"
+              icon={<Lock />}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={fieldErrors.password}
+              required
+            />
+            <PasswordStrength password={password} />
+            <AuthInput
+              id="confirmPassword"
+              label="Confirm password"
+              type="password"
+              placeholder="Re-enter your password"
+              autoComplete="new-password"
+              icon={<Lock />}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={fieldErrors.confirmPassword}
+              required
+            />
+            <p className="text-[12px] text-text-tertiary leading-relaxed">
+              By creating an account, I agree to the{" "}
+              <Link href="/terms" className="text-brand hover:underline">
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-brand hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </>
+        )}
 
         {error && (
           <div
             role="alert"
-            className="text-[13px] text-red bg-red/[0.08] border border-red/30 rounded-md px-4 py-3"
+            className="text-[13px] text-red bg-red/[0.08] border border-red/30 rounded-lg px-4 py-3"
           >
             {error}
           </div>
         )}
 
-        <Button
-          type="submit"
-          className="w-full !h-[48px] !text-[15px] !font-semibold !rounded-md mt-1"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Creating account...
-            </span>
-          ) : (
-            "Create Account"
+        <div className="flex gap-3 pt-2">
+          {step > 1 && (
+            <Button
+              type="button"
+              variant="outline"
+              className="!h-[50px] flex-1 !rounded-lg"
+              onClick={handleBack}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back
+            </Button>
           )}
-        </Button>
 
-        <p className="text-[12px] text-text-tertiary text-center leading-relaxed pt-1">
-          By registering, I agree to the{" "}
-          <Link href="/terms" className="text-brand hover:underline">
-            Terms
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="text-brand hover:underline">
-            Privacy Policy
-          </Link>
-        </p>
+          {step < 3 ? (
+            <Button
+              type="button"
+              className="!h-[50px] flex-1 !rounded-lg !text-[15px]"
+              onClick={handleNext}
+            >
+              Continue
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className="!h-[50px] flex-1 !rounded-lg !text-[15px] !font-semibold"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Creating account...
+                </span>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+          )}
+        </div>
       </form>
-
-      <div className="mt-8 pt-8 border-t border-border">
-        <p className="text-center text-[14px] text-text-tertiary">
-          Already registered?{" "}
-          <Link
-            href="/login"
-            className="text-brand font-semibold hover:text-brand-hover transition-colors"
-          >
-            Log in
-          </Link>
-        </p>
-      </div>
     </AuthShell>
   );
 }

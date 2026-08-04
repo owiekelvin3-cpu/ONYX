@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { forwardRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ChevronDown } from "lucide-react";
 
 interface AuthInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -134,7 +134,7 @@ export const AuthSelect = forwardRef<HTMLSelectElement, AuthSelectProps>(
               props.onBlur?.(e);
             }}
             className={cn(
-              "flex-1 min-w-0 h-[48px] bg-transparent text-[15px] text-text-primary px-3.5",
+              "flex-1 min-w-0 h-[48px] bg-transparent text-[15px] text-text-primary pl-3.5 pr-10",
               "focus:outline-none appearance-none cursor-pointer",
               className
             )}
@@ -142,6 +142,7 @@ export const AuthSelect = forwardRef<HTMLSelectElement, AuthSelectProps>(
           >
             {children}
           </select>
+          <ChevronDown className="absolute right-3.5 w-4 h-4 text-text-tertiary pointer-events-none" />
         </div>
         {error && <p className="text-[12px] text-red pt-0.5">{error}</p>}
       </div>

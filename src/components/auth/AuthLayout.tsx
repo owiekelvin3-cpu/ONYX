@@ -1,6 +1,117 @@
 import Link from "next/link";
-import { BRAND } from "@/lib/constants";
-import { Globe, HelpCircle } from "lucide-react";
+import { BRAND, TRUST_ITEMS } from "@/lib/constants";
+import { ArrowLeft, HelpCircle, Shield, Zap } from "lucide-react";
+
+const FEATURES = [
+  { icon: Shield, text: "Bank-grade security & cold storage" },
+  { icon: Zap, text: "Instant access to 500+ markets" },
+];
+
+export function AuthShell({
+  children,
+  wide = false,
+  panelTitle,
+  panelSubtitle,
+}: {
+  children: React.ReactNode;
+  wide?: boolean;
+  panelTitle?: string;
+  panelSubtitle?: string;
+}) {
+  return (
+    <div className="min-h-dvh bg-bg-primary auth-page flex flex-col lg:flex-row">
+      {/* Brand panel — desktop */}
+      <aside className="hidden lg:flex lg:w-[44%] xl:w-[42%] flex-col border-r border-border bg-bg-secondary/40">
+        <div className="flex items-center justify-between h-16 px-8 border-b border-border/60">
+          <Link href="/" className="flex items-center gap-2.5">
+            <AuthLogo size={28} />
+            <span className="text-base font-bold text-text-primary">{BRAND.name}</span>
+          </Link>
+          <Link
+            href="/help"
+            className="flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-text-primary transition-colors"
+          >
+            <HelpCircle className="w-4 h-4" />
+            Help
+          </Link>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center px-8 xl:px-12 py-10">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-brand transition-colors mb-8 w-fit"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to home
+          </Link>
+
+          <h2 className="text-[32px] xl:text-[36px] font-bold text-text-primary leading-tight tracking-tight">
+            {panelTitle ?? BRAND.tagline}
+          </h2>
+          <p className="text-[15px] text-text-secondary mt-3 leading-relaxed max-w-md">
+            {panelSubtitle ?? BRAND.description}
+          </p>
+
+          <ul className="mt-8 space-y-3">
+            {FEATURES.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-[14px] text-text-secondary">
+                <span className="w-8 h-8 rounded-md bg-brand/10 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-brand" />
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 grid grid-cols-2 gap-3">
+            {TRUST_ITEMS.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-lg border border-border bg-bg-primary/60 px-4 py-3"
+              >
+                <p className="text-lg font-bold text-text-primary">{item.value}</p>
+                <p className="text-[11px] text-text-tertiary mt-0.5">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      {/* Form panel */}
+      <div className="flex-1 flex flex-col min-h-dvh min-w-0">
+        <header className="lg:hidden shrink-0 border-b border-border/60 safe-area-top">
+          <div className="flex items-center justify-between h-14 px-4">
+            <Link href="/" className="flex items-center gap-2">
+              <AuthLogo size={26} />
+              <span className="font-bold text-text-primary">{BRAND.name}</span>
+            </Link>
+            <Link href="/help" className="p-2 text-text-tertiary">
+              <HelpCircle className="w-5 h-5" />
+            </Link>
+          </div>
+        </header>
+
+        <main className="flex-1 flex items-start lg:items-center justify-center px-4 py-8 sm:py-10 lg:py-12 overflow-y-auto">
+          <div
+            className={
+              wide
+                ? "w-full max-w-[520px] auth-form-card"
+                : "w-full max-w-[420px] auth-form-card"
+            }
+          >
+            {children}
+          </div>
+        </main>
+
+        <footer className="shrink-0 py-4 px-4 safe-area-bottom border-t border-border/40 lg:border-0">
+          <p className="text-center text-[11px] text-text-tertiary">
+            &copy; {new Date().getFullYear()} {BRAND.fullName}. Trading involves risk.
+          </p>
+        </footer>
+      </div>
+    </div>
+  );
+}
 
 export function AuthLogo({ size = 28 }: { size?: number }) {
   return (
@@ -11,57 +122,30 @@ export function AuthLogo({ size = 28 }: { size?: number }) {
   );
 }
 
-export function AuthShell({
-  children,
-  wide = false,
+export function AuthCardHeader({
+  title,
+  subtitle,
+  alternate,
 }: {
-  children: React.ReactNode;
-  wide?: boolean;
+  title: string;
+  subtitle: string;
+  alternate: { prompt: string; href: string; label: string };
 }) {
   return (
-    <div className="min-h-dvh bg-bg-primary auth-page flex flex-col">
-      <header className="shrink-0 border-b border-border/60 safe-area-top">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <AuthLogo size={30} />
-            <span className="text-[17px] font-bold text-text-primary tracking-tight">
-              {BRAND.name}
-            </span>
-          </Link>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Link
-              href="/help"
-              className="flex items-center gap-1.5 h-9 px-2.5 sm:px-3 text-[13px] text-text-secondary hover:text-text-primary rounded-md hover:bg-bg-hover transition-colors"
-            >
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:inline">English</span>
-            </Link>
-            <Link
-              href="/help"
-              className="flex items-center gap-1.5 h-9 px-2.5 sm:px-3 text-[13px] text-text-secondary hover:text-text-primary rounded-md hover:bg-bg-hover transition-colors"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Help</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12">
-        <div className={wide ? "w-full max-w-[520px]" : "w-full max-w-[400px]"}>
-          {children}
-        </div>
-      </main>
-
-      <footer className="shrink-0 py-5 px-4 safe-area-bottom">
-        <p className="text-center text-[11px] text-text-tertiary leading-relaxed max-w-sm mx-auto">
-          &copy; {new Date().getFullYear()} {BRAND.fullName}.{" "}
-          <Link href="/risk" className="text-brand hover:underline">
-            Trading involves risk
-          </Link>
-          .
-        </p>
-      </footer>
+    <div className="mb-6 sm:mb-8">
+      <h1 className="text-[26px] sm:text-[30px] font-bold text-text-primary tracking-tight">
+        {title}
+      </h1>
+      <p className="text-[14px] text-text-tertiary mt-2">{subtitle}</p>
+      <p className="text-[14px] text-text-tertiary mt-4 pt-4 border-t border-border">
+        {alternate.prompt}{" "}
+        <Link
+          href={alternate.href}
+          className="text-brand font-semibold hover:text-brand-hover transition-colors"
+        >
+          {alternate.label}
+        </Link>
+      </p>
     </div>
   );
 }

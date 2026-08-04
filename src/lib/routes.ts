@@ -57,7 +57,6 @@ export const SITE_ROUTES: Record<string, string> = {
   Terms: "/terms",
   Privacy: "/privacy",
   "Privacy Policy": "/privacy",
-  "Risk Warning": "/risk",
   "Cookie Preferences": "/privacy",
 };
 
@@ -130,18 +129,6 @@ export const SITE_PAGES: Record<
       "Minimum Withdrawal: $50 USD equivalent.",
       "Trading Rules: All orders are executed at market price for market orders. Limit orders execute when price reaches your specified level.",
       "Market manipulation, wash trading, and abusive order patterns are prohibited and may result in account suspension.",
-    ],
-  },
-  risk: {
-    title: "Risk Warning",
-    description: "Important risk disclosure for digital asset trading.",
-    content: [
-      "Trading digital assets and derivatives involves significant risk and may result in the loss of your entire investment.",
-      "Digital asset prices are highly volatile and can fluctuate dramatically in short periods.",
-      "Leveraged trading amplifies both gains and losses. You may lose more than your initial deposit.",
-      "Past performance is not a reliable indicator of future results.",
-      "You should only trade with funds you can afford to lose.",
-      "ONYX does not provide financial advice. Consider seeking independent advice before trading.",
     ],
   },
   download: {
