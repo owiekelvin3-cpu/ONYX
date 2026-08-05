@@ -1,9 +1,9 @@
 export const BRAND = {
   name: "ONYX",
   fullName: "Onyx Exchange",
-  tagline: "Trade crypto, stocks & forex in one place",
+  tagline: "Markets move fast. Your exchange shouldn't slow you down.",
   description:
-    "A multi-asset exchange with clear fees, live charts, and the tools you need to buy, sell, and manage a portfolio.",
+    "Trade crypto, stocks, and forex from one dashboard — live prices, clear fees, no clutter.",
   domain: "onyx.exchange",
 } as const;
 
@@ -26,26 +26,26 @@ export const FOOTER = {
 export const PRODUCTS = [
   {
     title: "Spot Trading",
-    desc: "500+ trading pairs with industry-leading liquidity. Maker fees from 0.1%.",
-    cta: "Trade Now",
+    desc: "Market and limit orders with a book that updates in real time. 0.10% fees, shown upfront.",
+    cta: "Open trade desk",
     href: "/dashboard/trade",
   },
   {
-    title: "Futures & Derivatives",
-    desc: "Up to 125x leverage on crypto futures. Perpetual and quarterly contracts.",
-    cta: "Explore Futures",
+    title: "Futures",
+    desc: "Perpetuals and contracts when you want more than spot — with the same clean interface.",
+    cta: "View futures",
     href: "/dashboard/trade",
   },
   {
     title: "Copy Trading",
-    desc: "Follow elite traders. Mirror strategies automatically with full transparency.",
-    cta: "Start Copying",
+    desc: "Pick a trader, set how much to allocate, and mirror their moves. Pause or stop anytime.",
+    cta: "Browse traders",
     href: "/dashboard/copy-trading",
   },
   {
-    title: "AI Trading Bots",
-    desc: "Automated strategies powered by quantitative models. Set and forget.",
-    cta: "View Bots",
+    title: "AI Bots",
+    desc: "Define your rules once and let automation handle the repetitive entries and exits.",
+    cta: "See strategies",
     href: "/dashboard/ai-trading",
   },
 ] as const;
@@ -70,7 +70,7 @@ export const PLATFORM_HIGHLIGHTS = [
 ] as const;
 
 export const STEPS = [
-  { step: "01", title: "Create Account", desc: "Sign up with email in under 60 seconds." },
-  { step: "02", title: "Verify Identity", desc: "Complete KYC to unlock full platform access." },
-  { step: "03", title: "Fund & Trade", desc: "Deposit via crypto, card, or bank transfer." },
+  { step: "01", title: "Sign up", desc: "Email, password, done — no lengthy forms." },
+  { step: "02", title: "Verify", desc: "Quick KYC so withdrawals stay secure." },
+  { step: "03", title: "Fund & trade", desc: "Deposit crypto and place your first order." },
 ] as const;

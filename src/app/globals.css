@@ -119,6 +119,135 @@ body {
   animation-play-state: paused;
 }
 
+/* Landing page atmosphere */
+.landing-hero-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 20%, rgba(240, 185, 11, 0.09), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 60%, rgba(14, 203, 129, 0.06), transparent 50%);
+}
+
+.landing-hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(240, 185, 11, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 185, 11, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
+  animation: landing-grid-drift 28s linear infinite;
+}
+
+@keyframes landing-grid-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(56px, 56px);
+  }
+}
+
+.landing-pulse-ring {
+  animation: landing-pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes landing-pulse-ring {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.landing-terminal-float {
+  animation: landing-terminal-float 6s ease-in-out infinite;
+}
+
+@keyframes landing-terminal-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.landing-chart-scan {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(14, 203, 129, 0.06) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: landing-chart-scan 4s ease-in-out infinite;
+}
+
+@keyframes landing-chart-scan {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.landing-step-line {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--border) 10%,
+    var(--brand) 50%,
+    var(--border) 90%,
+    transparent
+  );
+  background-size: 100% 200%;
+  animation: landing-step-flow 3s ease-in-out infinite;
+}
+
+@keyframes landing-step-flow {
+  0%,
+  100% {
+    background-position: 0 0%;
+  }
+  50% {
+    background-position: 0 100%;
+  }
+}
+
+.landing-check-item {
+  animation: landing-fade-up 0.5s ease both;
+}
+
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-grid,
+  .landing-terminal-float,
+  .landing-chart-scan,
+  .landing-step-line,
+  .landing-pulse-ring,
+  .marquee-track,
+  .landing-check-item {
+    animation: none !important;
+  }
+}
+
 .market-row {
   transition: background 0.15s;
 }
