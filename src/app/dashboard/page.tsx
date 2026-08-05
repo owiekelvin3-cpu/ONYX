@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getRecentTrades, getUsdBalance, tradeNotional } from "@/lib/api/trading";
+import {
+  getRecentTrades,
+  getUsdBalance,
+  getPendingTradesCount,
+  get24hProfit,
+  tradeNotional,
+} from "@/lib/api/trading";
+import { getCachedLiveMarketPairs } from "@/lib/live-prices";
+import { chartFromTrades } from "@/lib/chart-data";
 import { Card } from "@/components/ui/Card";
 import { PortfolioChart } from "@/components/dashboard/PortfolioChartLoader";
 import { MarketTable } from "@/components/dashboard/MarketTable";
@@ -13,55 +21,23 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let balance = 0;
-  let recentTrades: Awaited<ReturnType<typeof getRecentTrades>> = [];
-  let totalTrades = 0;
+  const [balance, recentTrades, openOrders, pnl24h, marketPairs, tradesCount] =
+    await Promise.all([
+      user ? getUsdBalance(supabase, user.id) : Promise.resolve(0),
+      user ? getRecentTrades(supabase, user.id, 5) : Promise.resolve([]),
+      user ? getPendingTradesCount(supabase, user.id) : Promise.resolve(0),
+      user ? get24hProfit(supabase, user.id) : Promise.resolve(null),
+      getCachedLiveMarketPairs(),
+      user
+        ? supabase
+            .from("trades")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .then(({ count }) => count ?? 0)
+        : Promise.resolve(0),
+    ]);
 
-  if (user) {
-    balance = await getUsdBalance(supabase, user.id);
-    recentTrades = await getRecentTrades(supabase, user.id, 5);
-
-    const { count } = await supabase
-      .from("trades")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
-    totalTrades = count ?? recentTrades.length;
-  } else {
-    balance = 24891.5;
-    totalTrades = 3;
-    recentTrades = [
-      {
-        id: "1",
-        user_id: "",
-        asset: "BTC/USDT",
-        type: "buy",
-        amount: 0.05,
-        price: 97234.5,
-        status: "completed",
-        created_at: "",
-      },
-      {
-        id: "2",
-        user_id: "",
-        asset: "ETH/USDT",
-        type: "sell",
-        amount: 0.35,
-        price: 3456.78,
-        status: "completed",
-        created_at: "",
-      },
-      {
-        id: "3",
-        user_id: "",
-        asset: "SOL/USDT",
-        type: "buy",
-        amount: 4,
-        price: 187.42,
-        status: "completed",
-        created_at: "",
-      },
-    ];
-  }
+  const chartData = chartFromTrades(balance, recentTrades);
 
   return (
     <div className="space-y-5">
@@ -86,11 +62,16 @@ export default async function DashboardPage() {
           { label: "Total Balance", value: formatCurrency(balance) },
           {
             label: "24h P&L",
-            value: formatCurrency(user ? balance * 0.024 : balance * 0.0127),
-            color: "text-green",
+            value: pnl24h === null ? "—" : formatCurrency(pnl24h),
+            color:
+              pnl24h === null
+                ? undefined
+                : pnl24h >= 0
+                  ? "text-green"
+                  : "text-red",
           },
-          { label: "Open Orders", value: user ? "0" : "3" },
-          { label: "Total Trades", value: totalTrades.toString() },
+          { label: "Open Orders", value: openOrders.toString() },
+          { label: "Total Trades", value: tradesCount.toString() },
         ].map((stat) => (
           <Card key={stat.label} className="!p-4">
             <p className="text-[11px] text-text-tertiary">{stat.label}</p>
@@ -105,7 +86,7 @@ export default async function DashboardPage() {
 
       <div className="grid lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
-          <PortfolioChart balance={balance || 24891.5} />
+          <PortfolioChart balance={balance} chartData={chartData} />
         </Card>
         <Card>
           <h3 className="text-[13px] font-semibold text-text-primary mb-3">
@@ -131,7 +112,12 @@ export default async function DashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-[13px] text-text-tertiary">No trades yet.</p>
+            <p className="text-[13px] text-text-tertiary">
+              No trades yet.{" "}
+              <Link href="/dashboard/trade" className="text-brand hover:underline">
+                Place your first order
+              </Link>
+            </p>
           )}
         </Card>
       </div>
@@ -148,7 +134,7 @@ export default async function DashboardPage() {
             View all
           </Link>
         </div>
-        <MarketTable limit={6} />
+        <MarketTable pairs={marketPairs} limit={6} />
       </Card>
     </div>
   );

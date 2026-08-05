@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
-import { MARKET_PAIRS } from "@/lib/market-data";
+import { MARKET_PAIRS, type MarketPair } from "@/lib/market-data";
 import { formatNumber, formatPercent } from "@/lib/utils";
 import { HeroEnter } from "@/components/landing/motion";
 
@@ -21,11 +21,11 @@ const ORDER_ROWS = [
   { price: "97,230", qty: "0.567", side: "buy" as const },
 ];
 
-export function Hero() {
+export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
   const [email, setEmail] = useState("");
   const reduce = useReducedMotion();
-  const featured = MARKET_PAIRS.slice(0, 5);
-  const btc = MARKET_PAIRS.find((p) => p.symbol === "BTC/USDT") ?? featured[0];
+  const featured = pairs.slice(0, 5);
+  const btc = pairs.find((p) => p.symbol === "BTC/USDT") ?? featured[0];
 
   return (
     <section className="relative overflow-hidden bg-bg-primary">

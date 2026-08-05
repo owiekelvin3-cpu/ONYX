@@ -6,16 +6,19 @@ import { MarketsSection } from "@/components/landing/MarketsSection";
 import { ProductShowcase } from "@/components/landing/ProductShowcase";
 import { GetStarted } from "@/components/landing/GetStarted";
 import { Footer } from "@/components/landing/Footer";
+import { getCachedLiveMarketPairs } from "@/lib/live-prices";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const pairs = await getCachedLiveMarketPairs();
+
   return (
     <>
       <Header />
       <main>
-        <Hero />
-        <MarketTicker />
+        <Hero pairs={pairs} />
+        <MarketTicker pairs={pairs} />
         <TrustBar />
-        <MarketsSection />
+        <MarketsSection pairs={pairs} />
         <ProductShowcase />
         <GetStarted />
       </main>

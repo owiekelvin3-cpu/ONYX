@@ -1,6 +1,7 @@
 "use client";
 
-import { generateChartData } from "@/lib/market-data";
+import type { ChartPoint } from "@/lib/chart-data";
+import { buildPortfolioChartData } from "@/lib/chart-data";
 import { formatCurrency } from "@/lib/utils";
 import {
   AreaChart,
@@ -11,8 +12,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export function PortfolioChart({ balance }: { balance: number }) {
-  const data = generateChartData(30);
+export function PortfolioChart({
+  balance,
+  chartData,
+}: {
+  balance: number;
+  chartData?: ChartPoint[];
+}) {
+  const data = chartData ?? buildPortfolioChartData(balance);
 
   return (
     <div>

@@ -40,11 +40,11 @@ function MarketCard({ pair, rank }: { pair: MarketPair; rank: number }) {
   );
 }
 
-export function MarketsSection() {
+export function MarketsSection({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Hot");
   const reduce = useReducedMotion();
 
-  const sorted = [...MARKET_PAIRS].sort((a, b) => {
+  const sorted = [...pairs].sort((a, b) => {
     if (tab === "Gainers") return b.change24h - a.change24h;
     if (tab === "Losers") return a.change24h - b.change24h;
     return b.volume24h - a.volume24h;

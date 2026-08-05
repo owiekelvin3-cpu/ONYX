@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getHoldings, getUsdBalance } from "@/lib/api/trading";
+import { getHoldings, getUsdBalance, getRecentTrades } from "@/lib/api/trading";
 import { priceForAsset } from "@/lib/market-prices";
+import { chartFromTrades } from "@/lib/chart-data";
 import { Card } from "@/components/ui/Card";
 import { PortfolioChart } from "@/components/dashboard/PortfolioChartLoader";
 import { formatCurrency } from "@/lib/utils";
-
-const DEMO_HOLDINGS = [
-  { asset: "BTC", quantity: 0.52, price: 94200 },
-  { asset: "ETH", quantity: 4.2, price: 3280 },
-  { asset: "SOL", quantity: 38, price: 175 },
-];
 
 export default async function PortfolioPage() {
   const supabase = await createClient();
@@ -18,30 +13,31 @@ export default async function PortfolioPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let balance = 24891.5;
-  let holdings = DEMO_HOLDINGS.map((h) => ({
-    asset: h.asset,
-    quantity: h.quantity,
-    price: h.price,
-    value: h.quantity * h.price,
-  }));
+  let balance = 0;
+  let holdings: { asset: string; quantity: number; price: number; value: number }[] = [];
+  let chartData = chartFromTrades(0, []);
 
   if (user) {
     balance = await getUsdBalance(supabase, user.id);
-    const rows = await getHoldings(supabase, user.id);
+    const [rows, trades] = await Promise.all([
+      getHoldings(supabase, user.id),
+      getRecentTrades(supabase, user.id, 50),
+    ]);
+
+    chartData = chartFromTrades(balance, trades);
 
     if (rows.length > 0) {
-      holdings = rows.map((h) => {
-        const price = priceForAsset(h.asset);
-        return {
-          asset: h.asset,
-          quantity: h.quantity,
-          price,
-          value: h.quantity * price,
-        };
-      });
-    } else if (balance === 0) {
-      holdings = [];
+      holdings = await Promise.all(
+        rows.map(async (h) => {
+          const price = await priceForAsset(h.asset);
+          return {
+            asset: h.asset,
+            quantity: h.quantity,
+            price,
+            value: h.quantity * price,
+          };
+        })
+      );
     }
   }
 
@@ -50,7 +46,7 @@ export default async function PortfolioPage() {
       <h1 className="text-lg font-bold text-text-primary">Portfolio</h1>
 
       <Card>
-        <PortfolioChart balance={balance || 24891.5} />
+        <PortfolioChart balance={balance} chartData={chartData} />
       </Card>
 
       <Card>

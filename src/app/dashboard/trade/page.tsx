@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { executeTrade, getUsdBalance } from "@/lib/api/trading";
-import { MARKET_PAIRS } from "@/lib/market-data";
+import { useLivePrices } from "@/hooks/useLivePrices";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -14,7 +14,8 @@ import { Loader2 } from "lucide-react";
 
 export default function TradePage() {
   const router = useRouter();
-  const [selectedPair, setSelectedPair] = useState(MARKET_PAIRS[0]);
+  const { pairs, loading: pricesLoading } = useLivePrices();
+  const [selectedPair, setSelectedPair] = useState(pairs[0]);
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const [orderType, setOrderType] = useState<"market" | "limit">("market");
@@ -34,6 +35,14 @@ export default function TradePage() {
       setBalance(bal);
     });
   }, []);
+
+  useEffect(() => {
+    if (pairs.length === 0) return;
+    setSelectedPair((prev) => {
+      const match = pairs.find((p) => p.symbol === prev?.symbol);
+      return match ?? pairs[0];
+    });
+  }, [pairs]);
 
   const qty = amount ? parseFloat(amount) : 0;
   const total = qty * selectedPair.price;
@@ -198,7 +207,7 @@ export default function TradePage() {
 
         {showPairs && (
           <Card className="!p-0 mt-2 max-h-48 overflow-y-auto">
-            {MARKET_PAIRS.map((pair) => (
+            {pairs.map((pair) => (
               <button
                 key={pair.symbol}
                 type="button"
@@ -266,7 +275,7 @@ export default function TradePage() {
           <div className="hidden sm:block max-h-40 lg:max-h-48 overflow-y-auto border-t border-border">
             <table className="w-full">
               <tbody>
-                {MARKET_PAIRS.map((pair) => (
+                {pairs.map((pair) => (
                   <tr
                     key={pair.symbol}
                     onClick={() => setSelectedPair(pair)}

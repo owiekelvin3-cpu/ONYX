@@ -47,7 +47,7 @@ export default function WithdrawPage() {
           const eligibility = await getWithdrawalEligibility(supabase);
           setCanWithdraw(eligibility.can_withdraw);
         } catch {
-          setCanWithdraw(true);
+          setCanWithdraw(false);
         }
 
         const rows = await getUserWithdrawals(supabase, user.id);

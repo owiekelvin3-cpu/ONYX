@@ -73,6 +73,9 @@ export default function CopyTradingPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-lg font-bold text-text-primary">Copy Trading</h1>
+      <p className="text-xs text-text-tertiary -mt-2">
+        Past performance is not indicative of future results. Allocations can be paused or stopped anytime.
+      </p>
 
       {error && (
         <p role="alert" className="text-[13px] text-red bg-red/10 border border-red/30 rounded px-3 py-2">

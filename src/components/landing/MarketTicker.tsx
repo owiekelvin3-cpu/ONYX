@@ -1,10 +1,12 @@
 "use client";
 
-import { TICKER_PAIRS } from "@/lib/market-data";
+import type { MarketPair } from "@/lib/market-data";
+import { MARKET_PAIRS } from "@/lib/market-data";
 import { formatNumber, formatPercent } from "@/lib/utils";
 
-export function MarketTicker() {
-  const items = [...TICKER_PAIRS, ...TICKER_PAIRS];
+export function MarketTicker({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
+  const ticker = pairs.slice(0, 8);
+  const items = [...ticker, ...ticker];
 
   return (
     <div className="relative bg-bg-secondary border-y border-border overflow-hidden">

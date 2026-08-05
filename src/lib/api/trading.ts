@@ -30,6 +30,37 @@ export async function getRecentTrades(
   return (data ?? []) as TradeRow[];
 }
 
+export async function getPendingTradesCount(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("trades")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("status", "pending");
+
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+}
+
+export async function get24hProfit(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<number | null> {
+  const since = new Date(Date.now() - 86400000).toISOString();
+  const { data, error } = await supabase
+    .from("trades")
+    .select("profit")
+    .eq("user_id", userId)
+    .gte("created_at", since);
+
+  if (error) throw new Error(error.message);
+  if (!data?.length) return null;
+
+  return data.reduce((sum, row) => sum + (row.profit ?? 0), 0);
+}
+
 export async function getHoldings(
   supabase: SupabaseClient,
   userId: string

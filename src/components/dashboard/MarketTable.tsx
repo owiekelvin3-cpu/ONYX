@@ -1,9 +1,16 @@
 import Link from "next/link";
+import type { MarketPair } from "@/lib/market-data";
 import { MARKET_PAIRS } from "@/lib/market-data";
 import { formatCompact, formatNumber, formatPercent } from "@/lib/utils";
 
-export function MarketTable({ limit }: { limit?: number }) {
-  const pairs = limit ? MARKET_PAIRS.slice(0, limit) : MARKET_PAIRS;
+export function MarketTable({
+  pairs = MARKET_PAIRS,
+  limit,
+}: {
+  pairs?: MarketPair[];
+  limit?: number;
+}) {
+  const rows = limit ? pairs.slice(0, limit) : pairs;
 
   return (
     <div className="overflow-x-auto">
@@ -17,7 +24,7 @@ export function MarketTable({ limit }: { limit?: number }) {
           </tr>
         </thead>
         <tbody>
-          {pairs.map((pair) => (
+          {rows.map((pair) => (
             <tr key={pair.symbol} className="market-row">
               <td className="py-2.5">
                 <Link href="/dashboard/trade" className="text-[13px] font-medium text-text-primary hover:text-brand">
@@ -25,13 +32,13 @@ export function MarketTable({ limit }: { limit?: number }) {
                 </Link>
               </td>
               <td className="py-2.5 text-right">
-                <Link href="/dashboard/trade" className="font-mono text-[13px] text-text-primary hover:text-brand">
+                <Link href="/dashboard/trade" className="font-mono text-[13px] text-text-primary hover:text-brand tabular-nums">
                   ${formatNumber(pair.price, pair.price < 10 ? 4 : 2)}
                 </Link>
               </td>
               <td className="py-2.5 text-right">
                 <Link href="/dashboard/trade">
-                  <span className={`text-[11px] font-mono ${pair.change24h >= 0 ? "text-green" : "text-red"}`}>
+                  <span className={`text-[11px] font-mono tabular-nums ${pair.change24h >= 0 ? "text-green" : "text-red"}`}>
                     {formatPercent(pair.change24h)}
                   </span>
                 </Link>
