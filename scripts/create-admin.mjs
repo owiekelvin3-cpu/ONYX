@@ -85,9 +85,11 @@ async function main() {
   }
 
   console.log(`
-Login at: /login?redirect=/admin
+Login at: /admin/login
 Email:    ${ADMIN_EMAIL}
 Password: ${ADMIN_PASSWORD}
+
+Change the password after your first sign-in.
 `);
 }
 

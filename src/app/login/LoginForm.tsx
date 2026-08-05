@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
+import { isAdminPanelPath } from "@/lib/auth-guards";
 import { AuthShell, AuthCardHeader } from "@/components/auth/AuthLayout";
 import { AuthInput } from "@/components/auth/AuthInput";
 import { Button } from "@/components/ui/Button";
@@ -41,7 +42,7 @@ export default function LoginForm() {
     }
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -52,7 +53,23 @@ export default function LoginForm() {
       return;
     }
 
-    const redirect = searchParams.get("redirect") ?? "/dashboard";
+    const rawRedirect = searchParams.get("redirect") ?? "/dashboard";
+    let redirect = "/dashboard";
+
+    if (isAdminPanelPath(rawRedirect)) {
+      const userId = authData.user?.id;
+      if (userId) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", userId)
+          .maybeSingle();
+        redirect = profile?.role === "admin" ? rawRedirect : "/dashboard";
+      }
+    } else if (rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")) {
+      redirect = rawRedirect;
+    }
+
     router.push(redirect);
     router.refresh();
   }

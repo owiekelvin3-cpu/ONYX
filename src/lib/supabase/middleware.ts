@@ -1,5 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAdminPanelPath } from "@/lib/auth-guards";
+
+async function fetchRole(
+  supabase: ReturnType<typeof createServerClient>,
+  userId: string
+) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+
+  return data?.role ?? null;
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -31,7 +45,18 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isAdminLogin = pathname === "/admin/login";
-  const isAdminPanel = pathname.startsWith("/admin") && !isAdminLogin;
+  const isAdminPanel = isAdminPanelPath(pathname);
+
+  // Regular login must not be used as a back door to the team console
+  if (pathname === "/login") {
+    const redirectTarget = request.nextUrl.searchParams.get("redirect");
+    if (redirectTarget && isAdminPanelPath(redirectTarget)) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+  }
 
   if (!user && pathname.startsWith("/dashboard")) {
     const url = request.nextUrl.clone();
@@ -47,13 +72,8 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (profile?.role !== "admin") {
+    const role = await fetchRole(supabase, user.id);
+    if (role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
@@ -61,13 +81,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (isAdminLogin && user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (profile?.role === "admin") {
+    const role = await fetchRole(supabase, user.id);
+    if (role === "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/admin";
       return NextResponse.redirect(url);
