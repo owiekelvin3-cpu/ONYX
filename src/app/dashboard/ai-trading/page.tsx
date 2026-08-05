@@ -11,7 +11,7 @@ import {
 import type { AiSubscriptionRow } from "@/lib/supabase/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Bot, TrendingUp, Zap, Loader2 } from "lucide-react";
+import { Bot, TrendingUp, Zap, Loader2 } from "@/components/icons";
 import { formatCurrency } from "@/lib/utils";
 
 const PLANS = [

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { forwardRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { Eye, EyeOff, ChevronDown } from "lucide-react";
+import { Eye, EyeOff, ChevronDown } from "@/components/icons";
 
 interface AuthInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;

@@ -6,7 +6,7 @@ import { BRAND, NAV } from "@/lib/constants";
 import { siteRoute } from "@/lib/routes";
 import { Button } from "@/components/ui/Button";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
-import { ChevronDown, Globe, Menu, X } from "lucide-react";
+import { ChevronDown, Globe, Menu, X } from "@/components/icons";
 
 const NAV_ITEMS = [
   { label: "Buy Crypto", key: "BuyCrypto" as const },

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BRAND, PLATFORM_HIGHLIGHTS } from "@/lib/constants";
-import { ArrowLeft, Clock, HelpCircle, Layers, Receipt, Shield } from "lucide-react";
+import { ArrowLeft, Clock, HelpCircle, Layers, Receipt, Shield } from "@/components/icons";
 
 const FEATURE_ICONS = [Shield, Receipt, Layers, Clock] as const;
 

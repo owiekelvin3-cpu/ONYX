@@ -18,7 +18,7 @@ import {
   LogOut,
   Menu,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 
 const ADMIN_LINKS = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },

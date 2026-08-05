@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@/lib/fontawesome";
 import { BRAND } from "@/lib/constants";
 import { getAppUrl } from "@/lib/env";
 

@@ -16,7 +16,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
-import { Copy, Check, Loader2 } from "lucide-react";
+import { Copy, Check, Loader2 } from "@/components/icons";
 
 export default function DepositPage() {
   const router = useRouter();

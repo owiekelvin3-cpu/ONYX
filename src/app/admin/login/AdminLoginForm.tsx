@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
 import { AuthInput } from "@/components/auth/AuthInput";
 import { Button } from "@/components/ui/Button";
-import { Loader2, Lock, Mail, Shield } from "lucide-react";
+import { Loader2, Lock, Mail, Shield } from "@/components/icons";
 
 export default function AdminLoginForm() {
   const router = useRouter();

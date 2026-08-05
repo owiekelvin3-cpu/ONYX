@@ -12,7 +12,7 @@ import type { CopySubscriptionRow } from "@/lib/supabase/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatPercent, formatCurrency } from "@/lib/utils";
-import { Users, TrendingUp, Star, Loader2 } from "lucide-react";
+import { Users, TrendingUp, Star, Loader2 } from "@/components/icons";
 
 const TRADERS = [
   { name: "AlphaTrader", roi: 142.5, followers: 2840, winRate: 78, rating: 4.9 },

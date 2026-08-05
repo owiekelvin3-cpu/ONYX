@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Bot, Copy, LineChart, TrendingUp } from "lucide-react";
+import { ArrowRight, Bot, Copy, LineChart, TrendingUp } from "@/components/icons";
 import { PRODUCTS } from "@/lib/constants";
 import { FadeUp, Stagger, StaggerItem } from "@/components/landing/motion";
 

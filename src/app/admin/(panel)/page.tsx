@@ -13,7 +13,7 @@ import {
   ArrowUpFromLine,
   RefreshCw,
   ChevronRight,
-} from "lucide-react";
+} from "@/components/icons";
 
 const QUICK_LINKS = [
   { href: "/admin/kyc", label: "KYC Review", icon: FileCheck, statKey: "pendingKyc" as const },

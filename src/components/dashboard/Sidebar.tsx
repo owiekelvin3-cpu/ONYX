@@ -20,7 +20,7 @@ import {
   Menu,
   X,
   MoreHorizontal,
-} from "lucide-react";
+} from "@/components/icons";
 import { AdminNavLink } from "@/components/admin/AdminNavLink";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 

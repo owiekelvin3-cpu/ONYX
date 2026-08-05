@@ -9,7 +9,7 @@ import { isAdminPanelPath } from "@/lib/auth-guards";
 import { AuthShell, AuthCardHeader } from "@/components/auth/AuthLayout";
 import { AuthInput } from "@/components/auth/AuthInput";
 import { Button } from "@/components/ui/Button";
-import { Loader2, Lock, Mail } from "lucide-react";
+import { Loader2, Lock, Mail } from "@/components/icons";
 
 const REMEMBER_KEY = "onyx_remember_email";
 

@@ -23,7 +23,7 @@ import {
   MapPin,
   Phone,
   User,
-} from "lucide-react";
+} from "@/components/icons";
 
 const REGISTER_STEPS = [
   { label: "Account" },

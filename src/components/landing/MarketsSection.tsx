@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { MARKET_PAIRS, type MarketPair } from "@/lib/market-data";
 import { formatCompact, formatNumber, formatPercent } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/icons";
 import { FadeUp } from "@/components/landing/motion";
 
 const TABS = ["Hot", "Gainers", "Losers", "New"] as const;

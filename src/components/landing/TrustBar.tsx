@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Layers, Receipt, Shield } from "lucide-react";
+import { Clock, Layers, Receipt, Shield } from "@/components/icons";
 import { PLATFORM_HIGHLIGHTS } from "@/lib/constants";
 import { Stagger, StaggerItem } from "@/components/landing/motion";
 

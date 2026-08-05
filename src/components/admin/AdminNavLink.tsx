@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Shield } from "lucide-react";
+import { Shield } from "@/components/icons";
 
 export function AdminNavLink() {
   const [isAdmin, setIsAdmin] = useState(false);

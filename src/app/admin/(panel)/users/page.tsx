@@ -13,7 +13,7 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw } from "@/components/icons";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<Profile[]>([]);

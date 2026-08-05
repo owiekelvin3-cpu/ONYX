@@ -6,7 +6,7 @@ import { DEPOSIT_CRYPTO_KEYS, DEPOSIT_CRYPTO_LABELS } from "@/lib/deposit-option
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "@/components/icons";
 
 function emptyWallets(): Record<string, string> {
   return Object.fromEntries(DEPOSIT_CRYPTO_KEYS.map((key) => [key, ""]));

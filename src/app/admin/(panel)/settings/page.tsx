@@ -6,7 +6,7 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DepositWalletSettings } from "@/components/admin/DepositWalletSettings";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 interface SettingRow {
