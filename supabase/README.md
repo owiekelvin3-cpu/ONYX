@@ -1,62 +1,80 @@
 # ONYX Exchange — Supabase Backend
 
-## Environment
+ONYX uses its **own** Supabase project — separate from the BROKER/Velion backend (`lcqzpvhiuaynqxarzvsk`).
 
-Copy `.env.example` to `.env.local`:
+## Quick setup (new Supabase account)
+
+### 1. Create a new project
+
+1. Log into your **other** Supabase account: https://supabase.com/dashboard  
+2. **New project** → name it `ONYX Exchange`  
+3. Save the **project ref** (Settings → General)
+
+### 2. Apply migrations
+
+**Option A — Script (recommended)**
+
+```powershell
+cd meridian-markets
+$env:SUPABASE_ACCESS_TOKEN = "sbp_your_token"   # https://supabase.com/dashboard/account/tokens
+$env:PROJECT_REF = "your_new_project_ref"
+node scripts/setup-new-supabase.mjs
+```
+
+**Option B — Supabase CLI**
+
+```bash
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push
+```
+
+Migrations live in `supabase/migrations/` (001–040 broker schema + `041_onyx_backend.sql`).
+
+### 3. Configure environment
+
+`.env.local`:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_APP_NAME=ONYX
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Get URL and anon key from [Supabase Dashboard](https://supabase.com/dashboard) → Project Settings → API.
+Get URL and anon key from **Dashboard → Settings → API**.
 
-## What's connected
+Also set the same variables on **Vercel** (Production + Preview).
+
+### 4. Auth redirect URLs
+
+In **Authentication → URL Configuration**:
+
+| Setting | Value |
+|---------|--------|
+| Site URL | `https://meridian-markets-kohl.vercel.app` |
+| Redirect URLs | `http://localhost:3000/**`, `https://meridian-markets-kohl.vercel.app/**` |
+
+### 5. Deposit wallets (optional)
+
+Migration `005_deposit_config_seed.sql` seeds placeholder wallets. Update them in the Supabase dashboard (`platform_settings` → `deposit_config`) or via your admin panel.
+
+---
+
+## What’s connected
 
 | Feature | Table / RPC | Frontend |
 |---------|-------------|----------|
 | Auth & profiles | `auth.users`, `profiles` | `/login`, `/register`, `/dashboard/settings` |
 | Balances | `balances` | Dashboard, portfolio, trade |
-| Spot trading | `trades` + `debit_balance_for_trade` trigger | `/dashboard/trade` |
-| Holdings | `holdings` | `/dashboard/portfolio` |
+| Spot trading | `trades`, `holdings` | `/dashboard/trade` |
 | Deposits | `deposits`, `platform_settings` | `/dashboard/deposit` |
-| Withdrawals | `withdrawals`, `get_withdrawal_eligibility` RPC | `/dashboard/withdraw` |
+| Withdrawals | `withdrawals`, `get_withdrawal_eligibility` | `/dashboard/withdraw` |
 | AI bots | `ai_trading_subscriptions` | `/dashboard/ai-trading` |
 | Copy trading | `copy_trading_subscriptions` | `/dashboard/copy-trading` |
-| Notifications | `notifications` | Created by DB triggers |
 
-## Database flow
+---
 
-1. **Sign up** → `handle_new_user` trigger creates `profiles` row + zero USD `balances` row
-2. **Deposit** → User submits pending deposit → admin approves → balance credited
-3. **Trade** → Insert into `trades` → trigger debits/credits balance and updates `holdings`
-4. **Withdraw** → Insert into `withdrawals` → admin processes
-5. **AI subscribe** → Insert into `ai_trading_subscriptions` → trigger debits allocation from balance
+## BROKER database (old — disconnected)
 
-## Local development
-
-```bash
-npm install
-npm run dev
-```
-
-## Migrations
-
-SQL migrations live in `supabase/migrations/`. The remote project already has the full schema; these files document ONYX-specific changes.
-
-To pull full schema locally (optional):
-
-```bash
-npx supabase login
-npx supabase link --project-ref YOUR_PROJECT_REF
-npx supabase db pull
-```
-
-## Auth redirect URLs
-
-In Supabase Dashboard → Authentication → URL Configuration, add:
-
-- Site URL: `http://localhost:3000` (dev) or your production domain
-- Redirect URLs: `http://localhost:3000/**`, `https://yourdomain.com/**`
+ONYX no longer uses the BROKER/Velion Supabase project. That database was reverted to Velion defaults (welcome message + KYC-gated RLS). Existing users on that project belong to Velion/BROKER only.
