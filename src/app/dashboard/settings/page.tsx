@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -19,7 +21,7 @@ export default function SettingsPage() {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
-        setLoading(false);
+        router.replace("/login?redirect=/dashboard/settings");
         return;
       }
       setEmail(user.email ?? "");
@@ -37,7 +39,7 @@ export default function SettingsPage() {
           setLoading(false);
         });
     });
-  }, []);
+  }, [router]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -59,34 +61,6 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="text-[13px] text-text-tertiary">Loading settings...</div>
-    );
-  }
-
-  if (!email) {
-    return (
-      <div className="space-y-4 max-w-2xl">
-        <div>
-          <h1 className="text-lg font-bold text-text-primary">Settings</h1>
-          <p className="text-[13px] text-text-tertiary mt-1">
-            Manage your account preferences
-          </p>
-        </div>
-        <Card>
-          <p className="text-[13px] text-text-secondary">
-            Sign in to view and edit your account settings.
-          </p>
-          <div className="flex gap-2 mt-4">
-            <Link href="/login">
-              <Button size="sm">Log In</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="outline" size="sm">
-                Create Account
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      </div>
     );
   }
 

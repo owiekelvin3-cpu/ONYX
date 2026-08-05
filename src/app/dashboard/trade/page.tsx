@@ -113,14 +113,6 @@ export default function TradePage() {
         </p>
       )}
 
-      {!userId && (
-        <p className="text-[12px] text-text-tertiary mb-3">
-          <Link href="/login" className="text-brand hover:underline">
-            Log in
-          </Link>{" "}
-          to place live orders.
-        </p>
-      )}
 
       <div className="space-y-2.5 sm:space-y-3">
         {orderType === "limit" && (

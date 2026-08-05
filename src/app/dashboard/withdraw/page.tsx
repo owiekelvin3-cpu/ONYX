@@ -128,14 +128,6 @@ export default function WithdrawPage() {
             </p>
           )}
 
-          {!userId && !loading && (
-            <p className="text-[13px] text-text-tertiary">
-              <Link href="/login" className="text-brand hover:underline">
-                Log in
-              </Link>{" "}
-              to withdraw funds.
-            </p>
-          )}
 
           <div>
             <label className="block text-xs text-text-tertiary mb-2">Asset</label>

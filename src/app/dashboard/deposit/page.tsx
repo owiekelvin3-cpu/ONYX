@@ -175,14 +175,6 @@ export default function DepositPage() {
             </p>
           )}
 
-          {!userId && (
-            <p className="text-[13px] text-text-tertiary">
-              <Link href="/login" className="text-brand hover:underline">
-                Log in
-              </Link>{" "}
-              to submit a deposit request.
-            </p>
-          )}
 
           {error && (
             <p role="alert" className="text-[13px] text-red">

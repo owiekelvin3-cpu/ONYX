@@ -25,8 +25,17 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Refresh session only — all pages are publicly accessible
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  if (!user && pathname.startsWith("/dashboard")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }

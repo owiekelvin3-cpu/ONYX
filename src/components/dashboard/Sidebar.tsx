@@ -87,7 +87,7 @@ export function DashboardSidebar() {
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/dashboard");
+    router.push("/login");
     router.refresh();
   }
 
@@ -149,11 +149,9 @@ export function DashboardMobileNav() {
 export function DashboardTopBar({
   userName,
   userEmail,
-  isGuest,
 }: {
   userName?: string;
   userEmail?: string;
-  isGuest?: boolean;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -162,7 +160,7 @@ export function DashboardTopBar({
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/dashboard");
+    router.push("/login");
     router.refresh();
   }
 
@@ -196,10 +194,10 @@ export function DashboardTopBar({
           </Link>
           <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-bg-hover flex items-center justify-center text-[11px] font-bold text-text-secondary">
-            {isGuest ? "G" : (userName || userEmail || "U").charAt(0).toUpperCase()}
+            {(userName || userEmail || "U").charAt(0).toUpperCase()}
           </div>
           <span className="hidden sm:block text-[13px] text-text-secondary">
-            {isGuest ? "Guest" : userName || userEmail?.split("@")[0] || "User"}
+            {userName || userEmail?.split("@")[0] || "User"}
           </span>
           </div>
         </div>
