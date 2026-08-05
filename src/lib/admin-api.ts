@@ -26,7 +26,7 @@ export async function moderateAdminUser(params: {
   const supabase = createClient();
   const reason =
     params.action === "unsuspend" && (!params.reason || params.reason.trim().length < 3)
-      ? "Suspension lifted by administrator"
+      ? "Suspension lifted by team"
       : (params.reason ?? "").trim();
 
   const { error } = await supabase.rpc("admin_moderate_user", {

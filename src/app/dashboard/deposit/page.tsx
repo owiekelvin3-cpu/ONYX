@@ -95,7 +95,7 @@ export default function DepositPage() {
       });
       setDeposits((prev) => [row, ...prev]);
       setAmount("");
-      setSuccess("Deposit request submitted. Pending admin review.");
+      setSuccess("Deposit request submitted. Pending team review.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deposit failed");
     } finally {
@@ -200,7 +200,7 @@ export default function DepositPage() {
           </Button>
 
           <p className="text-[11px] text-text-tertiary leading-relaxed">
-            Deposits are typically confirmed within 10–30 minutes after admin
+            Deposits are typically confirmed within 10–30 minutes after team
             approval. Minimum deposit: $50.
           </p>
         </div>

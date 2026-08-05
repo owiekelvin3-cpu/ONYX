@@ -62,7 +62,7 @@ export default function AdminUsersPage() {
       await moderateAdminUser({
         userId: selectedId,
         action,
-        reason: action === "suspend" ? "Suspended by admin" : undefined,
+        reason: action === "suspend" ? "Suspended by team" : undefined,
       });
       setMessage(action === "suspend" ? "User suspended" : "User unsuspended");
       await openUser(selectedId);
@@ -132,7 +132,7 @@ export default function AdminUsersPage() {
                     <p className="text-xs text-text-tertiary truncate">{u.email}</p>
                     <div className="flex gap-2 mt-2">
                       <StatusBadge status={u.kyc_status} />
-                      {u.role === "admin" && <StatusBadge status="admin" />}
+                      {u.role === "admin" && <StatusBadge status="team" />}
                       {u.is_suspended && <StatusBadge status="suspended" />}
                     </div>
                   </button>

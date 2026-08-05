@@ -100,7 +100,7 @@ export default function WithdrawPage() {
       setWithdrawals((prev) => [row, ...prev]);
       setAmount("");
       setAddress("");
-      setSuccess("Withdrawal submitted. Processing within 24 hours.");
+      setSuccess("Withdrawal submitted. Our team will process it within 24 hours.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Withdrawal failed");
     } finally {
@@ -195,7 +195,7 @@ export default function WithdrawPage() {
           </Button>
 
           <p className="text-[11px] text-text-tertiary leading-relaxed">
-            Withdrawals are processed within 24 hours. KYC may be required for
+            Withdrawals are processed by our team within 24 hours. KYC may be required for
             amounts over $10,000.
           </p>
         </div>

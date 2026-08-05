@@ -63,7 +63,7 @@ export function GetStarted() {
                 {[
                   "Passwords hashed — never stored in plain text",
                   "Two-factor auth in settings when you want it",
-                  "Withdrawals reviewed before they leave",
+                  "Withdrawals reviewed by our team before they leave",
                   "Help center when you need a human",
                 ].map((item, i) => (
                   <li

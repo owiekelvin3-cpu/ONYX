@@ -48,7 +48,7 @@ export default function AdminLoginForm() {
 
     if (profile?.role !== "admin") {
       await supabase.auth.signOut();
-      setError("This account does not have admin access.");
+      setError("This account does not have team access.");
       setLoading(false);
       return;
     }
@@ -65,21 +65,21 @@ export default function AdminLoginForm() {
             <Shield className="w-5 h-5 text-brand" strokeWidth={1.75} />
           </span>
           <div>
-            <p className="text-xs text-text-tertiary uppercase tracking-wider">Admin</p>
+            <p className="text-xs text-text-tertiary uppercase tracking-wider">Team</p>
             <h1 className="text-xl font-bold text-text-primary">{BRAND.name} Console</h1>
           </div>
         </div>
 
         <p className="text-sm text-text-tertiary mb-6">
-          Sign in with your admin email and password. Only authorized operators can access this area.
+          Sign in with your team email and password. Only authorized operators can access this area.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <AuthInput
-            id="admin-email"
-            label="Admin email"
+            id="team-email"
+            label="Team email"
             type="email"
-            placeholder="admin@example.com"
+            placeholder="you@example.com"
             autoComplete="email"
             icon={<Mail />}
             value={email}
@@ -88,7 +88,7 @@ export default function AdminLoginForm() {
           />
 
           <AuthInput
-            id="admin-password"
+            id="team-password"
             label="Password"
             type="password"
             placeholder="Enter your password"
@@ -119,7 +119,7 @@ export default function AdminLoginForm() {
                 Signing in...
               </span>
             ) : (
-              "Sign in to admin"
+              "Sign in"
             )}
           </Button>
         </form>

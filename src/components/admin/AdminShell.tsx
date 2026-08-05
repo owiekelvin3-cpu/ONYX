@@ -67,7 +67,7 @@ export function AdminShell({
           <Link href="/admin" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
             <span className="font-bold text-sm">{BRAND.name}</span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-brand bg-brand/10 px-2 py-0.5 rounded">
-              Admin
+              Team
             </span>
           </Link>
           <button type="button" className="lg:hidden p-2 text-text-tertiary" onClick={() => setMenuOpen(false)}>
@@ -107,7 +107,7 @@ export function AdminShell({
             User dashboard
           </Link>
           <div className="px-3 py-2">
-            <p className="text-sm font-medium text-text-primary truncate">{adminName ?? "Admin"}</p>
+            <p className="text-sm font-medium text-text-primary truncate">{adminName ?? "Team member"}</p>
             <p className="text-xs text-text-tertiary truncate">{adminEmail}</p>
           </div>
           <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
@@ -131,7 +131,7 @@ export function AdminShell({
           <button type="button" className="lg:hidden p-2 text-text-secondary" onClick={() => setMenuOpen(true)}>
             <Menu className="w-5 h-5" />
           </button>
-          <p className="text-sm font-medium text-text-secondary">Admin Panel</p>
+          <p className="text-sm font-medium text-text-secondary">Team Console</p>
         </header>
         <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto min-w-0">{children}</main>
       </div>

@@ -25,7 +25,7 @@ export function AdminNavLink() {
       className="flex items-center gap-2.5 px-3 py-2.5 rounded text-[13px] text-brand hover:bg-brand/10 transition-colors mt-2 border border-brand/20"
     >
       <Shield className="w-4 h-4 shrink-0" />
-      Admin Panel
+      Team Console
     </Link>
   );
 }
