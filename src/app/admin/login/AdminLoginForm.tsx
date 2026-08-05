@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
+import { setAdminAuthCookie } from "@/lib/auth-guards";
 import { AuthInput } from "@/components/auth/AuthInput";
 import { Button } from "@/components/ui/Button";
 import { Loader2, Lock, Mail, Shield } from "@/components/icons";
@@ -53,6 +54,7 @@ export default function AdminLoginForm() {
       return;
     }
 
+    setAdminAuthCookie();
     router.push("/admin");
     router.refresh();
   }

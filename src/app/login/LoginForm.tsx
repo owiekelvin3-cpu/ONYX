@@ -42,7 +42,7 @@ export default function LoginForm() {
     }
 
     const supabase = createClient();
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -56,17 +56,7 @@ export default function LoginForm() {
     const rawRedirect = searchParams.get("redirect") ?? "/dashboard";
     let redirect = "/dashboard";
 
-    if (isAdminPanelPath(rawRedirect)) {
-      const userId = authData.user?.id;
-      if (userId) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", userId)
-          .maybeSingle();
-        redirect = profile?.role === "admin" ? rawRedirect : "/dashboard";
-      }
-    } else if (rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")) {
+    if (!isAdminPanelPath(rawRedirect) && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")) {
       redirect = rawRedirect;
     }
 

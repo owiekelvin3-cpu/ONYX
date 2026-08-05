@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
+import { clearAdminAuthCookie } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -21,7 +22,6 @@ import {
   X,
   MoreHorizontal,
 } from "@/components/icons";
-import { AdminNavLink } from "@/components/admin/AdminNavLink";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const NAV_ITEMS = [
@@ -87,6 +87,7 @@ export function DashboardSidebar() {
 
   async function handleLogout() {
     const supabase = createClient();
+    clearAdminAuthCookie();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
@@ -103,7 +104,6 @@ export function DashboardSidebar() {
 
       <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
         <NavLinks pathname={pathname} />
-        <AdminNavLink />
       </nav>
 
       <div className="p-2 border-t border-border">
@@ -161,6 +161,7 @@ export function DashboardTopBar({
 
   async function handleLogout() {
     const supabase = createClient();
+    clearAdminAuthCookie();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
@@ -234,7 +235,6 @@ export function DashboardTopBar({
                 pathname={pathname}
                 onNavigate={() => setMenuOpen(false)}
               />
-              <AdminNavLink />
             </nav>
             <div className="p-2 border-t border-border">
               <button

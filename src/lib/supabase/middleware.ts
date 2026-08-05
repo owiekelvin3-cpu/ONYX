@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isAdminPanelPath } from "@/lib/auth-guards";
+import { ADMIN_AUTH_COOKIE, isAdminPanelPath } from "@/lib/auth-guards";
 
 async function fetchRole(
   supabase: ReturnType<typeof createServerClient>,
@@ -13,6 +13,10 @@ async function fetchRole(
     .maybeSingle();
 
   return data?.role ?? null;
+}
+
+function hasAdminSession(request: NextRequest) {
+  return request.cookies.get(ADMIN_AUTH_COOKIE)?.value === "1";
 }
 
 export async function updateSession(request: NextRequest) {
@@ -46,6 +50,7 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAdminLogin = pathname === "/admin/login";
   const isAdminPanel = isAdminPanelPath(pathname);
+  const adminSession = hasAdminSession(request);
 
   // Regular login must not be used as a back door to the team console
   if (pathname === "/login") {
@@ -73,16 +78,16 @@ export async function updateSession(request: NextRequest) {
     }
 
     const role = await fetchRole(supabase, user.id);
-    if (role !== "admin") {
+    if (role !== "admin" || !adminSession) {
       const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
+      url.pathname = role === "admin" ? "/admin/login" : "/dashboard";
       return NextResponse.redirect(url);
     }
   }
 
   if (isAdminLogin && user) {
     const role = await fetchRole(supabase, user.id);
-    if (role === "admin") {
+    if (role === "admin" && adminSession) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin";
       return NextResponse.redirect(url);
