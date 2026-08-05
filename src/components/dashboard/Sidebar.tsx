@@ -21,6 +21,7 @@ import {
   X,
   MoreHorizontal,
 } from "lucide-react";
+import { AdminNavLink } from "@/components/admin/AdminNavLink";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -101,6 +102,7 @@ export function DashboardSidebar() {
 
       <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
         <NavLinks pathname={pathname} />
+        <AdminNavLink />
       </nav>
 
       <div className="p-2 border-t border-border">
@@ -232,6 +234,7 @@ export function DashboardTopBar({
                 pathname={pathname}
                 onNavigate={() => setMenuOpen(false)}
               />
+              <AdminNavLink />
             </nav>
             <div className="p-2 border-t border-border">
               <button

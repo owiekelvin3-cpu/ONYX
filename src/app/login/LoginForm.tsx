@@ -52,7 +52,8 @@ export default function LoginForm() {
       return;
     }
 
-    router.push("/dashboard");
+    const redirect = searchParams.get("redirect") ?? "/dashboard";
+    router.push(redirect);
     router.refresh();
   }
 
