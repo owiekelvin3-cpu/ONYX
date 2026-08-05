@@ -6,6 +6,7 @@ import { useState } from "react";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "@/components/ui/Button";
 import {
   LayoutDashboard,
@@ -45,6 +46,7 @@ export function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  useBodyScrollLock(menuOpen);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -57,7 +59,7 @@ export function AdminShell({
     <div className="min-h-dvh bg-bg-primary flex">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[min(18rem,88vw)] bg-bg-secondary border-r border-border flex flex-col transition-transform lg:static lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-[min(18rem,88vw)] bg-bg-secondary border-r border-border flex flex-col transition-transform duration-200 ease-out lg:static lg:translate-x-0 safe-area-top safe-area-bottom safe-area-x",
           menuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -125,13 +127,13 @@ export function AdminShell({
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 flex items-center gap-3 px-4 border-b border-border bg-bg-secondary/80 backdrop-blur sticky top-0 z-30">
+        <header className="h-14 flex items-center gap-3 px-3 sm:px-4 border-b border-border bg-bg-secondary/80 backdrop-blur sticky top-0 z-30 safe-area-top safe-area-x">
           <button type="button" className="lg:hidden p-2 text-text-secondary" onClick={() => setMenuOpen(true)}>
             <Menu className="w-5 h-5" />
           </button>
           <p className="text-sm font-medium text-text-secondary">Admin Panel</p>
         </header>
-        <main className="flex-1 p-4 sm:p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto min-w-0">{children}</main>
       </div>
     </div>
   );

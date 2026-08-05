@@ -203,6 +203,26 @@ export default function TradePage() {
             </div>
           </div>
           {orderPanel}
+          <div className="mt-4 h-32 border-t border-border pt-3">
+            <svg viewBox="0 0 600 120" className="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="tradeFillMobile" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0ECB81" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="#0ECB81" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0,90 L60,85 L120,75 L180,80 L240,60 L300,55 L360,40 L420,45 L480,30 L540,35 L600,25 L600,120 L0,120 Z"
+                fill="url(#tradeFillMobile)"
+              />
+              <path
+                d="M0,90 L60,85 L120,75 L180,80 L240,60 L300,55 L360,40 L420,45 L480,30 L540,35 L600,25"
+                fill="none"
+                stroke="#0ECB81"
+                strokeWidth="1.5"
+              />
+            </svg>
+          </div>
         </Card>
 
         {showPairs && (
@@ -231,7 +251,7 @@ export default function TradePage() {
         )}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid lg:grid-cols-3 gap-3 sm:gap-4 hidden lg:grid">
         <Card className="lg:col-span-2 !p-0 overflow-hidden min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-4 py-3 border-b border-border">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">

@@ -32,7 +32,7 @@ export default async function SitePage({
     <>
       <Header />
       <main className="min-h-[60vh] bg-bg-primary">
-        <div className="container-app py-10 sm:py-16 max-w-3xl">
+        <div className="container-app py-8 sm:py-10 lg:py-12 max-w-3xl safe-area-x">
           <Link
             href="/"
             className="text-[13px] text-brand hover:underline mb-6 inline-block"

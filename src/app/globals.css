@@ -41,11 +41,13 @@
 html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
@@ -56,10 +58,17 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-x: none;
 }
 
 ::selection {
   background: color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 /* Layout helpers */
@@ -67,12 +76,21 @@ body {
   width: 100%;
   max-width: 1280px;
   margin-inline: auto;
-  padding-inline: 1rem;
+  padding-left: max(0.875rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.875rem, env(safe-area-inset-right, 0px));
+}
+
+@media (min-width: 640px) {
+  .container-app {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
 }
 
 @media (min-width: 1024px) {
   .container-app {
-    padding-inline: 1.5rem;
+    padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
   }
 }
 
@@ -84,14 +102,63 @@ body {
   padding-top: var(--safe-top);
 }
 
-/* Horizontal scroll tabs */
-.scroll-tabs {
+.safe-area-x {
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+}
+
+/* Horizontal scroll strips (price tickers, filters, tabs) */
+.scroll-x {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  overscroll-behavior-x: contain;
 }
-.scroll-tabs::-webkit-scrollbar {
+.scroll-x::-webkit-scrollbar {
   display: none;
+}
+
+/* Responsive data tables */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  margin-inline: calc(-1 * max(0.875rem, env(safe-area-inset-left, 0px)));
+  padding-inline: max(0.875rem, env(safe-area-inset-left, 0px));
+}
+
+@media (min-width: 640px) {
+  .table-scroll {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
+/* Card-style rows on small screens (used with .table-scroll) */
+@media (max-width: 639px) {
+  .responsive-stack-table thead {
+    display: none;
+  }
+  .responsive-stack-table tbody tr {
+    display: block;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .responsive-stack-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.25rem 0;
+    text-align: right !important;
+  }
+  .responsive-stack-table tbody td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-align: left;
+    flex-shrink: 0;
+  }
 }
 
 /* Touch-friendly tap targets on mobile */
@@ -236,6 +303,12 @@ body {
   }
 }
 
+@media (max-width: 1023px) {
+  .landing-terminal-float {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-hero-grid,
   .landing-terminal-float,
@@ -246,6 +319,16 @@ body {
   .landing-check-item {
     animation: none !important;
   }
+}
+
+.scroll-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.scroll-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .market-row {
@@ -298,27 +381,12 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 @media (min-width: 640px) {
   .auth-form-card {
     padding: 2rem 2.25rem;
-  }
-}
-
-/* Responsive table wrapper */
-.table-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-inline: -1rem;
-  padding-inline: 1rem;
-}
-
-@media (min-width: 640px) {
-  .table-scroll {
-    margin-inline: 0;
-    padding-inline: 0;
   }
 }

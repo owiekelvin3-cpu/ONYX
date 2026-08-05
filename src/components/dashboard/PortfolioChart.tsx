@@ -27,8 +27,8 @@ export function PortfolioChart({
       <p className="text-2xl font-bold text-text-primary mt-1">
         {formatCurrency(balance)}
       </p>
-      <div className="h-56 mt-4">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-44 xs:h-48 sm:h-56 mt-4">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <AreaChart data={data}>
             <defs>
               <linearGradient id="portfolioFill" x1="0" y1="0" x2="0" y2="1">

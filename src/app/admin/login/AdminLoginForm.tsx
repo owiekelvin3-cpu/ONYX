@@ -58,7 +58,7 @@ export default function AdminLoginForm() {
   }
 
   return (
-    <div className="min-h-dvh bg-bg-primary auth-page flex flex-col items-center justify-center px-4 py-10">
+    <div className="min-h-dvh bg-bg-primary auth-page flex flex-col items-center justify-center px-4 py-8 sm:py-10 safe-area-top safe-area-bottom safe-area-x">
       <div className="w-full max-w-[420px] auth-form-card">
         <div className="flex items-center gap-3 mb-6">
           <span className="w-10 h-10 rounded-lg bg-brand/15 border border-brand/25 flex items-center justify-center">

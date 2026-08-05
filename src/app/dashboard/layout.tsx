@@ -30,14 +30,14 @@ export default async function DashboardLayout({
     .maybeSingle();
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-dvh">
       <DashboardSidebar />
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-dvh min-w-0">
         <DashboardTopBar
           userName={profile?.full_name ?? undefined}
           userEmail={user.email}
         />
-        <main className="flex-1 p-3 sm:p-4 lg:p-5 pb-[calc(3.5rem+var(--safe-bottom))] lg:pb-5 overflow-auto bg-bg-primary min-w-0">
+        <main className="flex-1 p-3 sm:p-4 lg:p-5 pb-[calc(3.5rem+var(--safe-bottom))] lg:pb-5 overflow-x-hidden overflow-y-auto bg-bg-primary min-w-0">
           {children}
         </main>
         <DashboardMobileNav />

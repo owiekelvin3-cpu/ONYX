@@ -22,6 +22,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { AdminNavLink } from "@/components/admin/AdminNavLink";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -92,7 +93,7 @@ export function DashboardSidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col w-[220px] bg-bg-secondary border-r border-border h-screen sticky top-0 shrink-0">
+    <aside className="hidden lg:flex flex-col w-[220px] bg-bg-secondary border-r border-border h-dvh sticky top-0 shrink-0">
       <div className="h-14 flex items-center px-5 border-b border-border">
         <Link href="/" className="flex items-center gap-2">
           <Logo size={22} />
@@ -122,8 +123,8 @@ export function DashboardMobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-bg-secondary/95 backdrop-blur-md border-t border-border safe-area-bottom">
-      <div className="flex items-stretch justify-around h-[56px]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-bg-secondary/95 backdrop-blur-md border-t border-border safe-area-x">
+      <div className="flex items-stretch justify-around min-h-[56px] pb-[var(--safe-bottom)]">
         {MOBILE_TABS.map((item) => {
           const Icon = item.icon;
           const active = isActive(pathname, item.href);
@@ -156,6 +157,7 @@ export function DashboardTopBar({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  useBodyScrollLock(menuOpen);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -166,7 +168,7 @@ export function DashboardTopBar({
 
   return (
     <>
-      <header className="h-14 border-b border-border bg-bg-primary flex items-center justify-between px-4 lg:px-5 sticky top-0 z-40">
+      <header className="h-14 border-b border-border bg-bg-primary flex items-center justify-between px-3 sm:px-4 lg:px-5 sticky top-0 z-40 safe-area-top safe-area-x">
         <div className="flex items-center gap-3">
           <button
             className="lg:hidden p-1.5 text-text-secondary hover:text-text-primary cursor-pointer"
@@ -210,7 +212,7 @@ export function DashboardTopBar({
             className="absolute inset-0 bg-black/60"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute left-0 top-0 h-full w-[280px] bg-bg-secondary border-r border-border flex flex-col">
+          <div className="absolute left-0 top-0 h-full w-[min(280px,88vw)] bg-bg-secondary border-r border-border flex flex-col safe-area-top safe-area-bottom safe-area-x">
             <div className="h-14 flex items-center justify-between px-4 border-b border-border">
               <Link
                 href="/"

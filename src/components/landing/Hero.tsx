@@ -78,7 +78,8 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
             </HeroEnter>
 
             <HeroEnter delay={0.32}>
-              <div className="mt-8 sm:mt-10 grid grid-cols-2 xs:flex xs:flex-wrap gap-x-4 sm:gap-x-8 gap-y-3">
+              <div className="mt-8 sm:mt-10 scroll-x -mx-[max(0.875rem,env(safe-area-inset-left))] px-[max(0.875rem,env(safe-area-inset-left))] sm:mx-0 sm:px-0">
+                <div className="flex xs:grid xs:grid-cols-2 xs:flex-none gap-x-5 sm:gap-x-8 gap-y-3 min-w-max xs:min-w-0 pr-4 xs:pr-0">
                 {featured.map((p, i) => (
                   <motion.div
                     key={p.symbol}
@@ -100,11 +101,12 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
                     </span>
                   </motion.div>
                 ))}
+                </div>
               </div>
             </HeroEnter>
           </div>
 
-          <HeroEnter delay={0.2} className="relative min-w-0 w-full">
+          <HeroEnter delay={0.2} className="relative min-w-0 w-full max-w-xl lg:max-w-none mx-auto lg:mx-0">
             <div className="landing-terminal-float relative">
               <div className="absolute -inset-px rounded-lg bg-gradient-to-br from-brand/20 via-transparent to-green/10 opacity-60 blur-sm pointer-events-none" />
               <div className="relative bg-bg-secondary border border-border rounded-lg overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.45)]">

@@ -6,8 +6,8 @@ export function Footer() {
   return (
     <footer className="bg-bg-secondary border-t border-border">
       <div className="container-app pt-10 sm:pt-14 pb-8 safe-area-bottom">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8 mb-10 sm:mb-12">
-          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 sm:gap-8 mb-10 sm:mb-12">
+          <div className="xs:col-span-2 sm:col-span-3 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2">
               <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
                 <rect width="28" height="28" rx="6" fill="#F0B90B" />

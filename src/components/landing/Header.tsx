@@ -5,6 +5,7 @@ import { useState } from "react";
 import { BRAND, NAV } from "@/lib/constants";
 import { siteRoute } from "@/lib/routes";
 import { Button } from "@/components/ui/Button";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { ChevronDown, Globe, Menu, X } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  useBodyScrollLock(mobileOpen);
 
   return (
     <>
@@ -71,12 +73,9 @@ export function Header() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-1.5 ml-auto lg:hidden shrink-0">
-              <Link href="/login" className="hidden xs:block">
-                <Button variant="ghost" size="sm">Log In</Button>
-              </Link>
+            <div className="flex items-center gap-1 ml-auto lg:hidden shrink-0">
               <Link href="/register">
-                <Button size="sm" className="!px-3 sm:!px-5">Sign Up</Button>
+                <Button size="sm" className="!px-3 sm:!px-5 !text-xs sm:!text-sm">Sign Up</Button>
               </Link>
               <button
                 className="p-2 text-text-secondary cursor-pointer touch-target"
@@ -93,7 +92,7 @@ export function Header() {
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-full max-w-[320px] bg-bg-secondary border-l border-border flex flex-col safe-area-top safe-area-bottom">
+          <div className="absolute right-0 top-0 h-full w-full max-w-[min(320px,100vw)] bg-bg-secondary border-l border-border flex flex-col safe-area-top safe-area-bottom safe-area-x">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <span className="font-bold">{BRAND.name}</span>
               <button onClick={() => setMobileOpen(false)} className="cursor-pointer touch-target p-1" aria-label="Close menu">
