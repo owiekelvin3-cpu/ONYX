@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { DepositWalletSettings } from "@/components/admin/DepositWalletSettings";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { RefreshCw } from "lucide-react";
@@ -57,35 +58,50 @@ export default function AdminSettingsPage() {
     }
   }
 
+  const otherSettings = settings.filter((row) => row.key !== "deposit_config");
+
   return (
     <div className="space-y-5 max-w-4xl">
       <AdminPageHeader
         title="Platform settings"
-        subtitle="Manage deposit config and other platform keys."
-        action={
+        subtitle="Manage deposit wallet addresses and other platform configuration."
+      />
+
+      <DepositWalletSettings />
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-text-primary">Other settings</h2>
+            <p className="text-sm text-text-tertiary mt-1">
+              Advanced JSON configuration. Deposit wallets are edited above.
+            </p>
+          </div>
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
             Refresh
           </Button>
-        }
-      />
+        </div>
 
-      {message && (
-        <p className="text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
-          {message}
-        </p>
-      )}
+        {message && (
+          <p className="text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
+            {message}
+          </p>
+        )}
 
-      {loading ? (
-        <p className="text-sm text-text-tertiary">Loading…</p>
-      ) : (
-        <div className="space-y-3">
-          {settings.map((row) => (
+        {loading ? (
+          <p className="text-sm text-text-tertiary">Loading…</p>
+        ) : otherSettings.length === 0 ? (
+          <p className="text-sm text-text-tertiary">No other platform settings found.</p>
+        ) : (
+          otherSettings.map((row) => (
             <Card key={row.key}>
               <div className="flex items-center justify-between gap-3 mb-2">
                 <h3 className="font-mono text-sm font-semibold text-text-primary">{row.key}</h3>
                 {editingKey !== row.key && (
-                  <Button size="sm" variant="outline" onClick={() => startEdit(row)}>Edit</Button>
+                  <Button size="sm" variant="outline" onClick={() => startEdit(row)}>
+                    Edit
+                  </Button>
                 )}
               </div>
               {editingKey === row.key ? (
@@ -97,8 +113,12 @@ export default function AdminSettingsPage() {
                     className="w-full font-mono text-xs bg-bg-primary border border-border rounded p-3"
                   />
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={saveEdit}>Save</Button>
-                    <Button size="sm" variant="outline" onClick={() => setEditingKey(null)}>Cancel</Button>
+                    <Button size="sm" onClick={saveEdit}>
+                      Save
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setEditingKey(null)}>
+                      Cancel
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -107,9 +127,9 @@ export default function AdminSettingsPage() {
                 </pre>
               )}
             </Card>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

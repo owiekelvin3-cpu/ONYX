@@ -125,3 +125,39 @@ export async function updateKycStatus(
     .eq("id", userId);
   if (profileErr) throw profileErr;
 }
+
+export async function fetchDepositConfig() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("platform_settings")
+    .select("value")
+    .eq("key", "deposit_config")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return (data?.value as { cryptoWallets?: Record<string, string> } | null) ?? null;
+}
+
+export async function updateDepositWallets(cryptoWallets: Record<string, string>) {
+  const supabase = createClient();
+  const { data: existing, error: loadError } = await supabase
+    .from("platform_settings")
+    .select("value")
+    .eq("key", "deposit_config")
+    .maybeSingle();
+
+  if (loadError) throw new Error(loadError.message);
+
+  const current = (existing?.value as Record<string, unknown> | null) ?? {};
+  const updated = {
+    ...current,
+    cryptoWallets,
+  };
+
+  const { error } = await supabase
+    .from("platform_settings")
+    .update({ value: updated, updated_at: new Date().toISOString() })
+    .eq("key", "deposit_config");
+
+  if (error) throw new Error(error.message);
+}

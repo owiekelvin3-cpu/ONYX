@@ -11,22 +11,12 @@ import {
   type DepositConfig,
 } from "@/lib/api/deposits";
 import type { DepositRow } from "@/lib/supabase/types";
+import { DEPOSIT_CRYPTO_LABELS } from "@/lib/deposit-options";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
 import { Copy, Check, Loader2 } from "lucide-react";
-
-const CRYPTO_LABELS: Record<string, string> = {
-  bitcoin: "Bitcoin (BTC)",
-  ethereum: "Ethereum (ETH)",
-  usdt: "Tether (USDT)",
-  bnb: "BNB",
-  solana: "Solana (SOL)",
-  xrp: "XRP",
-  dogecoin: "Dogecoin (DOGE)",
-  litecoin: "Litecoin (LTC)",
-};
 
 export default function DepositPage() {
   const router = useRouter();
@@ -91,7 +81,7 @@ export default function DepositPage() {
         userId,
         amount: value,
         method: `crypto_${selected}`,
-        notes: `Deposit via ${CRYPTO_LABELS[selected] ?? selected}`,
+        notes: `Deposit via ${DEPOSIT_CRYPTO_LABELS[selected] ?? selected}`,
       });
       setDeposits((prev) => [row, ...prev]);
       setAmount("");
@@ -119,7 +109,7 @@ export default function DepositPage() {
               Select Asset
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {Object.keys(CRYPTO_LABELS).map((key) => (
+              {Object.keys(DEPOSIT_CRYPTO_LABELS).map((key) => (
                 <button
                   key={key}
                   type="button"
@@ -130,7 +120,7 @@ export default function DepositPage() {
                       : "bg-bg-primary text-text-secondary border-border hover:text-text-primary"
                   }`}
                 >
-                  {CRYPTO_LABELS[key].split(" ")[0]}
+                  {DEPOSIT_CRYPTO_LABELS[key].split(" ")[0]}
                 </button>
               ))}
             </div>
@@ -150,7 +140,7 @@ export default function DepositPage() {
           ) : walletAddress && walletAddress.trim() !== "Unavailable" ? (
             <div>
               <label className="block text-xs text-text-tertiary mb-2">
-                Deposit Address — {CRYPTO_LABELS[selected]}
+                Deposit Address — {DEPOSIT_CRYPTO_LABELS[selected]}
               </label>
               <div className="flex items-center gap-2 bg-bg-primary border border-border rounded p-3">
                 <code className="flex-1 text-[11px] font-mono break-all text-text-secondary">
