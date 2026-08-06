@@ -1,23 +1,21 @@
 export default function DashboardLoading() {
   return (
-    <div className="space-y-5 animate-pulse">
-      <div className="flex justify-between">
-        <div className="h-6 w-32 bg-bg-hover rounded" />
-        <div className="flex gap-2">
-          <div className="h-8 w-20 bg-bg-hover rounded" />
-          <div className="h-8 w-16 bg-bg-hover rounded" />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="mx-auto max-w-6xl space-y-5 sm:space-y-6 animate-pulse">
+      <div className="h-64 sm:h-72 rounded-2xl bg-bg-secondary border border-border" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-20 bg-bg-secondary border border-border rounded-lg" />
+          <div key={i} className="h-[88px] rounded-xl bg-bg-secondary border border-border" />
         ))}
       </div>
-      <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 h-72 bg-bg-secondary border border-border rounded-lg" />
-        <div className="h-72 bg-bg-secondary border border-border rounded-lg" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-24 rounded-xl bg-bg-secondary border border-border" />
+        ))}
       </div>
-      <div className="h-64 bg-bg-secondary border border-border rounded-lg" />
+      <div className="grid lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-2 h-72 rounded-2xl bg-bg-secondary border border-border" />
+        <div className="lg:col-span-3 h-72 rounded-2xl bg-bg-secondary border border-border" />
+      </div>
     </div>
   );
 }

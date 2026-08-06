@@ -25,17 +25,37 @@ import {
 } from "@/components/icons";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
-  { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
-  { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
-  { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
-  { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
-  { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
-  { label: "Support", href: "/dashboard/support", icon: Comments },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
-];
+const NAV_GROUPS = [
+  {
+    label: "Overview",
+    items: [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
+      { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
+    ],
+  },
+  {
+    label: "Cash",
+    items: [
+      { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
+      { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
+    ],
+  },
+  {
+    label: "Tools",
+    items: [
+      { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
+      { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { label: "Support", href: "/dashboard/support", icon: Comments },
+      { label: "Settings", href: "/dashboard/settings", icon: Settings },
+    ],
+  },
+] as const;
 
 const MOBILE_TABS = [
   { label: "Home", href: "/dashboard", icon: LayoutDashboard },
@@ -78,33 +98,49 @@ function NavLinks({
 }) {
   return (
     <>
-      {NAV_ITEMS.map((item) => {
-        const Icon = item.icon;
-        const active = isActive(pathname, item.href);
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            className={cn(
-              "flex items-center gap-2.5 px-3 py-3 rounded-lg text-[14px] transition-colors",
-              active
-                ? "bg-brand/10 text-brand font-medium"
-                : "text-text-secondary hover:text-text-primary hover:bg-bg-hover active:bg-bg-hover"
-            )}
-          >
-            <Icon className="w-[18px] h-[18px] shrink-0" />
-            {item.label}
-          </Link>
-        );
-      })}
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label} className="mb-4 last:mb-0">
+          <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-tertiary/80">
+            {group.label}
+          </p>
+          <div className="space-y-0.5">
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onNavigate}
+                  className={cn(
+                    "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all",
+                    active
+                      ? "dashboard-nav-active text-brand font-semibold"
+                      : "text-text-secondary hover:text-text-primary hover:bg-bg-hover/70"
+                  )}
+                >
+                  <Icon className="w-[17px] h-[17px] shrink-0" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </>
   );
 }
 
-export function DashboardSidebar() {
+export function DashboardSidebar({
+  userName,
+  userEmail,
+}: {
+  userName?: string;
+  userEmail?: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
+  const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
 
   async function handleLogout() {
     const supabase = createClient();
@@ -115,25 +151,38 @@ export function DashboardSidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col w-[220px] bg-bg-secondary border-r border-border h-dvh sticky top-0 shrink-0">
-      <div className="h-14 flex items-center px-5 border-b border-border">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo size={22} />
-          <span className="font-bold text-sm">{BRAND.name}</span>
+    <aside className="dashboard-sidebar hidden lg:flex flex-col w-[240px] border-r border-border h-dvh sticky top-0 shrink-0 z-10">
+      <div className="h-16 flex items-center px-5 border-b border-border/80">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <Logo size={24} />
+          <span className="font-bold text-sm tracking-tight text-text-primary group-hover:text-brand transition-colors">
+            {BRAND.name}
+          </span>
         </Link>
       </div>
 
-      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 py-4 px-2.5 overflow-y-auto overscroll-contain">
         <NavLinks pathname={pathname} />
       </nav>
 
-      <div className="p-2 border-t border-border">
+      <div className="p-3 border-t border-border/80 space-y-2">
+        <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-bg-primary/40 px-3 py-2.5">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand/30 to-brand/5 border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
+            {initial}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-medium text-text-primary truncate">
+              {userName || userEmail?.split("@")[0] || "Trader"}
+            </p>
+            <p className="text-[11px] text-text-tertiary truncate">{userEmail ?? "Account"}</p>
+          </div>
+        </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2.5 px-3 py-2 rounded text-[13px] text-text-tertiary hover:text-red w-full transition-colors cursor-pointer"
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-text-tertiary hover:text-red hover:bg-red/5 w-full transition-colors cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
-          Log Out
+          Log out
         </button>
       </div>
     </aside>
@@ -165,7 +214,7 @@ export function DashboardMobileFrame({
 
   return (
     <>
-      <header className="h-14 border-b border-border bg-bg-primary/95 backdrop-blur-md flex items-center justify-between px-3 sm:px-4 lg:px-5 sticky top-0 z-40 safe-area-top safe-area-x shrink-0">
+      <header className="h-14 lg:h-16 border-b border-border/80 bg-bg-primary/90 backdrop-blur-xl flex items-center justify-between px-3 sm:px-4 lg:px-6 sticky top-0 z-40 safe-area-top safe-area-x shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <button
             type="button"
@@ -179,24 +228,25 @@ export function DashboardMobileFrame({
             <Logo size={20} />
             <span className="font-bold text-sm truncate">{BRAND.name}</span>
           </Link>
+          <p className="hidden lg:block text-sm font-medium text-text-tertiary">
+            Trading terminal
+          </p>
         </div>
-
-        <div className="hidden lg:block" />
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link
-            href="/help"
-            className="relative p-2 text-text-tertiary hover:text-text-primary transition-colors rounded-lg active:bg-bg-hover"
-            aria-label="Notifications and help"
+            href="/dashboard/support"
+            className="relative p-2 text-text-tertiary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-hover"
+            aria-label="Notifications"
           >
             <Bell className="w-[18px] h-[18px]" />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red rounded-full" />
           </Link>
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-bg-hover flex items-center justify-center text-[11px] font-bold text-text-secondary shrink-0">
+          <div className="flex items-center gap-2 min-w-0 pl-1 border-l border-border/60">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand/25 to-brand/5 border border-brand/15 flex items-center justify-center text-[11px] font-bold text-brand shrink-0">
               {(userName || userEmail || "U").charAt(0).toUpperCase()}
             </div>
-            <span className="hidden sm:block text-[13px] text-text-secondary truncate max-w-[120px]">
+            <span className="hidden sm:block text-[13px] text-text-secondary truncate max-w-[140px]">
               {userName || userEmail?.split("@")[0] || "User"}
             </span>
           </div>
@@ -205,66 +255,70 @@ export function DashboardMobileFrame({
 
       <main
         className={cn(
-          "flex-1 p-3 sm:p-4 lg:p-5 overflow-x-hidden overflow-y-auto bg-bg-primary min-w-0",
+          "relative z-[1] flex-1 p-3 sm:p-4 lg:p-6 overflow-x-hidden overflow-y-auto min-w-0",
           hideBottomNav
-            ? "pb-[max(0.75rem,var(--safe-bottom))] lg:pb-5"
-            : "pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-5"
+            ? "pb-[max(0.75rem,var(--safe-bottom))] lg:pb-6"
+            : "pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-6"
         )}
       >
         {children}
       </main>
 
       {!hideBottomNav && (
-      <nav
-        className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-bg-secondary/95 backdrop-blur-md safe-area-x"
-        aria-label="Primary"
-      >
-        <div className="flex items-stretch justify-around px-0.5 pt-1 pb-[max(0.25rem,var(--safe-bottom))]">
-          {MOBILE_TABS.map((item) => {
-            const Icon = item.icon;
-            const isMore = item.href === null;
-            const active = isMore
-              ? menuOpen || isMoreMenuActive(pathname)
-              : isActive(pathname, item.href);
+        <nav
+          className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border/80 bg-bg-secondary/95 backdrop-blur-xl safe-area-x"
+          aria-label="Primary"
+        >
+          <div className="flex items-stretch justify-around px-1 pt-1.5 pb-[max(0.35rem,var(--safe-bottom))]">
+            {MOBILE_TABS.map((item) => {
+              const Icon = item.icon;
+              const isMore = item.href === null;
+              const active = isMore
+                ? menuOpen || isMoreMenuActive(pathname)
+                : isActive(pathname, item.href);
 
-            const className = cn(
-              "relative flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 max-w-[80px] py-2 px-1 text-[10px] leading-tight transition-colors rounded-lg",
-              active ? "text-brand" : "text-text-tertiary active:text-text-secondary"
-            );
-
-            const content = (
-              <>
-                <Icon className="w-5 h-5 shrink-0" />
-                <span className="truncate w-full text-center">{item.label}</span>
-                {active && (
-                  <span className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-brand" />
-                )}
-              </>
-            );
-
-            if (isMore) {
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => setMenuOpen(true)}
-                  className={className}
-                  aria-label="Open menu"
-                  aria-expanded={menuOpen}
-                >
-                  {content}
-                </button>
+              const className = cn(
+                "relative flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 max-w-[80px] py-2 px-1 text-[10px] leading-tight transition-colors rounded-xl",
+                active ? "text-brand" : "text-text-tertiary active:text-text-secondary"
               );
-            }
 
-            return (
-              <Link key={item.href} href={item.href} className={className}>
-                {content}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+              const content = (
+                <>
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-xl transition-colors",
+                      active ? "bg-brand/10" : ""
+                    )}
+                  >
+                    <Icon className="w-[18px] h-[18px] shrink-0" />
+                  </span>
+                  <span className="truncate w-full text-center font-medium">{item.label}</span>
+                </>
+              );
+
+              if (isMore) {
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => setMenuOpen(true)}
+                    className={className}
+                    aria-label="Open menu"
+                    aria-expanded={menuOpen}
+                  >
+                    {content}
+                  </button>
+                );
+              }
+
+              return (
+                <Link key={item.href} href={item.href} className={className}>
+                  {content}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       )}
 
       {menuOpen && (
@@ -275,8 +329,8 @@ export function DashboardMobileFrame({
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu"
           />
-          <div className="absolute left-0 top-0 h-full w-[min(288px,88vw)] bg-bg-secondary border-r border-border flex flex-col safe-area-top safe-area-bottom safe-area-x mobile-nav-drawer">
-            <div className="h-14 flex items-center justify-between px-4 border-b border-border shrink-0">
+          <div className="dashboard-sidebar absolute left-0 top-0 h-full w-[min(300px,88vw)] border-r border-border flex flex-col safe-area-top safe-area-bottom safe-area-x mobile-nav-drawer">
+            <div className="h-14 flex items-center justify-between px-4 border-b border-border/80 shrink-0">
               <Link
                 href="/"
                 className="flex items-center gap-2 min-w-0"
@@ -294,10 +348,10 @@ export function DashboardMobileFrame({
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto overscroll-contain">
+            <nav className="flex-1 p-3 overflow-y-auto overscroll-contain">
               <NavLinks pathname={pathname} onNavigate={() => setMenuOpen(false)} />
             </nav>
-            <div className="p-3 border-t border-border shrink-0">
+            <div className="p-3 border-t border-border/80 shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -307,7 +361,7 @@ export function DashboardMobileFrame({
                 className="flex items-center gap-2.5 px-3 py-3 rounded-lg text-[14px] text-text-tertiary hover:text-red hover:bg-red/5 w-full cursor-pointer transition-colors"
               >
                 <LogOut className="w-[18px] h-[18px]" />
-                Log Out
+                Log out
               </button>
             </div>
           </div>
