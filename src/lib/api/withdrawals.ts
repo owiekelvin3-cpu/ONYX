@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { WithdrawalRow, WithdrawalEligibility } from "@/lib/supabase/types";
+import type { WithdrawalDetails, WithdrawalMethodId } from "@/lib/withdrawal-options";
 
 export async function getWithdrawalEligibility(
   supabase: SupabaseClient
@@ -32,7 +33,9 @@ export async function submitWithdrawal(
     userId: string;
     amount: number;
     currency: string;
-    walletAddress: string;
+    method: WithdrawalMethodId;
+    destination: string;
+    details: WithdrawalDetails;
   }
 ): Promise<WithdrawalRow> {
   const { data, error } = await supabase
@@ -41,8 +44,9 @@ export async function submitWithdrawal(
       user_id: params.userId,
       amount: params.amount,
       currency: params.currency,
-      method: "crypto",
-      wallet_address: params.walletAddress,
+      method: params.method,
+      wallet_address: params.destination,
+      notes: JSON.stringify(params.details),
       status: "pending",
     })
     .select(

@@ -50,9 +50,11 @@ export interface WithdrawalRow {
   id: string;
   user_id: string;
   amount: number;
+  currency?: string;
   method: string;
   status: TransactionStatus;
   wallet_address: string | null;
+  notes?: string | null;
   created_at: string;
   profiles?: { email: string; full_name: string | null } | null;
 }

@@ -9,6 +9,10 @@ import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import {
+  formatWithdrawalMethodLabel,
+  formatWithdrawalSummary,
+} from "@/lib/withdrawal-options";
 import { RefreshCw } from "@/components/icons";
 
 type Filter = "all" | "pending" | "completed" | "rejected";
@@ -105,11 +109,13 @@ export default function AdminWithdrawalsPage() {
                       <StatusBadge status={w.status} />
                     </div>
                     <p className="text-sm text-text-tertiary mt-1">
-                      {userLabel} · {w.method} · {formatDate(w.created_at)}
+                      {userLabel} · {formatWithdrawalMethodLabel(w.method)} · {formatDate(w.created_at)}
                     </p>
-                    {w.wallet_address && (
-                      <p className="text-xs text-text-tertiary mt-1 font-mono truncate">{w.wallet_address}</p>
-                    )}
+                    {formatWithdrawalSummary(w).map((line) => (
+                      <p key={line} className="text-xs text-text-tertiary mt-1 font-mono break-all">
+                        {line}
+                      </p>
+                    ))}
                   </div>
                   {pending && (
                     <div className="flex gap-2 shrink-0">

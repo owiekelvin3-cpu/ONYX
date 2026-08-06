@@ -43,6 +43,8 @@ import {
   faLocationDot,
   faPhone,
   faUser,
+  faBuildingColumns,
+  faMoneyBillTransfer,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -107,3 +109,5 @@ export const Calendar = icon(faCalendar);
 export const MapPin = icon(faLocationDot);
 export const Phone = icon(faPhone);
 export const User = icon(faUser);
+export const BuildingColumns = icon(faBuildingColumns);
+export const MoneyBillTransfer = icon(faMoneyBillTransfer);
