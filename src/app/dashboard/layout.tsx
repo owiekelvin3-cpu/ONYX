@@ -1,10 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import {
-  DashboardSidebar,
-  DashboardMobileFrame,
-} from "@/components/dashboard/Sidebar";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -29,19 +26,8 @@ export default async function DashboardLayout({
     .maybeSingle();
 
   return (
-    <div className="dashboard-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden">
-      <DashboardSidebar
-        userName={profile?.full_name ?? undefined}
-        userEmail={user.email}
-      />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <DashboardMobileFrame
-          userName={profile?.full_name ?? undefined}
-          userEmail={user.email}
-        >
-          {children}
-        </DashboardMobileFrame>
-      </div>
-    </div>
+    <DashboardShell userName={profile?.full_name ?? undefined} userEmail={user.email}>
+      {children}
+    </DashboardShell>
   );
 }

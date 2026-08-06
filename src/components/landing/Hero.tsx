@@ -62,7 +62,7 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
 
             <HeroEnter delay={0.24}>
               <div className="mt-6 sm:mt-8 w-full max-w-md">
-                <div className="rounded-xl border border-border bg-bg-secondary/90 p-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.25)] sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none sm:rounded-none">
+                <div className="rounded-2xl border border-border bg-bg-secondary p-3.5 shadow-[var(--shadow-card)] sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none sm:rounded-none">
                   <p className="text-[11px] font-medium uppercase tracking-wider text-text-tertiary mb-3 sm:hidden">
                     Start trading today
                   </p>
@@ -138,7 +138,7 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
           <HeroEnter delay={0.2} className="relative min-w-0 w-full max-w-xl lg:max-w-none mx-auto lg:mx-0">
             <div className="landing-terminal-float relative">
               <div className="absolute -inset-px rounded-lg bg-gradient-to-br from-brand/20 via-transparent to-green/10 opacity-60 blur-sm pointer-events-none" />
-              <div className="relative bg-bg-secondary border border-border rounded-lg overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+              <div className="relative bg-bg-secondary border border-border rounded-2xl overflow-hidden shadow-[var(--shadow-card)]">
                 <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 px-3 sm:px-4 py-3 border-b border-border">
                   <div className="flex flex-wrap items-center gap-x-2 sm:gap-3 gap-y-1 min-w-0">
                     <span className="text-xs sm:text-sm font-semibold">BTC/USDT</span>
@@ -182,13 +182,13 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
                   >
                     <defs>
                       <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0ECB81" stopOpacity="0.2" />
-                        <stop offset="100%" stopColor="#0ECB81" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#22C55E" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
                       </linearGradient>
                       <linearGradient id="chartStroke" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#0ECB81" stopOpacity="0.4" />
-                        <stop offset="50%" stopColor="#0ECB81" />
-                        <stop offset="100%" stopColor="#fcd535" stopOpacity="0.8" />
+                        <stop offset="0%" stopColor="#22C55E" stopOpacity="0.4" />
+                        <stop offset="50%" stopColor="#22C55E" />
+                        <stop offset="100%" stopColor="#6B4AE3" stopOpacity="0.8" />
                       </linearGradient>
                     </defs>
                     <motion.path
@@ -210,7 +210,7 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
                     />
                   </svg>
                   <motion.div
-                    className="absolute top-4 right-4 w-2 h-2 rounded-full bg-green shadow-[0_0_12px_rgba(14,203,129,0.8)]"
+                    className="absolute top-4 right-4 w-2 h-2 rounded-full bg-green shadow-[0_0_12px_rgba(34,197,94,0.6)]"
                     animate={reduce ? undefined : { scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   />

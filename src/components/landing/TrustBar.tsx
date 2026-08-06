@@ -16,7 +16,7 @@ export function TrustBar() {
             return (
               <StaggerItem key={item.title}>
                 <div className="group flex gap-3.5 min-w-0 h-full p-3 -m-3 rounded-lg transition-colors hover:bg-bg-primary/50">
-                  <span className="w-9 h-9 rounded-lg bg-bg-primary border border-border flex items-center justify-center shrink-0 transition-all group-hover:border-brand/30 group-hover:shadow-[0_0_20px_rgba(240,185,11,0.08)]">
+                  <span className="w-9 h-9 rounded-xl bg-bg-primary border border-border flex items-center justify-center shrink-0 transition-all group-hover:border-brand/30 group-hover:shadow-[0_0_20px_rgba(107,74,227,0.12)]">
                     <Icon className="w-4 h-4 text-brand transition-transform group-hover:scale-110" strokeWidth={1.75} />
                   </span>
                   <div className="min-w-0 pt-0.5">

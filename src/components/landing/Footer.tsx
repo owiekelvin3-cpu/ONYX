@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { BRAND, FOOTER } from "@/lib/constants";
 import { siteRoute } from "@/lib/routes";
 
@@ -20,10 +21,7 @@ export function Footer() {
         <div className="grid gap-8 sm:gap-10 sm:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2">
-              <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden>
-                <rect width="28" height="28" rx="6" fill="#F0B90B" />
-                <path d="M8 18L14 8L20 18H16.5L14 14.5L11.5 18H8Z" fill="#0B0E11" />
-              </svg>
+              <OnyxLogo size={24} />
               <span className="font-bold text-text-primary">{BRAND.name}</span>
             </Link>
             <p className="text-xs text-text-tertiary mt-3 leading-relaxed max-w-xs">

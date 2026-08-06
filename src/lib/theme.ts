@@ -1,0 +1,20 @@
+/** Brand palette extracted from reference UI video (Coinix-style dashboard). */
+export const THEME = {
+  brand: "#6B4AE3",
+  brandHover: "#7860E8",
+  brandLight: "#EEEAFD",
+  brandMuted: "#9B87F5",
+  pageBg: "#F2F6F7",
+  cardBg: "#FFFFFF",
+  surfaceMuted: "#F8FAFB",
+  hoverBg: "#EEF1F4",
+  border: "#E5E9EE",
+  borderLight: "#D8DEE6",
+  textPrimary: "#0F172A",
+  textSecondary: "#475569",
+  textTertiary: "#94A3B8",
+  green: "#22C55E",
+  red: "#EF4444",
+  navActiveBg: "#0B0B0F",
+  navPillBg: "#F3F4F6",
+} as const;

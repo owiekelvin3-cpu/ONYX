@@ -198,8 +198,8 @@ export default function TradePage() {
             <svg viewBox="0 0 600 120" className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="tradeFillMobile" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0ECB81" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#0ECB81" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#22C55E" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
                 </linearGradient>
               </defs>
               <path
@@ -209,7 +209,7 @@ export default function TradePage() {
               <path
                 d="M0,90 L60,85 L120,75 L180,80 L240,60 L300,55 L360,40 L420,45 L480,30 L540,35 L600,25"
                 fill="none"
-                stroke="#0ECB81"
+                stroke="#22C55E"
                 strokeWidth="1.5"
               />
             </svg>
@@ -266,8 +266,8 @@ export default function TradePage() {
             >
               <defs>
                 <linearGradient id="tradeFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0ECB81" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#0ECB81" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#22C55E" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
                 </linearGradient>
               </defs>
               <path
@@ -277,7 +277,7 @@ export default function TradePage() {
               <path
                 d="M0,140 L40,130 L80,120 L120,125 L160,100 L200,90 L240,100 L280,70 L320,75 L360,50 L400,55 L440,35 L480,40 L520,25 L560,30 L600,20"
                 fill="none"
-                stroke="#0ECB81"
+                stroke="#22C55E"
                 strokeWidth="1.5"
               />
             </svg>

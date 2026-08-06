@@ -29,7 +29,7 @@ export function ProductShowcase() {
               <StaggerItem key={product.title}>
                 <Link
                   href={product.href}
-                  className="group relative block bg-bg-secondary border border-border rounded-lg p-4 sm:p-6 overflow-hidden transition-all duration-300 hover:border-brand/25 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)] touch-target"
+                  className="group relative block bg-bg-secondary border border-border rounded-2xl p-4 sm:p-6 overflow-hidden transition-all duration-300 hover:border-brand/25 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)] touch-target"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative">

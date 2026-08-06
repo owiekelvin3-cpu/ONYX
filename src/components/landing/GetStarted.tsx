@@ -27,7 +27,7 @@ export function GetStarted() {
               {STEPS.map((s, i) => (
                 <StaggerItem key={s.step}>
                   <Link href={STEP_LINKS[i]} className="flex gap-3 sm:gap-4 group relative">
-                    <span className="relative z-10 flex items-center justify-center w-6 h-6 rounded-full bg-bg-primary border border-border text-brand font-bold text-[10px] font-mono shrink-0 transition-all group-hover:border-brand group-hover:shadow-[0_0_16px_rgba(240,185,11,0.15)]">
+                    <span className="relative z-10 flex items-center justify-center w-6 h-6 rounded-full bg-bg-primary border border-border text-brand font-bold text-[10px] font-mono shrink-0 transition-all group-hover:border-brand group-hover:shadow-[0_0_16px_rgba(107,74,227,0.15)]">
                       {s.step.replace("0", "")}
                     </span>
                     <div>

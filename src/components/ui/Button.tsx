@@ -10,16 +10,16 @@ const variants = {
   brand:
     "bg-brand text-brand-text font-semibold hover:bg-brand-hover active:scale-[0.98]",
   outline:
-    "border border-border-light text-text-primary hover:border-text-tertiary hover:bg-bg-hover",
+    "border border-border-light text-text-primary hover:border-brand/30 hover:bg-brand-light/40",
   ghost: "text-text-secondary hover:text-text-primary hover:bg-bg-hover",
   secondary:
     "bg-bg-tertiary text-text-primary hover:bg-bg-hover border border-border",
 };
 
 const sizes = {
-  sm: "h-8 px-4 text-xs rounded",
-  md: "h-10 px-5 text-sm rounded",
-  lg: "h-12 px-8 text-sm rounded",
+  sm: "h-8 px-4 text-xs rounded-xl",
+  md: "h-10 px-5 text-sm rounded-xl",
+  lg: "h-12 px-8 text-sm rounded-xl",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

@@ -38,41 +38,42 @@ export function PortfolioChart({
           <AreaChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="portfolioFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#F0B90B" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#F0B90B" stopOpacity={0} />
+                <stop offset="5%" stopColor="#6B4AE3" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#6B4AE3" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#848E9C", fontSize: 10 }}
+              tick={{ fill: "#94A3B8", fontSize: 10 }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#848E9C", fontSize: 10 }}
+              tick={{ fill: "#94A3B8", fontSize: 10 }}
               tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
               width={42}
             />
             <Tooltip
               contentStyle={{
-                background: "#1E2329",
-                border: "1px solid #2B3139",
-                borderRadius: "8px",
+                background: "#FFFFFF",
+                border: "1px solid #E5E9EE",
+                borderRadius: "12px",
                 fontSize: "12px",
-                color: "#EAECEF",
+                color: "#0F172A",
+                boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
               }}
               formatter={(value) => [formatCurrency(Number(value)), "Value"]}
             />
             <Area
               type="monotone"
               dataKey="price"
-              stroke="#F0B90B"
+              stroke="#6B4AE3"
               strokeWidth={2}
               fill="url(#portfolioFill)"
-              activeDot={{ r: 4, fill: "#F0B90B", stroke: "#0B0E11", strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: "#6B4AE3", stroke: "#FFFFFF", strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

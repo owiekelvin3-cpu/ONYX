@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { clearAdminAuthCookie } from "@/lib/auth-guards";
@@ -71,6 +72,7 @@ export function AdminShell({
       >
         <div className="h-14 flex items-center justify-between px-4 border-b border-border">
           <Link href="/admin" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
+            <OnyxLogo size={24} />
             <span className="font-bold text-sm">{BRAND.name}</span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-brand bg-brand/10 px-2 py-0.5 rounded">
               Team
@@ -91,9 +93,9 @@ export function AdminShell({
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className={cn(
-                  "flex items-center gap-2.5 px-3 py-2.5 rounded text-[13px] transition-colors",
+                  "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] transition-colors",
                   active
-                    ? "bg-brand/10 text-brand font-medium"
+                    ? "bg-nav-active text-nav-active-text font-medium"
                     : "text-text-secondary hover:text-text-primary hover:bg-bg-hover"
                 )}
               >

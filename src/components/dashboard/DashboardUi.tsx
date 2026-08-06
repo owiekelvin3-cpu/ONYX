@@ -36,7 +36,7 @@ export function DashboardStatCard({
   hint?: string;
 }) {
   return (
-    <div className="dashboard-stat-card group relative overflow-hidden rounded-xl border border-border bg-bg-secondary/80 p-4 transition-colors hover:border-border-light">
+    <div className="dashboard-stat-card group relative overflow-hidden rounded-2xl border border-border bg-bg-secondary p-4 transition-all hover:shadow-[var(--shadow-card)]">
       <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.04] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="relative flex items-start justify-between gap-2">
         <div className="min-w-0">
@@ -79,7 +79,7 @@ export function DashboardQuickActions({
         <Link
           key={item.href}
           href={item.href}
-          className="dashboard-quick-action group flex flex-col gap-2 rounded-xl border border-border bg-bg-secondary/60 px-3 py-3.5 transition-all hover:border-brand/30 hover:bg-bg-secondary"
+          className="dashboard-quick-action group flex flex-col gap-2 rounded-2xl border border-border bg-bg-secondary px-3 py-3.5 transition-all hover:border-brand/20 hover:shadow-[var(--shadow-card)]"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand transition-transform group-hover:scale-105">
             {icons[item.label]}
@@ -108,7 +108,7 @@ export function DashboardHeroCard({
   const pnlTone = pnl24h === null ? null : pnl24h >= 0 ? "up" : "down";
 
   return (
-    <div className="dashboard-hero relative overflow-hidden rounded-2xl border border-border bg-bg-secondary p-5 sm:p-6">
+    <div className="dashboard-hero coinix-card relative overflow-hidden p-5 sm:p-6">
       <div className="pointer-events-none absolute inset-0 dashboard-hero-glow" aria-hidden />
       <div className="relative">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -173,7 +173,7 @@ export function DashboardPanel({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-2xl border border-border bg-bg-secondary/80 p-4 sm:p-5", className)}>
+    <div className={cn("coinix-card p-4 sm:p-5", className)}>
       <div className="flex items-center justify-between gap-3 mb-4">
         <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
         {action}
