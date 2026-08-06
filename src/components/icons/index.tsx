@@ -60,7 +60,6 @@ function icon(def: IconDefinition, defaults?: { spin?: boolean }) {
         icon={def}
         className={cn(className)}
         spin={spin ?? defaults?.spin}
-        fixedWidth
       />
     );
   }

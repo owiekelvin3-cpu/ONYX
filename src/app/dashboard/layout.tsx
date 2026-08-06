@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import {
   DashboardSidebar,
-  DashboardTopBar,
-  DashboardMobileNav,
+  DashboardMobileFrame,
 } from "@/components/dashboard/Sidebar";
 
 export const metadata: Metadata = {
@@ -33,14 +32,14 @@ export default async function DashboardLayout({
     <div className="flex min-h-dvh">
       <DashboardSidebar />
       <div className="flex-1 flex flex-col min-h-dvh min-w-0">
-        <DashboardTopBar
+        <DashboardMobileFrame
           userName={profile?.full_name ?? undefined}
           userEmail={user.email}
-        />
-        <main className="flex-1 p-3 sm:p-4 lg:p-5 pb-[calc(3.5rem+var(--safe-bottom))] lg:pb-5 overflow-x-hidden overflow-y-auto bg-bg-primary min-w-0">
-          {children}
-        </main>
-        <DashboardMobileNav />
+        >
+          <main className="flex-1 p-3 sm:p-4 lg:p-5 pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-5 overflow-x-hidden overflow-y-auto bg-bg-primary min-w-0">
+            {children}
+          </main>
+        </DashboardMobileFrame>
       </div>
     </div>
   );
