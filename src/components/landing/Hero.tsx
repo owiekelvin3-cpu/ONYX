@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
+import { Mail, ArrowRight } from "@/components/icons";
 import { MARKET_PAIRS, type MarketPair } from "@/lib/market-data";
 import { formatNumber, formatPercent } from "@/lib/utils";
 import { HeroEnter } from "@/components/landing/motion";
@@ -58,22 +59,48 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
             </HeroEnter>
 
             <HeroEnter delay={0.24}>
-              <div className="mt-6 sm:mt-8 flex flex-col xs:flex-row gap-2 max-w-md">
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 h-11 sm:h-12 px-4 bg-bg-secondary border border-border rounded text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-brand transition-colors min-w-0"
-                />
-                <Link
-                  href={`/register${email ? `?email=${encodeURIComponent(email)}` : ""}`}
-                  className="w-full xs:w-auto shrink-0"
-                >
-                  <Button size="lg" className="w-full xs:w-auto">
-                    Get started
-                  </Button>
-                </Link>
+              <div className="mt-6 sm:mt-8 w-full max-w-md">
+                <div className="rounded-xl border border-border bg-bg-secondary/90 p-3.5 shadow-[0_8px_32px_rgba(0,0,0,0.25)] sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none sm:rounded-none">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-text-tertiary mb-3 sm:hidden">
+                    Start trading today
+                  </p>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:gap-2">
+                    <div className="relative flex-1 min-w-0">
+                      <label htmlFor="hero-email" className="sr-only">
+                        Email address
+                      </label>
+                      <Mail
+                        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary"
+                        aria-hidden
+                      />
+                      <input
+                        id="hero-email"
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full h-12 sm:h-12 pl-11 pr-4 bg-bg-primary sm:bg-bg-secondary border border-border rounded-lg sm:rounded text-[15px] sm:text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all min-w-0"
+                      />
+                    </div>
+
+                    <Link
+                      href={`/register${email ? `?email=${encodeURIComponent(email)}` : ""}`}
+                      className="w-full sm:w-auto shrink-0"
+                    >
+                      <Button size="lg" className="w-full sm:w-auto h-12 px-6 text-[15px] sm:text-sm">
+                        Get started
+                        <ArrowRight className="w-4 h-4 sm:hidden" aria-hidden />
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <p className="mt-3 text-[12px] leading-relaxed text-text-tertiary text-center sm:text-left sm:mt-2.5">
+                    Free account · No credit card · Ready in minutes
+                  </p>
+                </div>
               </div>
             </HeroEnter>
 
