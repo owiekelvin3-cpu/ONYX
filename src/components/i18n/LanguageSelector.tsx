@@ -18,9 +18,11 @@ export const LANGUAGES = [
 export function LanguageSelector({
   className,
   showLabel = false,
+  menuPlacement = "bottom",
 }: {
   className?: string;
   showLabel?: boolean;
+  menuPlacement?: "bottom" | "top";
 }) {
   const { t, i18n: i18nInstance } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -58,7 +60,14 @@ export function LanguageSelector({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-[70] mt-1.5 w-44 rounded-xl border border-border bg-bg-secondary py-1 shadow-xl">
+        <div
+          className={cn(
+            "absolute z-[70] w-44 rounded-xl border border-border bg-bg-secondary py-1 shadow-xl",
+            menuPlacement === "top"
+              ? "bottom-full left-0 mb-1.5"
+              : "right-0 top-full mt-1.5"
+          )}
+        >
           <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
             {t("common.language")}
           </p>

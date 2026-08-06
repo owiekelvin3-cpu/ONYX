@@ -29,12 +29,12 @@ export default async function DashboardLayout({
     .maybeSingle();
 
   return (
-    <div className="dashboard-shell flex min-h-dvh">
+    <div className="dashboard-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden">
       <DashboardSidebar
         userName={profile?.full_name ?? undefined}
         userEmail={user.email}
       />
-      <div className="flex-1 flex flex-col min-h-dvh min-w-0">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardMobileFrame
           userName={profile?.full_name ?? undefined}
           userEmail={user.email}

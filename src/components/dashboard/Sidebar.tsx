@@ -29,29 +29,33 @@ import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const NAV_GROUPS = [
   {
-    labelKey: "dashboard.overview",
+    id: "overview",
+    labelKey: "dashboard.navGroupOverview",
     items: [
-      { labelKey: "dashboard.overview", href: "/dashboard", icon: LayoutDashboard },
-      { labelKey: "dashboard.tradingRoom", href: "/dashboard/trade", icon: TrendingUp },
-      { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
+      { labelKey: "dashboard.navDashboard", href: "/dashboard", icon: LayoutDashboard },
+      { labelKey: "dashboard.navTrade", href: "/dashboard/trade", icon: TrendingUp },
+      { labelKey: "dashboard.navPortfolio", href: "/dashboard/portfolio", icon: Wallet },
     ],
   },
   {
-    labelKey: "dashboard.deposits",
+    id: "cash",
+    labelKey: "dashboard.navGroupCash",
     items: [
-      { labelKey: "dashboard.deposits", href: "/dashboard/deposit", icon: ArrowDownToLine },
-      { labelKey: "dashboard.withdrawals", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
+      { labelKey: "dashboard.navDeposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
+      { labelKey: "dashboard.navWithdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
     ],
   },
   {
-    labelKey: "nav.products",
+    id: "tools",
+    labelKey: "dashboard.navGroupTools",
     items: [
       { labelKey: "dashboard.aiTrading", href: "/dashboard/ai-trading", icon: Bot },
       { labelKey: "dashboard.copyTrading", href: "/dashboard/copy-trading", icon: Users },
     ],
   },
   {
-    labelKey: "dashboard.settings",
+    id: "account",
+    labelKey: "dashboard.navGroupAccount",
     items: [
       { labelKey: "dashboard.support", href: "/dashboard/support", icon: Comments },
       { labelKey: "dashboard.settings", href: "/dashboard/settings", icon: Settings },
@@ -60,10 +64,10 @@ const NAV_GROUPS = [
 ] as const;
 
 const MOBILE_TABS = [
-  { labelKey: "dashboard.overview", href: "/dashboard", icon: LayoutDashboard },
-  { labelKey: "dashboard.tradingRoom", href: "/dashboard/trade", icon: TrendingUp },
-  { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
-  { labelKey: "dashboard.deposits", href: "/dashboard/deposit", icon: ArrowDownToLine },
+  { labelKey: "dashboard.dock.home", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "dashboard.navTrade", href: "/dashboard/trade", icon: TrendingUp },
+  { labelKey: "dashboard.navPortfolio", href: "/dashboard/portfolio", icon: Wallet },
+  { labelKey: "dashboard.navDeposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
   { labelKey: "nav.more", href: null, icon: MoreHorizontal },
 ] as const;
 
@@ -102,7 +106,7 @@ function NavLinks({
   return (
     <>
       {NAV_GROUPS.map((group) => (
-        <div key={group.labelKey} className="mb-4 last:mb-0">
+        <div key={group.id} className="mb-5 last:mb-0">
           <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-tertiary/80">
             {t(group.labelKey)}
           </p>
@@ -155,38 +159,40 @@ export function DashboardSidebar({
   }
 
   return (
-    <aside className="dashboard-sidebar hidden lg:flex flex-col w-[240px] border-r border-border h-dvh sticky top-0 shrink-0 z-10">
-      <div className="h-16 flex items-center px-5 border-b border-border/80">
-        <Link href="/" className="flex items-center gap-2.5 group">
+    <aside
+      className="dashboard-sidebar hidden lg:flex relative z-20 h-dvh max-h-dvh w-[240px] xl:w-[256px] shrink-0 flex-col border-r border-border"
+      aria-label={t("dashboard.navLabel")}
+    >
+      <div className="flex h-16 shrink-0 items-center border-b border-border/80 px-5">
+        <Link href="/" className="group flex min-w-0 items-center gap-2.5">
           <Logo size={24} />
-          <span className="font-bold text-sm tracking-tight text-text-primary group-hover:text-brand transition-colors">
+          <span className="truncate font-bold text-sm tracking-tight text-text-primary transition-colors group-hover:text-brand">
             {BRAND.name}
           </span>
         </Link>
       </div>
 
-      <nav className="flex-1 py-4 px-2.5 overflow-y-auto overscroll-contain">
+      <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 py-4">
         <NavLinks pathname={pathname} />
       </nav>
 
-      <div className="p-3 border-t border-border/80 space-y-2">
-        <div className="flex items-center justify-end px-1">
-          <LanguageSelector />
-        </div>
-        <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-bg-primary/40 px-3 py-2.5">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand/30 to-brand/5 border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
+      <div className="shrink-0 space-y-2 border-t border-border/80 p-3">
+        <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-bg-primary/40 px-3 py-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand/20 bg-gradient-to-br from-brand/30 to-brand/5 text-xs font-bold text-brand">
             {initial}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-medium text-text-primary truncate">
+            <p className="truncate text-[13px] font-medium text-text-primary">
               {userName || userEmail?.split("@")[0] || "Trader"}
             </p>
-            <p className="text-[11px] text-text-tertiary truncate">{userEmail ?? "Account"}</p>
+            <p className="truncate text-[11px] text-text-tertiary">{userEmail ?? "Account"}</p>
           </div>
+          <LanguageSelector menuPlacement="top" showLabel />
         </div>
         <button
+          type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-text-tertiary hover:text-red hover:bg-red/5 w-full transition-colors cursor-pointer"
+          className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] text-text-tertiary transition-colors hover:bg-red/5 hover:text-red"
         >
           <LogOut className="w-4 h-4" />
           {t("common.signOut")}
@@ -222,40 +228,40 @@ export function DashboardMobileFrame({
 
   return (
     <>
-      <header className="h-14 lg:h-16 border-b border-border/80 bg-bg-primary/90 backdrop-blur-xl flex items-center justify-between px-3 sm:px-4 lg:px-6 sticky top-0 z-40 safe-area-top safe-area-x shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
+      <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-border/80 bg-bg-primary/90 px-3 backdrop-blur-xl safe-area-top safe-area-x sm:px-4 lg:h-16 lg:px-6">
+        <div className="flex min-w-0 items-center gap-2">
           <button
             type="button"
-            className="lg:hidden p-2 -ml-1 text-text-secondary hover:text-text-primary cursor-pointer rounded-lg active:bg-bg-hover"
+            className="-ml-1 cursor-pointer rounded-lg p-2 text-text-secondary hover:text-text-primary active:bg-bg-hover lg:hidden"
             onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
+            aria-label={t("dashboard.openSidebar")}
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Link href="/" className="flex items-center gap-2 lg:hidden min-w-0">
+          <Link href="/" className="flex min-w-0 items-center gap-2 lg:hidden">
             <Logo size={20} />
-            <span className="font-bold text-sm truncate">{BRAND.name}</span>
+            <span className="truncate text-sm font-bold">{BRAND.name}</span>
           </Link>
-          <p className="hidden lg:block text-sm font-medium text-text-tertiary">
-            Trading terminal
+          <p className="hidden text-sm font-medium text-text-tertiary lg:block">
+            {t("dashboard.clientPortal")}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <LanguageSelector />
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <LanguageSelector className="lg:hidden" />
           <Link
             href="/dashboard/support"
-            className="relative p-2 text-text-tertiary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-hover"
-            aria-label="Notifications"
+            className="relative rounded-lg p-2 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-primary"
+            aria-label={t("dashboard.support")}
           >
             <Bell className="w-[18px] h-[18px]" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red rounded-full" />
+            <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-red" />
           </Link>
-          <div className="flex items-center gap-2 min-w-0 pl-1 border-l border-border/60">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand/25 to-brand/5 border border-brand/15 flex items-center justify-center text-[11px] font-bold text-brand shrink-0">
+          <div className="flex min-w-0 items-center gap-2 border-l border-border/60 pl-1 lg:hidden">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-brand/15 bg-gradient-to-br from-brand/25 to-brand/5 text-[11px] font-bold text-brand">
               {(userName || userEmail || "U").charAt(0).toUpperCase()}
             </div>
-            <span className="hidden sm:block text-[13px] text-text-secondary truncate max-w-[140px]">
+            <span className="hidden max-w-[140px] truncate text-[13px] text-text-secondary sm:block">
               {userName || userEmail?.split("@")[0] || "User"}
             </span>
           </div>
@@ -264,7 +270,7 @@ export function DashboardMobileFrame({
 
       <main
         className={cn(
-          "relative z-[1] flex-1 p-3 sm:p-4 lg:p-6 overflow-x-hidden overflow-y-auto min-w-0",
+          "relative z-[1] min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 lg:p-6",
           hideBottomNav
             ? "pb-[max(0.75rem,var(--safe-bottom))] lg:pb-6"
             : "pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-6"
@@ -275,8 +281,8 @@ export function DashboardMobileFrame({
 
       {!hideBottomNav && (
         <nav
-          className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border/80 bg-bg-secondary/95 backdrop-blur-xl safe-area-x"
-          aria-label="Primary"
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-bg-secondary/95 backdrop-blur-xl safe-area-x lg:hidden"
+          aria-label={t("dashboard.navLabel")}
         >
           <div className="flex items-stretch justify-around px-1 pt-1.5 pb-[max(0.35rem,var(--safe-bottom))]">
             {MOBILE_TABS.map((item) => {
@@ -287,7 +293,7 @@ export function DashboardMobileFrame({
                 : isActive(pathname, item.href);
 
               const className = cn(
-                "relative flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 max-w-[80px] py-2 px-1 text-[10px] leading-tight transition-colors rounded-xl",
+                "relative flex max-w-[80px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-2 text-[10px] leading-tight transition-colors",
                 active ? "text-brand" : "text-text-tertiary active:text-text-secondary"
               );
 
@@ -301,7 +307,7 @@ export function DashboardMobileFrame({
                   >
                     <Icon className="w-[18px] h-[18px] shrink-0" />
                   </span>
-                  <span className="truncate w-full text-center font-medium">{t(item.labelKey)}</span>
+                  <span className="w-full truncate text-center font-medium">{t(item.labelKey)}</span>
                 </>
               );
 
@@ -331,43 +337,52 @@ export function DashboardMobileFrame({
       )}
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
+        <div
+          className="fixed inset-0 z-[60] lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("dashboard.navLabel")}
+        >
           <button
             type="button"
-            className="absolute inset-0 bg-black/60 mobile-nav-backdrop"
+            className="mobile-nav-backdrop absolute inset-0 bg-black/60"
             onClick={() => setMenuOpen(false)}
-            aria-label="Close menu"
+            aria-label={t("dashboard.closeSidebar")}
           />
-          <div className="dashboard-sidebar absolute left-0 top-0 h-full w-[min(300px,88vw)] border-r border-border flex flex-col safe-area-top safe-area-bottom safe-area-x mobile-nav-drawer">
-            <div className="h-14 flex items-center justify-between px-4 border-b border-border/80 shrink-0">
+          <div className="dashboard-sidebar mobile-nav-drawer absolute left-0 top-0 flex h-full w-[min(300px,88vw)] flex-col border-r border-border safe-area-top safe-area-bottom safe-area-x">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/80 px-4">
               <Link
                 href="/"
-                className="flex items-center gap-2 min-w-0"
+                className="flex min-w-0 items-center gap-2"
                 onClick={() => setMenuOpen(false)}
               >
                 <Logo size={22} />
-                <span className="font-bold text-sm truncate">{BRAND.name}</span>
+                <span className="truncate text-sm font-bold">{BRAND.name}</span>
               </Link>
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="p-2 -mr-1 text-text-tertiary hover:text-text-primary cursor-pointer rounded-lg active:bg-bg-hover"
-                aria-label="Close menu"
+                className="-mr-1 cursor-pointer rounded-lg p-2 text-text-tertiary hover:text-text-primary active:bg-bg-hover"
+                aria-label={t("dashboard.closeSidebar")}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <nav className="flex-1 p-3 overflow-y-auto overscroll-contain">
+            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
               <NavLinks pathname={pathname} onNavigate={() => setMenuOpen(false)} />
             </nav>
-            <div className="p-3 border-t border-border/80 shrink-0">
+            <div className="shrink-0 space-y-2 border-t border-border/80 p-3">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs text-text-tertiary">{t("common.language")}</span>
+                <LanguageSelector showLabel />
+              </div>
               <button
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
                   handleLogout();
                 }}
-                className="flex items-center gap-2.5 px-3 py-3 rounded-lg text-[14px] text-text-tertiary hover:text-red hover:bg-red/5 w-full cursor-pointer transition-colors"
+                className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-3 text-[14px] text-text-tertiary transition-colors hover:bg-red/5 hover:text-red"
               >
                 <LogOut className="w-[18px] h-[18px]" />
                 {t("common.signOut")}
