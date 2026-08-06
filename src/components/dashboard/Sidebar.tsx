@@ -64,6 +64,11 @@ function isMoreMenuActive(pathname: string) {
   );
 }
 
+/** Hide bottom tabs on immersive full-screen views (e.g. support chat). */
+export function shouldHideMobileBottomNav(pathname: string) {
+  return pathname.startsWith("/dashboard/support");
+}
+
 function NavLinks({
   pathname,
   onNavigate,
@@ -147,6 +152,7 @@ export function DashboardMobileFrame({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const hideBottomNav = shouldHideMobileBottomNav(pathname);
   useBodyScrollLock(menuOpen);
 
   async function handleLogout() {
@@ -197,8 +203,18 @@ export function DashboardMobileFrame({
         </div>
       </header>
 
-      {children}
+      <main
+        className={cn(
+          "flex-1 p-3 sm:p-4 lg:p-5 overflow-x-hidden overflow-y-auto bg-bg-primary min-w-0",
+          hideBottomNav
+            ? "pb-[max(0.75rem,var(--safe-bottom))] lg:pb-5"
+            : "pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-5"
+        )}
+      >
+        {children}
+      </main>
 
+      {!hideBottomNav && (
       <nav
         className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-bg-secondary/95 backdrop-blur-md safe-area-x"
         aria-label="Primary"
@@ -249,6 +265,7 @@ export function DashboardMobileFrame({
           })}
         </div>
       </nav>
+      )}
 
       {menuOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">

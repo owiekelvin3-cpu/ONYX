@@ -94,7 +94,7 @@ export function AuthShell({
           </div>
         </main>
 
-        <footer className="shrink-0 py-4 px-4 safe-area-bottom border-t border-border/40 lg:border-0">
+        <footer className="shrink-0 pt-4 pb-[max(1rem,var(--safe-bottom))] px-4 border-t border-border/40 lg:border-0">
           <p className="text-center text-[11px] text-text-tertiary">
             &copy; {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
           </p>

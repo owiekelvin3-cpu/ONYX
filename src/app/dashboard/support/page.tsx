@@ -227,7 +227,7 @@ export default function SupportPage() {
 
       {/* Mobile inbox list */}
       <div className={cn("min-h-0 flex-1 lg:hidden", showThread && "hidden")}>
-        <div className="flex h-full min-h-[calc(100dvh-11rem)] flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary">
+        <div className="flex h-full min-h-[calc(100dvh-9rem)] flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary">
           <div className="border-b border-border p-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />

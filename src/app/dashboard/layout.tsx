@@ -36,9 +36,7 @@ export default async function DashboardLayout({
           userName={profile?.full_name ?? undefined}
           userEmail={user.email}
         >
-          <main className="flex-1 p-3 sm:p-4 lg:p-5 pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-5 overflow-x-hidden overflow-y-auto bg-bg-primary min-w-0">
-            {children}
-          </main>
+          {children}
         </DashboardMobileFrame>
       </div>
     </div>
