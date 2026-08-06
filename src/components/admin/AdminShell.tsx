@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { clearAdminAuthCookie } from "@/lib/auth-guards";
@@ -140,6 +141,9 @@ export function AdminShell({
             <Menu className="w-5 h-5" />
           </button>
           <p className="text-sm font-medium text-text-secondary">Team Console</p>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </header>
         <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto min-w-0">{children}</main>
       </div>

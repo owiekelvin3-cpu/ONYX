@@ -45,6 +45,13 @@
     "close": "Close",
     "cancel": "Cancel"
   },
+  "theme": {
+    "appearance": "外观",
+    "light": "浅色",
+    "dark": "深色",
+    "switchToLight": "切换到浅色模式",
+    "switchToDark": "切换到深色模式"
+  },
   "nav": {
     "services": "服务",
     "about": "关于我们",

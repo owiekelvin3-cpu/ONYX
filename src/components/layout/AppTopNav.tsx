@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Bell, Menu, Search, X } from "@/components/icons";
 import { useState } from "react";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
@@ -103,6 +104,7 @@ export function AppTopNav({
               </>
             )}
 
+            <ThemeToggle className="hidden sm:inline-flex" />
             <LanguageSelector className="hidden sm:block" />
 
             {mode === "dashboard" ? (
@@ -162,7 +164,8 @@ export function AppTopNav({
                 </Link>
               ))}
             </nav>
-            <div className="border-t border-border p-3">
+            <div className="border-t border-border p-3 space-y-3">
+              <ThemeToggle showLabel className="w-full justify-start px-2" />
               <LanguageSelector showLabel />
             </div>
           </div>

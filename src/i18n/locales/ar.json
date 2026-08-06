@@ -45,6 +45,13 @@
     "close": "Close",
     "cancel": "Cancel"
   },
+  "theme": {
+    "appearance": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "switchToLight": "التبديل إلى الوضع الفاتح",
+    "switchToDark": "التبديل إلى الوضع الداكن"
+  },
   "nav": {
     "services": "الخدمات",
     "about": "من نحن",

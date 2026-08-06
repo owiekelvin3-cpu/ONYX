@@ -46,6 +46,13 @@
     "allRightsReserved": "All rights reserved.",
     "segregatedAccounts": "Segregated client custody"
   },
+  "theme": {
+    "appearance": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
   "nav": {
     "services": "Services",
     "about": "About",

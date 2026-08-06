@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BRAND, PLATFORM_HIGHLIGHTS } from "@/lib/constants";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ArrowLeft, Clock, HelpCircle, Layers, Receipt, Shield } from "@/components/icons";
 
 const FEATURE_ICONS = [Shield, Receipt, Layers, Clock] as const;
@@ -25,13 +26,16 @@ export function AuthShell({
             <OnyxLogo size={28} />
             <span className="text-base font-bold text-text-primary">{BRAND.name}</span>
           </Link>
-          <Link
-            href="/help"
-            className="flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-text-primary transition-colors"
-          >
-            <HelpCircle className="w-4 h-4" />
-            Help
-          </Link>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <Link
+              href="/help"
+              className="flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-text-primary transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              Help
+            </Link>
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col justify-center px-8 xl:px-12 py-10">
@@ -77,9 +81,12 @@ export function AuthShell({
               <OnyxLogo size={26} />
               <span className="font-bold text-text-primary">{BRAND.name}</span>
             </Link>
-            <Link href="/help" className="p-2 text-text-tertiary">
-              <HelpCircle className="w-5 h-5" />
-            </Link>
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <Link href="/help" className="p-2 text-text-tertiary">
+                <HelpCircle className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </header>
 

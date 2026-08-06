@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { BRAND } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 
 export function Header() {
@@ -36,6 +37,7 @@ export function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           <LanguageSelector className="hidden sm:block" />
           <Link href="/login" className="hidden sm:block">
             <Button variant="ghost" size="sm">

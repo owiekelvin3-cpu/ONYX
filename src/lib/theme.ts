@@ -18,3 +18,23 @@ export const THEME = {
   navActiveBg: "#0B0B0F",
   navPillBg: "#F3F4F6",
 } as const;
+
+export const DARK_THEME = {
+  brand: "#7860E8",
+  brandHover: "#8B75F0",
+  brandLight: "rgba(107, 74, 227, 0.15)",
+  brandMuted: "#9B87F5",
+  pageBg: "#0B0E11",
+  cardBg: "#181A20",
+  surfaceMuted: "#1E2329",
+  hoverBg: "#2B3139",
+  border: "#2B3139",
+  borderLight: "#363C45",
+  textPrimary: "#EAECEF",
+  textSecondary: "#B7BDC6",
+  textTertiary: "#848E9C",
+  green: "#22C55E",
+  red: "#EF4444",
+  navActiveBg: "#6B4AE3",
+  navPillBg: "#1E2329",
+} as const;

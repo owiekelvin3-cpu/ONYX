@@ -3,6 +3,7 @@
 import type { ChartPoint } from "@/lib/chart-data";
 import { buildPortfolioChartData } from "@/lib/chart-data";
 import { formatCurrency } from "@/lib/utils";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import {
   AreaChart,
   Area,
@@ -22,6 +23,7 @@ export function PortfolioChart({
   compact?: boolean;
 }) {
   const data = chartData ?? buildPortfolioChartData(balance);
+  const colors = useThemeColors();
 
   return (
     <div>
@@ -38,42 +40,42 @@ export function PortfolioChart({
           <AreaChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="portfolioFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6B4AE3" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#6B4AE3" stopOpacity={0} />
+                <stop offset="5%" stopColor={colors.brand} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={colors.brand} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#94A3B8", fontSize: 10 }}
+              tick={{ fill: colors.textTertiary, fontSize: 10 }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#94A3B8", fontSize: 10 }}
+              tick={{ fill: colors.textTertiary, fontSize: 10 }}
               tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
               width={42}
             />
             <Tooltip
               contentStyle={{
-                background: "#FFFFFF",
-                border: "1px solid #E5E9EE",
+                background: colors.bgSecondary,
+                border: `1px solid ${colors.border}`,
                 borderRadius: "12px",
                 fontSize: "12px",
-                color: "#0F172A",
-                boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
+                color: colors.textPrimary,
+                boxShadow: "var(--shadow-card)",
               }}
               formatter={(value) => [formatCurrency(Number(value)), "Value"]}
             />
             <Area
               type="monotone"
               dataKey="price"
-              stroke="#6B4AE3"
+              stroke={colors.brand}
               strokeWidth={2}
               fill="url(#portfolioFill)"
-              activeDot={{ r: 4, fill: "#6B4AE3", stroke: "#FFFFFF", strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: colors.brand, stroke: colors.bgSecondary, strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

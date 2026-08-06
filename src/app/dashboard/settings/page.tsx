@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -96,6 +97,14 @@ export default function SettingsPage() {
           />
           <Button type="submit">{saved ? "Saved!" : "Save Changes"}</Button>
         </form>
+      </Card>
+
+      <Card>
+        <h3 className="text-[13px] font-semibold text-text-primary mb-2">Appearance</h3>
+        <p className="text-[13px] text-text-tertiary mb-4">
+          Choose light or dark mode for the platform interface.
+        </p>
+        <ThemeToggle variant="segmented" />
       </Card>
 
       <Card>

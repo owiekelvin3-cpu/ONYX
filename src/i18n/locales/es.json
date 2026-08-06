@@ -45,6 +45,13 @@
     "close": "Close",
     "cancel": "Cancel"
   },
+  "theme": {
+    "appearance": "Apariencia",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "switchToLight": "Cambiar a modo claro",
+    "switchToDark": "Cambiar a modo oscuro"
+  },
   "nav": {
     "services": "Servicios",
     "about": "Nosotros",
