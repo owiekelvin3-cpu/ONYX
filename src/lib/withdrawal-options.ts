@@ -9,6 +9,9 @@ export type WithdrawalMethod = {
   processingTime: string;
   feeLabel: string;
   minAmount: number;
+  /** Platform fee as flat USD or percentage (0–1). */
+  feeFlat?: number;
+  feePercent?: number;
 };
 
 export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
@@ -19,6 +22,7 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
     processingTime: "1–24 hours",
     feeLabel: "Network fee applies",
     minAmount: 50,
+    feeFlat: 0,
   },
   {
     id: "bank_transfer",
@@ -27,6 +31,7 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
     processingTime: "1–3 business days",
     feeLabel: "No platform fee",
     minAmount: 100,
+    feeFlat: 0,
   },
   {
     id: "wire",
@@ -35,6 +40,7 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
     processingTime: "2–5 business days",
     feeLabel: "$25 wire fee",
     minAmount: 500,
+    feeFlat: 25,
   },
   {
     id: "paypal",
@@ -43,10 +49,30 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
     processingTime: "24–48 hours",
     feeLabel: "1.5% processing fee",
     minAmount: 50,
+    feePercent: 0.015,
   },
 ];
 
 export const WITHDRAWAL_CRYPTO_ASSETS = ["USDT", "BTC", "ETH", "USDC", "SOL"] as const;
+
+export type CryptoAsset = (typeof WITHDRAWAL_CRYPTO_ASSETS)[number];
+
+export const CRYPTO_NETWORKS: Record<CryptoAsset, string[]> = {
+  USDT: ["TRC20", "ERC20", "BEP20"],
+  BTC: ["Bitcoin"],
+  ETH: ["ERC20"],
+  USDC: ["ERC20", "BEP20", "Solana"],
+  SOL: ["Solana"],
+};
+
+export const EWALLET_PROVIDERS = [
+  { id: "paypal", label: "PayPal", color: "#003087" },
+  { id: "wise", label: "Wise", color: "#163300" },
+  { id: "skrill", label: "Skrill", color: "#872166" },
+  { id: "revolut", label: "Revolut", color: "#191C1F" },
+] as const;
+
+export type EwalletProviderId = (typeof EWALLET_PROVIDERS)[number]["id"];
 
 export type WithdrawalDetails = Record<string, string>;
 
@@ -54,11 +80,35 @@ export function getWithdrawalMethod(id: WithdrawalMethodId): WithdrawalMethod {
   return WITHDRAWAL_METHODS.find((m) => m.id === id) ?? WITHDRAWAL_METHODS[0];
 }
 
+export function getNetworksForAsset(asset: string): string[] {
+  return CRYPTO_NETWORKS[asset as CryptoAsset] ?? ["TRC20", "ERC20"];
+}
+
+export function calculateWithdrawalFee(amount: number, methodId: WithdrawalMethodId): number {
+  const method = getWithdrawalMethod(methodId);
+  const flat = method.feeFlat ?? 0;
+  const pct = (method.feePercent ?? 0) * amount;
+  return Math.round((flat + pct) * 100) / 100;
+}
+
+export function estimateReceiveAmount(amount: number, methodId: WithdrawalMethodId): number {
+  const fee = calculateWithdrawalFee(amount, methodId);
+  return Math.max(0, Math.round((amount - fee) * 100) / 100);
+}
+
 export function formatWithdrawalMethodLabel(method: string): string {
   const found = WITHDRAWAL_METHODS.find((m) => m.id === method);
   if (found) return found.label;
   if (method === "crypto") return "Crypto Wallet";
   return method.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function withdrawalStatusTone(
+  status: string
+): "pending" | "success" | "error" {
+  if (status === "completed" || status === "approved") return "success";
+  if (status === "rejected" || status === "failed") return "error";
+  return "pending";
 }
 
 export function parseWithdrawalNotes(notes: string | null | undefined): WithdrawalDetails | null {
@@ -112,6 +162,7 @@ export function formatWithdrawalSummary(row: {
     if (value) lines.push(`${label}: ${value}`);
   };
 
+  push("Provider", "provider");
   push("Holder", "accountHolder");
   push("Bank", "bankName");
   push("Account", "accountNumber");

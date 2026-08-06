@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -11,33 +12,30 @@ import {
 import { getUsdBalance } from "@/lib/api/trading";
 import type { WithdrawalRow } from "@/lib/supabase/types";
 import {
-  WITHDRAWAL_METHODS,
   WITHDRAWAL_CRYPTO_ASSETS,
+  EWALLET_PROVIDERS,
   getWithdrawalMethod,
-  formatWithdrawalMethodLabel,
+  getNetworksForAsset,
   type WithdrawalMethodId,
+  type EwalletProviderId,
 } from "@/lib/withdrawal-options";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { Clock, Comments } from "@/components/icons";
 import {
-  Loader2,
-  Wallet,
-  BuildingColumns,
-  MoneyBillTransfer,
-  Mail,
-  Clock,
-  Shield,
-} from "@/components/icons";
-
-const METHOD_ICONS: Record<WithdrawalMethodId, typeof Wallet> = {
-  crypto: Wallet,
-  bank_transfer: BuildingColumns,
-  wire: MoneyBillTransfer,
-  paypal: Mail,
-};
+  WithdrawalPageHeader,
+  WithdrawalBalanceBanner,
+  WithdrawalBlockedBanner,
+  WithdrawalMethodPicker,
+  WithdrawalAmountField,
+  WithdrawalPayoutSummary,
+  WithdrawalConfirmBar,
+  WithdrawalSecurityNote,
+  WithdrawalAlert,
+  WithdrawalHistoryList,
+  Input,
+} from "@/components/dashboard/WithdrawalUi";
 
 const EMPTY_BANK = {
   accountHolder: "",
@@ -61,13 +59,17 @@ export default function WithdrawPage() {
   const [network, setNetwork] = useState("TRC20");
   const [walletAddress, setWalletAddress] = useState("");
   const [bank, setBank] = useState(EMPTY_BANK);
-  const [paypalEmail, setPaypalEmail] = useState("");
+  const [ewalletProvider, setEwalletProvider] = useState<EwalletProviderId>("paypal");
+  const [ewalletEmail, setEwalletEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const selectedMethod = useMemo(() => getWithdrawalMethod(method), [method]);
+  const networks = useMemo(() => getNetworksForAsset(asset), [asset]);
+  const parsedAmount = parseFloat(amount) || 0;
 
   useEffect(() => {
     const supabase = createClient();
@@ -94,18 +96,31 @@ export default function WithdrawPage() {
     load();
   }, []);
 
+  useEffect(() => {
+    if (!networks.includes(network)) {
+      setNetwork(networks[0] ?? "TRC20");
+    }
+  }, [networks, network]);
+
+  function handleMethodChange(next: WithdrawalMethodId) {
+    setMethod(next);
+    setConfirming(false);
+    setError("");
+  }
+
   function updateBank(field: keyof typeof EMPTY_BANK, value: string) {
     setBank((prev) => ({ ...prev, [field]: value }));
+    setConfirming(false);
   }
 
   function validateForm(): { destination: string; details: Record<string, string> } | null {
-    const value = parseFloat(amount);
+    const value = parsedAmount;
     if (!value || value <= 0) {
       setError("Enter a valid amount");
       return null;
     }
     if (value < selectedMethod.minAmount) {
-      setError(`Minimum withdrawal for this method is ${formatCurrency(selectedMethod.minAmount)}`);
+      setError(`Minimum withdrawal for this method is $${selectedMethod.minAmount.toFixed(2)}`);
       return null;
     }
     if (balance !== null && value > balance) {
@@ -151,38 +166,47 @@ export default function WithdrawPage() {
       };
     }
 
-    if (!paypalEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paypalEmail.trim())) {
-      setError("Enter a valid PayPal or e-wallet email");
+    if (!ewalletEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ewalletEmail.trim())) {
+      setError("Enter a valid e-wallet email");
       return null;
     }
     return {
-      destination: paypalEmail.trim(),
-      details: { paypalEmail: paypalEmail.trim(), type: "paypal" },
+      destination: ewalletEmail.trim(),
+      details: {
+        provider: ewalletProvider,
+        paypalEmail: ewalletEmail.trim(),
+        type: "paypal",
+      },
     };
   }
 
-  async function handleSubmit() {
+  function handleReview() {
     setError("");
     setSuccess("");
-
     if (!userId) {
       router.push("/login");
       return;
     }
     if (!canWithdraw) {
-      setError("Withdrawals are currently blocked. Check pending fees or portfolio requirements.");
+      setError("Withdrawals are currently blocked. Check pending fees or contact support.");
       return;
     }
-
     const payload = validateForm();
     if (!payload) return;
+    setConfirming(true);
+  }
+
+  async function handleConfirm() {
+    const payload = validateForm();
+    if (!payload || !userId) return;
 
     setSubmitting(true);
+    setError("");
     try {
       const supabase = createClient();
       const row = await submitWithdrawal(supabase, {
         userId,
-        amount: parseFloat(amount),
+        amount: parsedAmount,
         currency: method === "crypto" ? asset : "USD",
         method,
         destination: payload.destination,
@@ -192,344 +216,301 @@ export default function WithdrawPage() {
       setAmount("");
       setWalletAddress("");
       setBank(EMPTY_BANK);
-      setPaypalEmail("");
+      setEwalletEmail("");
+      setConfirming(false);
       setSuccess(
-        `Withdrawal request submitted via ${selectedMethod.label}. Our team will process it within ${selectedMethod.processingTime}.`
+        `Withdrawal request submitted via ${selectedMethod.label}. Expected processing: ${selectedMethod.processingTime}.`
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Withdrawal failed");
+      setConfirming(false);
     } finally {
       setSubmitting(false);
     }
   }
 
+  const formDisabled = loading || submitting || !userId || !canWithdraw || (balance ?? 0) <= 0;
+
   return (
-    <div className="space-y-5 max-w-3xl">
-      <div>
-        <h1 className="text-xl font-bold text-text-primary">Withdraw Funds</h1>
-        <p className="text-sm text-text-tertiary mt-1">
-          Choose a payout method and submit your request for team review.
-        </p>
-      </div>
+    <div className="space-y-5 max-w-3xl pb-2">
+      <WithdrawalPageHeader />
 
-      {userId && balance !== null && (
-        <Card className="bg-gradient-to-br from-bg-secondary to-bg-primary border-brand/20">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-text-tertiary">Available balance</p>
-              <p className="text-2xl font-bold font-mono text-text-primary mt-1">
-                {formatCurrency(balance)}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-text-tertiary">
-              <Shield className="w-4 h-4 text-brand shrink-0" />
-              Secured withdrawals · Team-reviewed payouts
-            </div>
-          </div>
-        </Card>
-      )}
+      <WithdrawalBalanceBanner balance={balance} loading={loading} />
 
-      <Card>
-        <div className="space-y-5">
-          <div>
-            <h2 className="text-sm font-semibold text-text-primary">Withdrawal method</h2>
-            <p className="text-xs text-text-tertiary mt-1">
-              Select how you would like to receive your funds.
-            </p>
-          </div>
+      {!canWithdraw && !loading && <WithdrawalBlockedBanner />}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {WITHDRAWAL_METHODS.map((option) => {
-              const Icon = METHOD_ICONS[option.id];
-              const active = method === option.id;
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => setMethod(option.id)}
-                  className={cn(
-                    "text-left rounded-xl border p-4 transition-all cursor-pointer",
-                    active
-                      ? "border-brand/50 bg-brand/5 shadow-[0_0_0_1px_rgba(240,185,11,0.15)]"
-                      : "border-border bg-bg-primary hover:border-border-light hover:bg-bg-hover/40"
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                        active ? "bg-brand/15 text-brand" : "bg-bg-secondary text-text-tertiary"
-                      )}
-                    >
-                      <Icon className="w-[18px] h-[18px]" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-text-primary">{option.label}</p>
-                      <p className="text-xs text-text-tertiary mt-1 leading-relaxed">
-                        {option.description}
-                      </p>
-                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px] text-text-tertiary">
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {option.processingTime}
-                        </span>
-                        <span>Min {formatCurrency(option.minAmount)}</span>
-                      </div>
+      {canWithdraw && (balance ?? 0) > 0 && (
+        <>
+          <Card className="rounded-2xl p-4 sm:p-5 space-y-5">
+            <WithdrawalMethodPicker method={method} onChange={handleMethodChange} />
+
+            <div className="border-t border-border pt-5 space-y-4">
+              <div>
+                <h2 className="text-sm font-semibold text-text-primary">Payout details</h2>
+                <p className="text-xs text-text-tertiary mt-1">
+                  {selectedMethod.description}
+                </p>
+              </div>
+
+              {balance !== null && (
+                <WithdrawalAmountField
+                  balance={balance}
+                  amount={amount}
+                  onChange={(v) => {
+                    setAmount(v);
+                    setConfirming(false);
+                  }}
+                  min={selectedMethod.minAmount}
+                />
+              )}
+
+              {method === "crypto" && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-text-tertiary mb-2">Asset</label>
+                    <div className="flex flex-wrap gap-2">
+                      {WITHDRAWAL_CRYPTO_ASSETS.map((a) => (
+                        <button
+                          key={a}
+                          type="button"
+                          onClick={() => {
+                            setAsset(a);
+                            setConfirming(false);
+                          }}
+                          className={cn(
+                            "px-3 py-2 rounded-lg text-[13px] border transition-colors cursor-pointer font-medium",
+                            asset === a
+                              ? "bg-brand/10 text-brand border-brand/40"
+                              : "bg-bg-primary text-text-secondary border-border hover:border-border-light"
+                          )}
+                        >
+                          {a}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </Card>
-
-      <Card>
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-text-primary">Payout details</h2>
-            <p className="text-xs text-text-tertiary mt-1">
-              Enter the destination for your {selectedMethod.label.toLowerCase()} withdrawal.
-            </p>
-          </div>
-
-          <Input
-            id="amount"
-            label="Amount (USD)"
-            type="number"
-            placeholder="0.00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-
-          {method === "crypto" && (
-            <>
-              <div>
-                <label className="block text-xs text-text-tertiary mb-2">Asset</label>
-                <div className="flex flex-wrap gap-2">
-                  {WITHDRAWAL_CRYPTO_ASSETS.map((a) => (
-                    <button
-                      key={a}
-                      type="button"
-                      onClick={() => setAsset(a)}
-                      className={cn(
-                        "px-3 py-2 rounded-lg text-[13px] border transition-colors cursor-pointer",
-                        asset === a
-                          ? "bg-brand/10 text-brand border-brand/40"
-                          : "bg-bg-primary text-text-secondary border-border"
-                      )}
-                    >
-                      {a}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-text-tertiary mb-2">Network</label>
-                <div className="flex flex-wrap gap-2">
-                  {["TRC20", "ERC20", "BEP20", "Bitcoin"].map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      onClick={() => setNetwork(n)}
-                      className={cn(
-                        "px-3 py-2 rounded-lg text-[13px] border transition-colors cursor-pointer",
-                        network === n
-                          ? "bg-brand/10 text-brand border-brand/40"
-                          : "bg-bg-primary text-text-secondary border-border"
-                      )}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <Input
-                id="wallet"
-                label="Wallet address"
-                placeholder="Paste your receiving address"
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
-                className="font-mono text-xs"
-              />
-            </>
-          )}
-
-          {method === "bank_transfer" && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Input
-                id="account-holder"
-                label="Account holder name"
-                placeholder="Full name on account"
-                value={bank.accountHolder}
-                onChange={(e) => updateBank("accountHolder", e.target.value)}
-              />
-              <Input
-                id="bank-name"
-                label="Bank name"
-                placeholder="e.g. Chase, Barclays"
-                value={bank.bankName}
-                onChange={(e) => updateBank("bankName", e.target.value)}
-              />
-              <Input
-                id="account-number"
-                label="Account number"
-                placeholder="Account / IBAN"
-                value={bank.accountNumber}
-                onChange={(e) => updateBank("accountNumber", e.target.value)}
-              />
-              <Input
-                id="routing-number"
-                label="Routing / Sort code"
-                placeholder="Routing, sort, or BSB"
-                value={bank.routingNumber}
-                onChange={(e) => updateBank("routingNumber", e.target.value)}
-              />
-              <Input
-                id="country"
-                label="Country"
-                placeholder="Country of bank"
-                value={bank.country}
-                onChange={(e) => updateBank("country", e.target.value)}
-                className="sm:col-span-2"
-              />
-            </div>
-          )}
-
-          {method === "wire" && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Input
-                id="wire-holder"
-                label="Beneficiary name"
-                placeholder="Full legal name"
-                value={bank.accountHolder}
-                onChange={(e) => updateBank("accountHolder", e.target.value)}
-              />
-              <Input
-                id="wire-bank"
-                label="Bank name"
-                placeholder="Receiving bank"
-                value={bank.bankName}
-                onChange={(e) => updateBank("bankName", e.target.value)}
-              />
-              <Input
-                id="wire-iban"
-                label="IBAN / Account number"
-                placeholder="International account number"
-                value={bank.iban}
-                onChange={(e) => updateBank("iban", e.target.value)}
-              />
-              <Input
-                id="wire-swift"
-                label="SWIFT / BIC code"
-                placeholder="e.g. CHASUS33"
-                value={bank.swiftCode}
-                onChange={(e) => updateBank("swiftCode", e.target.value)}
-              />
-              <Input
-                id="wire-country"
-                label="Bank country"
-                placeholder="Country"
-                value={bank.country}
-                onChange={(e) => updateBank("country", e.target.value)}
-                className="sm:col-span-2"
-              />
-            </div>
-          )}
-
-          {method === "paypal" && (
-            <Input
-              id="paypal-email"
-              label="PayPal or e-wallet email"
-              type="email"
-              placeholder="you@email.com"
-              value={paypalEmail}
-              onChange={(e) => setPaypalEmail(e.target.value)}
-            />
-          )}
-
-          <div className="rounded-lg border border-border bg-bg-primary/60 p-4 space-y-2 text-[13px]">
-            <div className="flex justify-between gap-4">
-              <span className="text-text-tertiary">Processing time</span>
-              <span className="text-text-secondary text-right">{selectedMethod.processingTime}</span>
-            </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-text-tertiary">Fees</span>
-              <span className="text-text-secondary text-right">{selectedMethod.feeLabel}</span>
-            </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-text-tertiary">Minimum</span>
-              <span className="font-mono text-text-secondary">{formatCurrency(selectedMethod.minAmount)}</span>
-            </div>
-          </div>
-
-          {error && (
-            <p role="alert" className="text-sm text-red bg-red/5 border border-red/20 rounded-lg px-4 py-3">
-              {error}
-            </p>
-          )}
-          {success && (
-            <p className="text-sm text-green bg-green/5 border border-green/20 rounded-lg px-4 py-3">
-              {success}
-            </p>
-          )}
-
-          <Button
-            type="button"
-            className="w-full !h-12"
-            disabled={submitting || !userId || loading}
-            onClick={handleSubmit}
-          >
-            {submitting ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Submitting request...
-              </span>
-            ) : (
-              `Submit ${selectedMethod.label} Withdrawal`
-            )}
-          </Button>
-
-          <p className="text-[11px] text-text-tertiary leading-relaxed">
-            All withdrawals are reviewed by our team for security. KYC verification may be required
-            for amounts over $10,000 or for first-time bank and wire payouts.
-          </p>
-        </div>
-      </Card>
-
-      {withdrawals.length > 0 && (
-        <Card>
-          <h3 className="text-sm font-semibold text-text-primary mb-4">Withdrawal history</h3>
-          <div className="space-y-3">
-            {withdrawals.map((w) => (
-              <div
-                key={w.id}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3 border-b border-border last:border-0"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-text-primary">
-                      {formatCurrency(w.amount)} {w.currency}
-                    </p>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-bg-hover text-text-tertiary capitalize">
-                      {w.status}
-                    </span>
+                  <div>
+                    <label className="block text-xs font-medium text-text-tertiary mb-2">Network</label>
+                    <div className="flex flex-wrap gap-2">
+                      {networks.map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => {
+                            setNetwork(n);
+                            setConfirming(false);
+                          }}
+                          className={cn(
+                            "px-3 py-2 rounded-lg text-[13px] border transition-colors cursor-pointer",
+                            network === n
+                              ? "bg-brand/10 text-brand border-brand/40"
+                              : "bg-bg-primary text-text-secondary border-border hover:border-border-light"
+                          )}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-xs text-text-tertiary mt-1">
-                    {formatWithdrawalMethodLabel(w.method)} ·{" "}
-                    {new Date(w.created_at).toLocaleDateString()}
+                  <Input
+                    id="wallet"
+                    label="Wallet address"
+                    placeholder="Paste your receiving address"
+                    value={walletAddress}
+                    onChange={(e) => {
+                      setWalletAddress(e.target.value);
+                      setConfirming(false);
+                    }}
+                    className="font-mono text-xs"
+                  />
+                  <p className="text-[11px] text-text-tertiary -mt-2">
+                    Double-check the address and network — incorrect details may result in lost funds.
                   </p>
-                  {w.wallet_address && (
-                    <p className="text-[11px] text-text-tertiary mt-1 font-mono truncate">
-                      {w.wallet_address}
-                    </p>
-                  )}
+                </>
+              )}
+
+              {method === "bank_transfer" && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input
+                    id="account-holder"
+                    label="Account holder name *"
+                    placeholder="Full name on account"
+                    value={bank.accountHolder}
+                    onChange={(e) => updateBank("accountHolder", e.target.value)}
+                  />
+                  <Input
+                    id="bank-name"
+                    label="Bank name *"
+                    placeholder="e.g. Chase, Barclays"
+                    value={bank.bankName}
+                    onChange={(e) => updateBank("bankName", e.target.value)}
+                  />
+                  <Input
+                    id="account-number"
+                    label="Account number *"
+                    placeholder="Account number"
+                    value={bank.accountNumber}
+                    onChange={(e) => updateBank("accountNumber", e.target.value)}
+                  />
+                  <Input
+                    id="routing-number"
+                    label="Routing / Sort code"
+                    placeholder="Routing, sort, or BSB"
+                    value={bank.routingNumber}
+                    onChange={(e) => updateBank("routingNumber", e.target.value)}
+                  />
+                  <Input
+                    id="country"
+                    label="Country"
+                    placeholder="Country of bank"
+                    value={bank.country}
+                    onChange={(e) => updateBank("country", e.target.value)}
+                    className="sm:col-span-2"
+                  />
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+              )}
+
+              {method === "wire" && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input
+                    id="wire-holder"
+                    label="Beneficiary name *"
+                    placeholder="Full legal name"
+                    value={bank.accountHolder}
+                    onChange={(e) => updateBank("accountHolder", e.target.value)}
+                  />
+                  <Input
+                    id="wire-bank"
+                    label="Bank name *"
+                    placeholder="Receiving bank"
+                    value={bank.bankName}
+                    onChange={(e) => updateBank("bankName", e.target.value)}
+                  />
+                  <Input
+                    id="wire-iban"
+                    label="IBAN / Account number *"
+                    placeholder="International account number"
+                    value={bank.iban}
+                    onChange={(e) => updateBank("iban", e.target.value)}
+                  />
+                  <Input
+                    id="wire-swift"
+                    label="SWIFT / BIC code *"
+                    placeholder="e.g. CHASUS33"
+                    value={bank.swiftCode}
+                    onChange={(e) => updateBank("swiftCode", e.target.value)}
+                  />
+                  <Input
+                    id="wire-country"
+                    label="Bank country"
+                    placeholder="Country"
+                    value={bank.country}
+                    onChange={(e) => updateBank("country", e.target.value)}
+                    className="sm:col-span-2"
+                  />
+                </div>
+              )}
+
+              {method === "paypal" && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-text-tertiary mb-2">Provider</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {EWALLET_PROVIDERS.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setEwalletProvider(p.id);
+                            setConfirming(false);
+                          }}
+                          className={cn(
+                            "rounded-xl border px-3 py-3 text-left transition-colors cursor-pointer",
+                            ewalletProvider === p.id
+                              ? "border-brand/50 bg-brand/5"
+                              : "border-border bg-bg-primary hover:bg-bg-hover"
+                          )}
+                        >
+                          <span
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-bold text-white mb-1.5"
+                            style={{ backgroundColor: p.color }}
+                          >
+                            {p.label.charAt(0)}
+                          </span>
+                          <span className="block text-xs font-semibold text-text-primary">{p.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Input
+                    id="ewallet-email"
+                    label={`${EWALLET_PROVIDERS.find((p) => p.id === ewalletProvider)?.label ?? "E-wallet"} email *`}
+                    type="email"
+                    placeholder="you@email.com"
+                    value={ewalletEmail}
+                    onChange={(e) => {
+                      setEwalletEmail(e.target.value);
+                      setConfirming(false);
+                    }}
+                  />
+                </>
+              )}
+
+              <WithdrawalPayoutSummary
+                amount={parsedAmount}
+                methodId={method}
+                methodLabel={selectedMethod.label}
+                processingTime={selectedMethod.processingTime}
+              />
+
+              {error && <WithdrawalAlert type="error">{error}</WithdrawalAlert>}
+              {success && <WithdrawalAlert type="success">{success}</WithdrawalAlert>}
+
+              {confirming ? (
+                <WithdrawalConfirmBar
+                  amount={parsedAmount}
+                  methodLabel={selectedMethod.label}
+                  loading={submitting}
+                  onCancel={() => setConfirming(false)}
+                  onConfirm={() => void handleConfirm()}
+                />
+              ) : (
+                <Button
+                  type="button"
+                  className="w-full !h-12"
+                  disabled={formDisabled || parsedAmount <= 0}
+                  onClick={handleReview}
+                >
+                  Review withdrawal request
+                </Button>
+              )}
+
+              <p className="text-[11px] text-text-tertiary leading-relaxed flex items-center gap-1.5">
+                <Clock className="w-3 h-3 shrink-0" />
+                Min {selectedMethod.minAmount.toFixed(0)} USD · {selectedMethod.feeLabel}
+              </p>
+            </div>
+          </Card>
+
+          <WithdrawalSecurityNote />
+        </>
       )}
+
+      <Card className="rounded-2xl p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Clock className="w-4 h-4 text-text-tertiary" />
+          <h3 className="text-sm font-semibold text-text-primary">Recent withdrawals</h3>
+        </div>
+        <WithdrawalHistoryList withdrawals={withdrawals} />
+      </Card>
+
+      <p className="text-center text-xs text-text-tertiary pb-1">
+        Need help with a payout?{" "}
+        <Link href="/dashboard/support" className="font-medium text-brand hover:text-brand-hover inline-flex items-center gap-1">
+          <Comments className="w-3.5 h-3.5" />
+          Contact support
+        </Link>
+      </p>
     </div>
   );
 }

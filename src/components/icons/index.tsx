@@ -53,6 +53,8 @@ import {
   faFaceSmile,
   faFileLines,
   faImage,
+  faCircleCheck,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -127,3 +129,5 @@ export const PaperClip = icon(faPaperclip);
 export const FaceSmile = icon(faFaceSmile);
 export const FileLines = icon(faFileLines);
 export const Image = icon(faImage);
+export const CircleCheck = icon(faCircleCheck);
+export const AlertTriangle = icon(faTriangleExclamation);
