@@ -12,29 +12,39 @@ import {
   LayoutDashboard,
   TrendingUp,
   Wallet,
-  ArrowDownToLine,
   MoreHorizontal,
   LogOut,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Receipt,
+  Bell,
+  Bot,
+  Copy,
+  Comments,
+  Settings,
+  X,
 } from "@/components/icons";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const MOBILE_TABS = [
   { labelKey: "dashboard.dock.home", href: "/dashboard", icon: LayoutDashboard },
-  { labelKey: "dashboard.navTrade", href: "/dashboard/trade", icon: TrendingUp },
-  { labelKey: "dashboard.navPortfolio", href: "/dashboard/portfolio", icon: Wallet },
-  { labelKey: "dashboard.navDeposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
+  { labelKey: "dashboard.dock.trade", href: "/dashboard/trade", icon: TrendingUp },
+  { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
   { labelKey: "nav.more", href: null, icon: MoreHorizontal },
 ] as const;
 
-const MORE_MENU_PATHS = [
-  "/dashboard/transactions",
-  "/dashboard/notifications",
-  "/dashboard/withdraw",
-  "/dashboard/ai-trading",
-  "/dashboard/copy-trading",
-  "/dashboard/support",
-  "/dashboard/settings",
-];
+const MORE_MENU_ITEMS = [
+  { href: "/dashboard/deposit", labelKey: "dashboard.navDeposit", icon: ArrowDownToLine },
+  { href: "/dashboard/withdraw", labelKey: "dashboard.navWithdraw", icon: ArrowUpFromLine },
+  { href: "/dashboard/transactions", labelKey: "dashboard.transactions", icon: Receipt },
+  { href: "/dashboard/notifications", labelKey: "dashboard.notifications", icon: Bell },
+  { href: "/dashboard/ai-trading", labelKey: "dashboard.aiTrading", icon: Bot },
+  { href: "/dashboard/copy-trading", labelKey: "dashboard.copyTrading", icon: Copy },
+  { href: "/dashboard/support", labelKey: "dashboard.support", icon: Comments },
+  { href: "/dashboard/settings", labelKey: "dashboard.settings", icon: Settings },
+] as const;
+
+const MORE_MENU_PATHS = MORE_MENU_ITEMS.map((item) => item.href);
 
 function isActive(pathname: string, href: string) {
   if (href === "/dashboard") return pathname === "/dashboard";
@@ -84,7 +94,7 @@ export function DashboardShell({
           "relative z-[1] mx-auto w-full max-w-7xl flex-1 px-3 py-4 sm:px-5 sm:py-6 lg:px-8",
           hideBottomNav
             ? "pb-[max(0.75rem,var(--safe-bottom))]"
-            : "pb-[calc(4.25rem+var(--safe-bottom))] lg:pb-8"
+            : "pb-[calc(5.5rem+var(--safe-bottom))] lg:pb-8"
         )}
       >
         {children}
@@ -92,10 +102,10 @@ export function DashboardShell({
 
       {!hideBottomNav && (
         <nav
-          className="fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-bg-secondary/95 backdrop-blur-xl safe-area-x lg:hidden"
+          className="dashboard-mobile-dock fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-bg-secondary/95 shadow-[0_-8px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl safe-area-x lg:hidden"
           aria-label={t("dashboard.navLabel")}
         >
-          <div className="flex items-stretch justify-around px-1 pt-1.5 pb-[max(0.35rem,var(--safe-bottom))]">
+          <div className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1.5 pb-[max(0.5rem,var(--safe-bottom))]">
             {MOBILE_TABS.map((item) => {
               const Icon = item.icon;
               const isMore = item.href === null;
@@ -104,19 +114,19 @@ export function DashboardShell({
                 : isActive(pathname, item.href);
 
               const className = cn(
-                "relative flex max-w-[80px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-2 text-[10px] leading-tight transition-colors",
-                active ? "text-brand" : "text-text-tertiary"
+                "touch-target relative flex min-h-[52px] min-w-0 flex-1 max-w-[88px] flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[10px] leading-none transition-colors",
+                active ? "text-brand" : "text-text-tertiary active:text-text-secondary"
               );
 
               const content = (
                 <>
                   <span
                     className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-xl",
+                      "flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
                       active ? "bg-brand/10" : ""
                     )}
                   >
-                    <Icon className="h-[18px] w-[18px]" />
+                    <Icon className="h-[18px] w-[18px] shrink-0" />
                   </span>
                   <span className="w-full truncate text-center font-medium">{t(item.labelKey)}</span>
                 </>
@@ -129,7 +139,8 @@ export function DashboardShell({
                     type="button"
                     onClick={() => setMenuOpen(true)}
                     className={className}
-                    aria-label={t("dashboard.openSidebar")}
+                    aria-label={t("nav.more")}
+                    aria-expanded={menuOpen}
                   >
                     {content}
                   </button>
@@ -150,38 +161,70 @@ export function DashboardShell({
         <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true">
           <button
             type="button"
-            className="absolute inset-0 bg-black/20"
+            className="absolute inset-0 bg-black/30 mobile-nav-backdrop"
             onClick={() => setMenuOpen(false)}
+            aria-label={t("common.close")}
           />
-          <div className="absolute bottom-0 left-0 right-0 max-h-[70vh] overflow-y-auto rounded-t-3xl border-t border-border bg-bg-secondary p-4 safe-area-bottom">
-            <div className="grid gap-2">
-              {MORE_MENU_PATHS.map((href) => {
-                const labelKey =
-                  href === "/dashboard/transactions"
-                    ? "dashboard.transactions"
-                    : href === "/dashboard/notifications"
-                      ? "dashboard.notifications"
-                      : null;
-                return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-xl px-4 py-3 text-sm font-medium text-text-secondary hover:bg-bg-hover"
-                >
-                  {labelKey ? t(labelKey) : href.split("/").pop()?.replace("-", " ")}
-                </Link>
-              );
-              })}
+          <div className="absolute bottom-0 left-0 right-0 max-h-[min(78vh,640px)] overflow-hidden rounded-t-3xl border-t border-border bg-bg-secondary shadow-[0_-16px_48px_rgba(15,23,42,0.12)] safe-area-bottom">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold text-text-primary">{t("nav.more")}</p>
+                <p className="text-[11px] text-text-tertiary">{t("dashboard.clientPortal")}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary"
+                aria-label={t("common.close")}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="max-h-[calc(min(78vh,640px)-8rem)] overflow-y-auto px-3 py-2">
+              <div className="grid gap-1">
+                {MORE_MENU_ITEMS.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(pathname, item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
+                        active
+                          ? "bg-nav-active text-nav-active-text"
+                          : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                          active ? "bg-white/10" : "bg-bg-primary text-brand"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      {t(item.labelKey)}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="border-t border-border p-3">
               <button
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
                   void handleLogout();
                 }}
-                className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm text-red hover:bg-red/5"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red hover:bg-red/5"
               >
-                <LogOut className="h-4 w-4" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red/10">
+                  <LogOut className="h-4 w-4" />
+                </span>
                 {t("common.signOut")}
               </button>
             </div>

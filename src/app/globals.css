@@ -468,6 +468,16 @@ body {
   box-shadow: var(--shadow-card);
 }
 
+.dashboard-mobile-dock {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 1023px) {
+  .dashboard-mobile-dock {
+    backdrop-filter: blur(16px);
+  }
+}
+
 .nav-dropdown {
   opacity: 0;
   visibility: hidden;

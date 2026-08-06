@@ -114,14 +114,16 @@ export function AppTopNav({
               authActions
             )}
 
-            <button
-              type="button"
-              className="rounded-xl p-2 text-text-secondary hover:bg-bg-hover lg:hidden"
-              onClick={() => setMenuOpen(true)}
-              aria-label={t("nav.openMenu")}
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+            {mode !== "dashboard" && (
+              <button
+                type="button"
+                className="rounded-xl p-2 text-text-secondary hover:bg-bg-hover lg:hidden"
+                onClick={() => setMenuOpen(true)}
+                aria-label={t("nav.openMenu")}
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            )}
           </div>
         </div>
       </header>
