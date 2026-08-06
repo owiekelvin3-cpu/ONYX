@@ -518,7 +518,7 @@
   },
   "settingsPage": {
     "title": "Settings",
-    "subtitle": "Manage your profile, wallet, security, and preferences.",
+    "subtitle": "Manage your profile, preferences, notifications, and account details.",
     "sections": {
       "profile": "Profile",
       "wallet": "Wallet",
