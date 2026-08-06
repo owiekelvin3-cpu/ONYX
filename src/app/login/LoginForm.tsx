@@ -20,6 +20,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -27,6 +28,9 @@ export default function LoginForm() {
     if (saved && !searchParams.get("email")) {
       setEmail(saved);
       setRemember(true);
+    }
+    if (searchParams.get("message") === "confirm-email") {
+      setInfo("Check your email to confirm your account, then sign in.");
     }
   }, [searchParams]);
 
@@ -115,13 +119,19 @@ export default function LoginForm() {
               <span className="text-[13px] text-text-secondary">Remember email</span>
             </label>
             <Link
-              href="/help"
+              href="/forgot-password"
               className="text-[13px] text-brand hover:text-brand-hover transition-colors shrink-0"
             >
               Forgot password?
             </Link>
           </div>
         </div>
+
+        {info && (
+          <div className="text-[13px] text-green bg-green/[0.08] border border-green/30 rounded-lg px-4 py-3">
+            {info}
+          </div>
+        )}
 
         {error && (
           <div

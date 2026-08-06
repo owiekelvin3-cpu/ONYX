@@ -10,10 +10,10 @@ import { AI_BOTS, RECOMMENDED_BOT_ID, ASSET_SYMBOL_MAP, seedEntryPrice } from "@
 import { computeLiveProfit } from "@/lib/ai-trading";
 import {
   getAiSubscriptions,
-  getUsdBalance,
   purchaseAiBot,
   syncUserAiBots,
 } from "@/lib/api/ai-trading";
+import { getUsdBalance } from "@/lib/api/trading";
 import { formatCurrency, cn } from "@/lib/utils";
 import { StartBotFlow } from "./StartBotFlow";
 import { RunningBotView } from "./RunningBotView";

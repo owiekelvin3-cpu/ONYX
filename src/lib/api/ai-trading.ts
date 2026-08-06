@@ -85,17 +85,3 @@ export async function adminAdjustAiBotProfit(
   if (error) throw new Error(error.message);
   return data;
 }
-
-export async function getUsdBalance(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<number> {
-  const { data, error } = await supabase
-    .from("balances")
-    .select("amount")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (error && error.code !== "PGRST116") throw new Error(error.message);
-  return Number(data?.amount ?? 0);
-}

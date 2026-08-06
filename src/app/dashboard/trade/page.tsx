@@ -18,7 +18,6 @@ export default function TradePage() {
   const [selectedPair, setSelectedPair] = useState(pairs[0]);
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
-  const [orderType, setOrderType] = useState<"market" | "limit">("market");
   const [showPairs, setShowPairs] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
@@ -124,14 +123,6 @@ export default function TradePage() {
 
 
       <div className="space-y-2.5 sm:space-y-3">
-        {orderType === "limit" && (
-          <Input
-            id="limitPrice"
-            label="Price"
-            type="number"
-            placeholder={String(selectedPair.price)}
-          />
-        )}
         <Input
           id="amount"
           label="Amount"
@@ -318,22 +309,6 @@ export default function TradePage() {
         </Card>
 
         <Card className="!p-3 sm:!p-4 hidden lg:block">
-          <div className="flex gap-1 mb-4">
-            {(["market", "limit"] as const).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setOrderType(type)}
-                className={`flex-1 h-8 text-xs font-medium rounded capitalize cursor-pointer touch-target ${
-                  orderType === type
-                    ? "bg-bg-hover text-text-primary"
-                    : "text-text-tertiary"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
           {orderPanel}
         </Card>
       </div>

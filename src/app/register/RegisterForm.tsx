@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
+import { getAppUrl } from "@/lib/env";
 import { COUNTRIES } from "@/lib/countries";
 import { AuthShell, AuthCardHeader } from "@/components/auth/AuthLayout";
 import { AuthInput, AuthSelect } from "@/components/auth/AuthInput";
@@ -136,10 +137,12 @@ export default function RegisterForm() {
     setLoading(true);
 
     const supabase = createClient();
+    const appUrl = getAppUrl();
     const { data, error: authError } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
+        emailRedirectTo: `${appUrl}/auth/callback?next=/dashboard`,
         data: {
           first_name: firstName.trim(),
           last_name: lastName.trim(),
@@ -173,8 +176,13 @@ export default function RegisterForm() {
         .eq("id", data.user.id);
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    if (data.session) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      router.push("/login?message=confirm-email");
+    }
+    setLoading(false);
   }
 
   return (

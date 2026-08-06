@@ -5,13 +5,14 @@ export async function getUsdBalance(
   supabase: SupabaseClient,
   userId: string
 ): Promise<number> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("balances")
     .select("amount")
     .eq("user_id", userId)
-    .eq("currency", "USD")
     .maybeSingle();
-  return data?.amount ?? 0;
+
+  if (error && error.code !== "PGRST116") throw new Error(error.message);
+  return Number(data?.amount ?? 0);
 }
 
 export async function getRecentTrades(
