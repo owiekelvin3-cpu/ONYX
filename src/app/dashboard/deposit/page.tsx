@@ -12,6 +12,8 @@ import {
 } from "@/lib/api/deposits";
 import type { DepositRow } from "@/lib/supabase/types";
 import { DEPOSIT_CRYPTO_LABELS } from "@/lib/deposit-options";
+import { CryptoIcon } from "@/components/crypto/CryptoIcon";
+import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -114,13 +116,17 @@ export default function DepositPage() {
                   key={key}
                   type="button"
                   onClick={() => setSelected(key)}
-                  className={`px-3 py-2 rounded text-[13px] transition-colors cursor-pointer border ${
+                  className={cn(
+                    "flex flex-col items-center gap-2 rounded-xl border px-2 py-3 transition-colors cursor-pointer",
                     selected === key
                       ? "bg-brand/10 text-brand border-brand/40"
-                      : "bg-bg-primary text-text-secondary border-border hover:text-text-primary"
-                  }`}
+                      : "bg-bg-primary text-text-secondary border-border hover:text-text-primary hover:bg-bg-hover/40"
+                  )}
                 >
-                  {DEPOSIT_CRYPTO_LABELS[key].split(" ")[0]}
+                  <CryptoIcon symbol={key} label={DEPOSIT_CRYPTO_LABELS[key]} size="md" selected={selected === key} />
+                  <span className="text-[11px] font-semibold text-center leading-tight">
+                    {DEPOSIT_CRYPTO_LABELS[key].split(" (")[0]}
+                  </span>
                 </button>
               ))}
             </div>

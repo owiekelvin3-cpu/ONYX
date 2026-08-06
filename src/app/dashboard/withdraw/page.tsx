@@ -23,6 +23,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { Clock, Comments } from "@/components/icons";
+import { CryptoIcon, BrandIcon } from "@/components/crypto/CryptoIcon";
 import {
   WithdrawalPageHeader,
   WithdrawalBalanceBanner,
@@ -268,7 +269,7 @@ export default function WithdrawPage() {
                 <>
                   <div>
                     <label className="block text-xs font-medium text-text-tertiary mb-2">Asset</label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {WITHDRAWAL_CRYPTO_ASSETS.map((a) => (
                         <button
                           key={a}
@@ -278,13 +279,14 @@ export default function WithdrawPage() {
                             setConfirming(false);
                           }}
                           className={cn(
-                            "px-3 py-2 rounded-lg text-[13px] border transition-colors cursor-pointer font-medium",
+                            "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors cursor-pointer text-left",
                             asset === a
                               ? "bg-brand/10 text-brand border-brand/40"
-                              : "bg-bg-primary text-text-secondary border-border hover:border-border-light"
+                              : "bg-bg-primary text-text-secondary border-border hover:border-border-light hover:bg-bg-hover/40"
                           )}
                         >
-                          {a}
+                          <CryptoIcon symbol={a} label={a} size="sm" selected={asset === a} />
+                          <span className="text-sm font-semibold">{a}</span>
                         </button>
                       ))}
                     </div>
@@ -425,19 +427,21 @@ export default function WithdrawPage() {
                             setConfirming(false);
                           }}
                           className={cn(
-                            "rounded-xl border px-3 py-3 text-left transition-colors cursor-pointer",
+                            "flex flex-col items-center gap-2 rounded-xl border px-3 py-3 transition-colors cursor-pointer",
                             ewalletProvider === p.id
                               ? "border-brand/50 bg-brand/5"
                               : "border-border bg-bg-primary hover:bg-bg-hover"
                           )}
                         >
-                          <span
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-bold text-white mb-1.5"
-                            style={{ backgroundColor: p.color }}
-                          >
-                            {p.label.charAt(0)}
-                          </span>
-                          <span className="block text-xs font-semibold text-text-primary">{p.label}</span>
+                          <BrandIcon
+                            src={p.iconUrl}
+                            alt={p.label}
+                            size="md"
+                            selected={ewalletProvider === p.id}
+                            fallback={p.label.charAt(0)}
+                            fallbackBg={p.color}
+                          />
+                          <span className="text-xs font-semibold text-text-primary">{p.label}</span>
                         </button>
                       ))}
                     </div>

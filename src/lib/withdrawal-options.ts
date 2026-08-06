@@ -1,4 +1,5 @@
 import type { WithdrawalRow } from "@/lib/supabase/types";
+import { EWALLET_ICON_URLS } from "@/lib/crypto-assets";
 
 export type WithdrawalMethodId = "crypto" | "bank_transfer" | "wire" | "paypal";
 
@@ -66,10 +67,10 @@ export const CRYPTO_NETWORKS: Record<CryptoAsset, string[]> = {
 };
 
 export const EWALLET_PROVIDERS = [
-  { id: "paypal", label: "PayPal", color: "#003087" },
-  { id: "wise", label: "Wise", color: "#163300" },
-  { id: "skrill", label: "Skrill", color: "#872166" },
-  { id: "revolut", label: "Revolut", color: "#191C1F" },
+  { id: "paypal", label: "PayPal", color: "#003087", iconUrl: EWALLET_ICON_URLS.paypal },
+  { id: "wise", label: "Wise", color: "#163300", iconUrl: EWALLET_ICON_URLS.wise },
+  { id: "skrill", label: "Skrill", color: "#872166", iconUrl: EWALLET_ICON_URLS.skrill },
+  { id: "revolut", label: "Revolut", color: "#191C1F", iconUrl: EWALLET_ICON_URLS.revolut },
 ] as const;
 
 export type EwalletProviderId = (typeof EWALLET_PROVIDERS)[number]["id"];

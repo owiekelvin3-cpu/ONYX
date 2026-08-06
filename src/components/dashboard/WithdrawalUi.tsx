@@ -11,6 +11,7 @@ import {
   getWithdrawalMethod,
   type WithdrawalMethodId,
 } from "@/lib/withdrawal-options";
+import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -412,15 +413,20 @@ export function WithdrawalHistoryList({ withdrawals }: { withdrawals: Withdrawal
         const methodId = w.method as WithdrawalMethodId;
         const Icon = METHOD_ICONS[methodId] ?? ArrowUpFromLine;
         const dest = formatWithdrawalDestination(w);
+        const isCrypto = w.method === "crypto";
 
         return (
           <div
             key={w.id}
             className="flex items-center gap-3 rounded-xl border border-border bg-bg-primary/50 px-3.5 py-3"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-bg-secondary text-text-tertiary">
-              <Icon className="w-4 h-4" />
-            </span>
+            {isCrypto ? (
+              <CryptoIcon symbol={w.currency} label={w.currency} size="sm" />
+            ) : (
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-bg-secondary text-text-tertiary">
+                <Icon className="w-4 h-4" />
+              </span>
+            )}
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold font-mono text-text-primary">
