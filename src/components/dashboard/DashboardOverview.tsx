@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   TrendingUp,
-  Wallet,
   ArrowDownToLine,
   ArrowUpFromLine,
   Clock,
@@ -9,13 +8,14 @@ import {
   Comments,
 } from "@/components/icons";
 import {
-  DashboardHeroCard,
   DashboardStatCard,
   DashboardQuickActions,
   DashboardPanel,
 } from "@/components/dashboard/DashboardUi";
+import { DashboardBalanceStrip } from "@/components/dashboard/DashboardBalanceStrip";
 import { PortfolioChart } from "@/components/dashboard/PortfolioChartLoader";
 import { MarketTable } from "@/components/dashboard/MarketTable";
+import type { PortfolioSummary } from "@/lib/api/trading";
 import type { ChartPoint } from "@/lib/chart-data";
 import type { MarketPair } from "@/lib/market-data";
 import type { TradeRow } from "@/lib/supabase/types";
@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   displayName: string;
-  balance: number;
+  summary: PortfolioSummary;
   pnl24h: number | null;
   openOrders: number;
   tradesCount: number;
@@ -35,7 +35,7 @@ type Props = {
 
 export function DashboardOverview({
   displayName,
-  balance,
+  summary,
   pnl24h,
   openOrders,
   tradesCount,
@@ -45,12 +45,11 @@ export function DashboardOverview({
 }: Props) {
   return (
     <div className="mx-auto max-w-6xl space-y-5 sm:space-y-6">
-      <DashboardHeroCard
-        displayName={displayName}
-        balance={balance}
-        pnl24h={pnl24h}
-        chart={<PortfolioChart balance={balance} chartData={chartData} compact />}
-      />
+      <DashboardBalanceStrip displayName={displayName} summary={summary} pnl24h={pnl24h} />
+
+      <div className="coinix-card p-4 sm:p-5">
+        <PortfolioChart balance={summary.totalValue} chartData={chartData} compact />
+      </div>
 
       <DashboardQuickActions
         icons={{
@@ -61,15 +60,10 @@ export function DashboardOverview({
         }}
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-        <DashboardStatCard
-          label="Total balance"
-          value={formatCurrency(balance)}
-          icon={<Wallet className="w-4 h-4" />}
-        />
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         <DashboardStatCard
           label="24h P&L"
-          value={pnl24h === null ? "—" : formatCurrency(pnl24h)}
+          value={pnl24h === null ? "—" : formatCurrency(pnl24h, summary.currency)}
           tone={pnl24h === null ? "default" : pnl24h >= 0 ? "up" : "down"}
           icon={<TrendingUp className="w-4 h-4" />}
         />
@@ -109,7 +103,7 @@ export function DashboardOverview({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-mono font-medium tabular-nums">
-                      {formatCurrency(trade.amount * trade.price)}
+                      {formatCurrency(trade.amount * trade.price, summary.currency)}
                     </p>
                     <p
                       className={cn(

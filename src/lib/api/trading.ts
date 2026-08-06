@@ -1,5 +1,67 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { TradeRow, HoldingRow, BalanceRow } from "@/lib/supabase/types";
+import { priceForAsset } from "@/lib/market-prices";
+
+export type PortfolioSummary = {
+  cashBalance: number;
+  holdingsValue: number;
+  totalValue: number;
+  holdingsCount: number;
+  currency: string;
+  totalDeposits: number;
+  totalWithdrawals: number;
+};
+
+export async function getPortfolioSummary(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<PortfolioSummary> {
+  const [cashBalance, holdings, profileRes, depositsRes, withdrawalsRes] = await Promise.all([
+    getUsdBalance(supabase, userId),
+    getHoldings(supabase, userId),
+    supabase.from("profiles").select("preferred_currency").eq("id", userId).maybeSingle(),
+    supabase
+      .from("deposits")
+      .select("amount")
+      .eq("user_id", userId)
+      .in("status", ["approved", "completed"]),
+    supabase
+      .from("withdrawals")
+      .select("amount")
+      .eq("user_id", userId)
+      .in("status", ["approved", "completed"]),
+  ]);
+
+  let holdingsValue = 0;
+  if (holdings.length > 0) {
+    const values = await Promise.all(
+      holdings.map(async (holding) => {
+        const price = await priceForAsset(holding.asset);
+        return holding.quantity * price;
+      })
+    );
+    holdingsValue = values.reduce((sum, value) => sum + value, 0);
+  }
+
+  const totalDeposits = (depositsRes.data ?? []).reduce(
+    (sum, row) => sum + Number(row.amount),
+    0
+  );
+  const totalWithdrawals = (withdrawalsRes.data ?? []).reduce(
+    (sum, row) => sum + Number(row.amount),
+    0
+  );
+
+  return {
+    cashBalance,
+    holdingsValue,
+    totalValue: cashBalance + holdingsValue,
+    holdingsCount: holdings.length,
+    currency: profileRes.data?.preferred_currency ?? "USD",
+    totalDeposits,
+    totalWithdrawals,
+  };
+}
 
 export async function getUsdBalance(
   supabase: SupabaseClient,

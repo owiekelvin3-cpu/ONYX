@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   getRecentTrades,
-  getUsdBalance,
+  getPortfolioSummary,
   getPendingTradesCount,
   get24hProfit,
 } from "@/lib/api/trading";
@@ -23,9 +23,17 @@ export default async function DashboardPage() {
         .maybeSingle()
     : { data: null };
 
-  const [balance, recentTrades, openOrders, pnl24h, marketPairs, tradesCount] =
+  const [summary, recentTrades, openOrders, pnl24h, marketPairs, tradesCount] =
     await Promise.all([
-      user ? getUsdBalance(supabase, user.id) : Promise.resolve(0),
+      user ? getPortfolioSummary(supabase, user.id) : Promise.resolve({
+        cashBalance: 0,
+        holdingsValue: 0,
+        totalValue: 0,
+        holdingsCount: 0,
+        currency: "USD",
+        totalDeposits: 0,
+        totalWithdrawals: 0,
+      }),
       user ? getRecentTrades(supabase, user.id, 5) : Promise.resolve([]),
       user ? getPendingTradesCount(supabase, user.id) : Promise.resolve(0),
       user ? get24hProfit(supabase, user.id) : Promise.resolve(null),
@@ -39,13 +47,13 @@ export default async function DashboardPage() {
         : Promise.resolve(0),
     ]);
 
-  const chartData = chartFromTrades(balance, recentTrades);
+  const chartData = chartFromTrades(summary.totalValue, recentTrades);
   const displayName = profile?.full_name?.trim() ?? user?.email?.split("@")[0] ?? "";
 
   return (
     <DashboardOverview
       displayName={displayName}
-      balance={balance}
+      summary={summary}
       pnl24h={pnl24h}
       openOrders={openOrders}
       tradesCount={tradesCount}
