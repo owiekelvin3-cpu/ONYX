@@ -27,6 +27,8 @@ const MOBILE_TABS = [
 ] as const;
 
 const MORE_MENU_PATHS = [
+  "/dashboard/transactions",
+  "/dashboard/notifications",
   "/dashboard/withdraw",
   "/dashboard/ai-trading",
   "/dashboard/copy-trading",
@@ -153,16 +155,24 @@ export function DashboardShell({
           />
           <div className="absolute bottom-0 left-0 right-0 max-h-[70vh] overflow-y-auto rounded-t-3xl border-t border-border bg-bg-secondary p-4 safe-area-bottom">
             <div className="grid gap-2">
-              {MORE_MENU_PATHS.map((href) => (
+              {MORE_MENU_PATHS.map((href) => {
+                const labelKey =
+                  href === "/dashboard/transactions"
+                    ? "dashboard.transactions"
+                    : href === "/dashboard/notifications"
+                      ? "dashboard.notifications"
+                      : null;
+                return (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setMenuOpen(false)}
                   className="rounded-xl px-4 py-3 text-sm font-medium text-text-secondary hover:bg-bg-hover"
                 >
-                  {href.split("/").pop()?.replace("-", " ")}
+                  {labelKey ? t(labelKey) : href.split("/").pop()?.replace("-", " ")}
                 </Link>
-              ))}
+              );
+              })}
               <button
                 type="button"
                 onClick={() => {

@@ -91,8 +91,8 @@ export function DashboardOverview({
           title="Recent trades"
           className="lg:col-span-2"
           action={
-            <Link href="/dashboard/trade" className="text-xs font-medium text-brand hover:text-brand-hover">
-              Open desk
+            <Link href="/dashboard/transactions" className="text-xs font-medium text-brand hover:text-brand-hover">
+              View all
             </Link>
           }
         >

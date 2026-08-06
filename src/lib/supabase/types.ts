@@ -98,3 +98,31 @@ export type ProfileRow = {
   kyc_status: string;
   role: string;
 };
+
+export type NotificationRow = {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+};
+
+export type TransactionKind = "deposit" | "withdrawal" | "trade";
+
+export type TransactionItem = {
+  id: string;
+  kind: TransactionKind;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  amount: number;
+  currency: string;
+  method?: string | null;
+  asset?: string | null;
+  tradeType?: "buy" | "sell" | null;
+  quantity?: number | null;
+  unitPrice?: number | null;
+  destination?: string | null;
+  notes?: string | null;
+};

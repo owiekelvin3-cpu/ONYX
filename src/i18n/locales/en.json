@@ -461,6 +461,8 @@
     "navPortfolio": "Portfolio",
     "navDeposit": "Deposit",
     "navWithdraw": "Withdraw",
+    "navNotifications": "Notifications",
+    "navTransactions": "Transactions",
     "clientPortal": "Client Portal",
     "searchPlaceholder": "Search portfolio, trades...",
     "todayChange": "today",

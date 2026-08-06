@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { Bell, Menu, Search, X } from "@/components/icons";
+import { NotificationBell } from "@/components/dashboard/NotificationBell";
+import { Menu, Receipt, X } from "@/components/icons";
 import { useState } from "react";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
@@ -86,21 +87,14 @@ export function AppTopNav({
           <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
             {mode === "dashboard" && (
               <>
-                <button
-                  type="button"
-                  className="hidden rounded-xl p-2.5 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-primary sm:inline-flex"
-                  aria-label={t("nav.searchPlaceholder")}
-                >
-                  <Search className="h-[18px] w-[18px]" />
-                </button>
                 <Link
-                  href="/dashboard/support"
-                  className="relative hidden rounded-xl p-2.5 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-primary sm:inline-flex"
-                  aria-label={t("dashboard.support")}
+                  href="/dashboard/transactions"
+                  className="hidden rounded-xl p-2.5 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-primary sm:inline-flex"
+                  aria-label={t("dashboard.openTransactions")}
                 >
-                  <Bell className="h-[18px] w-[18px]" />
-                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-brand" />
+                  <Receipt className="h-[18px] w-[18px]" />
                 </Link>
+                <NotificationBell />
               </>
             )}
 
