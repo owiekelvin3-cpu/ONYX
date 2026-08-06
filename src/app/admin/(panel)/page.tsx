@@ -13,12 +13,14 @@ import {
   ArrowUpFromLine,
   RefreshCw,
   ChevronRight,
+  Comments,
 } from "@/components/icons";
 
 const QUICK_LINKS = [
   { href: "/admin/kyc", label: "KYC Review", icon: FileCheck, statKey: "pendingKyc" as const },
   { href: "/admin/deposits", label: "Deposits", icon: ArrowDownToLine, statKey: "pendingDeposits" as const },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine, statKey: "pendingWithdrawals" as const },
+  { href: "/admin/support", label: "Support", icon: Comments, statKey: null },
   { href: "/admin/users", label: "Users", icon: Users, statKey: "totalUsers" as const },
 ];
 
@@ -93,7 +95,11 @@ export default function AdminOverviewPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text-primary">{link.label}</p>
                   <p className="text-xs text-text-tertiary">
-                    {loading ? "—" : `${stats[link.statKey]} total`}
+                    {link.statKey
+                      ? loading
+                        ? "—"
+                        : `${stats[link.statKey]} total`
+                      : "Live customer messages"}
                   </p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-text-tertiary" />

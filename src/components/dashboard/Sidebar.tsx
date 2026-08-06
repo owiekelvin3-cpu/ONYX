@@ -18,6 +18,7 @@ import {
   Bell,
   Bot,
   Users,
+  Comments,
   Menu,
   X,
   MoreHorizontal,
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
   { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
+  { label: "Support", href: "/dashboard/support", icon: Comments },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -47,6 +49,7 @@ const MORE_MENU_PATHS = [
   "/dashboard/withdraw",
   "/dashboard/ai-trading",
   "/dashboard/copy-trading",
+  "/dashboard/support",
   "/dashboard/settings",
 ];
 

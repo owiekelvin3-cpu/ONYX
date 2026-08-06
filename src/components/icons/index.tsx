@@ -45,6 +45,14 @@ import {
   faUser,
   faBuildingColumns,
   faMoneyBillTransfer,
+  faComments,
+  faPlus,
+  faMagnifyingGlass,
+  faPaperPlane,
+  faPaperclip,
+  faFaceSmile,
+  faFileLines,
+  faImage,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -111,3 +119,11 @@ export const Phone = icon(faPhone);
 export const User = icon(faUser);
 export const BuildingColumns = icon(faBuildingColumns);
 export const MoneyBillTransfer = icon(faMoneyBillTransfer);
+export const Comments = icon(faComments);
+export const Plus = icon(faPlus);
+export const Search = icon(faMagnifyingGlass);
+export const PaperPlane = icon(faPaperPlane);
+export const PaperClip = icon(faPaperclip);
+export const FaceSmile = icon(faFaceSmile);
+export const FileLines = icon(faFileLines);
+export const Image = icon(faImage);

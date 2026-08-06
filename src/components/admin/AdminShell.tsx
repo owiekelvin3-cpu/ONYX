@@ -15,6 +15,7 @@ import {
   FileCheck,
   ArrowDownToLine,
   ArrowUpFromLine,
+  Comments,
   Settings,
   LogOut,
   Menu,
@@ -27,6 +28,7 @@ const ADMIN_LINKS = [
   { href: "/admin/kyc", label: "KYC Review", icon: FileCheck },
   { href: "/admin/deposits", label: "Deposits", icon: ArrowDownToLine },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
+  { href: "/admin/support", label: "Support", icon: Comments },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

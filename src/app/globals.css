@@ -429,3 +429,19 @@ body {
     padding: 2rem 2.25rem;
   }
 }
+
+/* Support chat */
+.support-thread-wallpaper {
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(circle at 20% 20%, rgba(240, 185, 11, 0.04), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(240, 185, 11, 0.03), transparent 40%);
+}
+
+.support-message-scroller,
+.support-composer textarea {
+  font-size: 16px;
+}
+
+html.support-chat-open body {
+  overflow: hidden;
+}

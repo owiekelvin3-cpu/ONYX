@@ -87,7 +87,7 @@ export const SITE_PAGES: Record<
       "Trading: Go to Dashboard → Trade to access spot markets. Select a pair, enter amount, and click Buy or Sell.",
       "Withdrawals: Dashboard → Withdraw. Choose crypto wallet, bank transfer, international wire, or PayPal/e-wallet. Enter payout details and amount — our team processes requests within 1–5 business days depending on method.",
       "Security: Enable 2FA in Settings. Never share your password or API keys. ONYX will never ask for your credentials via email.",
-      "Need more help? Email support@onyx.exchange — our team is available 24/7.",
+      "Need more help? Open Dashboard → Support for live chat with our team, or email support@onyx.exchange — available 24/7.",
     ],
   },
   terms: {
