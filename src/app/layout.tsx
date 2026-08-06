@@ -4,6 +4,7 @@ import "./globals.css";
 import "@/lib/fontawesome";
 import { BRAND } from "@/lib/constants";
 import { getAppUrl } from "@/lib/env";
+import { I18nProvider } from "@/components/i18n/I18nProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -65,7 +66,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} h-full overflow-x-hidden`}>
-      <body className="min-h-dvh antialiased overflow-x-hidden">{children}</body>
+      <body className="min-h-dvh antialiased overflow-x-hidden">
+        <I18nProvider>{children}</I18nProvider>
+      </body>
     </html>
   );
 }

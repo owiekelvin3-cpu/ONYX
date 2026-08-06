@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BRAND, NAV } from "@/lib/constants";
 import { siteRoute } from "@/lib/routes";
 import { Button } from "@/components/ui/Button";
+import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
-import { ChevronDown, Globe, Menu, X } from "@/components/icons";
+import { ChevronDown, Menu, X } from "@/components/icons";
 
 const NAV_ITEMS = [
   { label: "Buy Crypto", key: "BuyCrypto" as const },
@@ -17,6 +19,7 @@ const NAV_ITEMS = [
 ];
 
 export function Header() {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   useBodyScrollLock(mobileOpen);
 
@@ -58,37 +61,32 @@ export function Header() {
             </nav>
 
             <div className="hidden lg:flex items-center gap-2 ml-auto shrink-0">
-              <Link
-                href="/help"
-                className="p-2 text-text-tertiary hover:text-text-primary transition-colors flex items-center justify-center rounded-lg"
-                aria-label="Help"
-              >
-                <Globe className="w-[18px] h-[18px]" />
-              </Link>
+              <LanguageSelector />
               <Link href="/login">
-                <Button variant="ghost" size="sm">Log In</Button>
+                <Button variant="ghost" size="sm">{t("auth.login")}</Button>
               </Link>
               <Link href="/register">
-                <Button size="sm">Sign Up</Button>
+                <Button size="sm">{t("common.openAccount")}</Button>
               </Link>
             </div>
 
             <div className="flex items-center gap-1.5 ml-auto lg:hidden shrink-0">
+              <LanguageSelector />
               <Link href="/login" className="hidden xs:block">
                 <Button variant="ghost" size="sm" className="!px-3 !text-xs">
-                  Log In
+                  {t("auth.login")}
                 </Button>
               </Link>
               <Link href="/register">
                 <Button size="sm" className="!px-3 sm:!px-5 !text-xs sm:!text-sm">
-                  Sign Up
+                  {t("common.openAccount")}
                 </Button>
               </Link>
               <button
                 type="button"
                 className="p-2 text-text-secondary hover:text-text-primary cursor-pointer rounded-lg active:bg-bg-hover"
                 onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
+                aria-label={t("nav.openMenu")}
                 aria-expanded={mobileOpen}
               >
                 <Menu className="w-5 h-5" />
@@ -99,7 +97,7 @@ export function Header() {
       </header>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Site menu">
+        <div role="dialog" aria-modal="true" aria-label={t("nav.mobileMenu")} className="fixed inset-0 z-[60] lg:hidden">
           <button
             type="button"
             className="absolute inset-0 bg-black/60 mobile-nav-backdrop"
@@ -138,11 +136,15 @@ export function Header() {
               ))}
             </nav>
             <div className="p-4 border-t border-border space-y-2 shrink-0">
+              <div className="flex items-center justify-between px-1 pb-2">
+                <span className="text-xs text-text-tertiary">{t("common.language")}</span>
+                <LanguageSelector showLabel />
+              </div>
               <Link href="/login" onClick={() => setMobileOpen(false)}>
-                <Button variant="outline" className="w-full" size="md">Log In</Button>
+                <Button variant="outline" className="w-full" size="md">{t("auth.login")}</Button>
               </Link>
               <Link href="/register" onClick={() => setMobileOpen(false)}>
-                <Button className="w-full" size="md">Sign Up</Button>
+                <Button className="w-full" size="md">{t("common.openAccount")}</Button>
               </Link>
             </div>
           </div>

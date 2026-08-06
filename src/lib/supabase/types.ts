@@ -53,13 +53,21 @@ export type WithdrawalRow = {
 export type AiSubscriptionRow = {
   id: string;
   user_id: string;
+  bot_id?: string | null;
   bot_name: string;
   allocation: number;
+  duration_hours?: number | null;
+  expires_at?: string | null;
+  crypto_asset?: string | null;
   market: string;
   status: string;
-  profit_earned?: number;
+  profit_earned?: number | null;
+  entry_price?: number | null;
+  last_mark_price?: number | null;
+  admin_pnl?: number | null;
+  last_sync_at?: string | null;
+  purchase_cost?: number | null;
   created_at: string;
-  expires_at?: string | null;
 };
 
 export type CopySubscriptionRow = {

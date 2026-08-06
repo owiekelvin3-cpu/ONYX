@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
 import { clearAdminAuthCookie } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
+import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -27,42 +29,42 @@ import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 const NAV_GROUPS = [
   {
-    label: "Overview",
+    labelKey: "dashboard.overview",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
-      { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
+      { labelKey: "dashboard.overview", href: "/dashboard", icon: LayoutDashboard },
+      { labelKey: "dashboard.tradingRoom", href: "/dashboard/trade", icon: TrendingUp },
+      { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
     ],
   },
   {
-    label: "Cash",
+    labelKey: "dashboard.deposits",
     items: [
-      { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
-      { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
+      { labelKey: "dashboard.deposits", href: "/dashboard/deposit", icon: ArrowDownToLine },
+      { labelKey: "dashboard.withdrawals", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
     ],
   },
   {
-    label: "Tools",
+    labelKey: "nav.products",
     items: [
-      { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
-      { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
+      { labelKey: "dashboard.aiTrading", href: "/dashboard/ai-trading", icon: Bot },
+      { labelKey: "dashboard.copyTrading", href: "/dashboard/copy-trading", icon: Users },
     ],
   },
   {
-    label: "Account",
+    labelKey: "dashboard.settings",
     items: [
-      { label: "Support", href: "/dashboard/support", icon: Comments },
-      { label: "Settings", href: "/dashboard/settings", icon: Settings },
+      { labelKey: "dashboard.support", href: "/dashboard/support", icon: Comments },
+      { labelKey: "dashboard.settings", href: "/dashboard/settings", icon: Settings },
     ],
   },
 ] as const;
 
 const MOBILE_TABS = [
-  { label: "Home", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
-  { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
-  { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
-  { label: "More", href: null, icon: MoreHorizontal },
+  { labelKey: "dashboard.overview", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "dashboard.tradingRoom", href: "/dashboard/trade", icon: TrendingUp },
+  { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
+  { labelKey: "dashboard.deposits", href: "/dashboard/deposit", icon: ArrowDownToLine },
+  { labelKey: "nav.more", href: null, icon: MoreHorizontal },
 ] as const;
 
 const MORE_MENU_PATHS = [
@@ -96,12 +98,13 @@ function NavLinks({
   pathname: string;
   onNavigate?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <>
       {NAV_GROUPS.map((group) => (
-        <div key={group.label} className="mb-4 last:mb-0">
+        <div key={group.labelKey} className="mb-4 last:mb-0">
           <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-tertiary/80">
-            {group.label}
+            {t(group.labelKey)}
           </p>
           <div className="space-y-0.5">
             {group.items.map((item) => {
@@ -120,7 +123,7 @@ function NavLinks({
                   )}
                 >
                   <Icon className="w-[17px] h-[17px] shrink-0" />
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               );
             })}
@@ -140,6 +143,7 @@ export function DashboardSidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
   const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
 
   async function handleLogout() {
@@ -166,6 +170,9 @@ export function DashboardSidebar({
       </nav>
 
       <div className="p-3 border-t border-border/80 space-y-2">
+        <div className="flex items-center justify-end px-1">
+          <LanguageSelector />
+        </div>
         <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-bg-primary/40 px-3 py-2.5">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand/30 to-brand/5 border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
             {initial}
@@ -182,7 +189,7 @@ export function DashboardSidebar({
           className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-text-tertiary hover:text-red hover:bg-red/5 w-full transition-colors cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
-          Log out
+          {t("common.signOut")}
         </button>
       </div>
     </aside>
@@ -200,6 +207,7 @@ export function DashboardMobileFrame({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const hideBottomNav = shouldHideMobileBottomNav(pathname);
   useBodyScrollLock(menuOpen);
@@ -234,6 +242,7 @@ export function DashboardMobileFrame({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <LanguageSelector />
           <Link
             href="/dashboard/support"
             className="relative p-2 text-text-tertiary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-hover"
@@ -292,18 +301,18 @@ export function DashboardMobileFrame({
                   >
                     <Icon className="w-[18px] h-[18px] shrink-0" />
                   </span>
-                  <span className="truncate w-full text-center font-medium">{item.label}</span>
+                  <span className="truncate w-full text-center font-medium">{t(item.labelKey)}</span>
                 </>
               );
 
               if (isMore) {
                 return (
                   <button
-                    key={item.label}
+                    key={item.labelKey}
                     type="button"
                     onClick={() => setMenuOpen(true)}
                     className={className}
-                    aria-label="Open menu"
+                    aria-label={t("dashboard.openSidebar")}
                     aria-expanded={menuOpen}
                   >
                     {content}
@@ -361,7 +370,7 @@ export function DashboardMobileFrame({
                 className="flex items-center gap-2.5 px-3 py-3 rounded-lg text-[14px] text-text-tertiary hover:text-red hover:bg-red/5 w-full cursor-pointer transition-colors"
               >
                 <LogOut className="w-[18px] h-[18px]" />
-                Log out
+                {t("common.signOut")}
               </button>
             </div>
           </div>

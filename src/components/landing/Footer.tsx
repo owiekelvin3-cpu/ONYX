@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { BRAND, FOOTER } from "@/lib/constants";
 import { siteRoute } from "@/lib/routes";
 
@@ -10,6 +13,7 @@ const MOBILE_FOOTER_LINKS = [
 ] as const;
 
 export function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-bg-secondary border-t border-border">
       <div className="container-app pt-10 sm:pt-14 pb-[max(2rem,var(--safe-bottom))]">
@@ -65,7 +69,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-8 sm:mt-10 pt-5 sm:pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <p className="text-[11px] text-text-tertiary">
-            &copy; {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {BRAND.fullName}. {t("common.allRightsReserved")}
           </p>
         </div>
       </div>

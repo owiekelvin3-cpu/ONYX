@@ -20,6 +20,7 @@ import {
   LogOut,
   Menu,
   X,
+  Bot,
 } from "@/components/icons";
 
 const ADMIN_LINKS = [
@@ -28,6 +29,7 @@ const ADMIN_LINKS = [
   { href: "/admin/kyc", label: "KYC Review", icon: FileCheck },
   { href: "/admin/deposits", label: "Deposits", icon: ArrowDownToLine },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
+  { href: "/admin/ai-trading", label: "AI Trading", icon: Bot },
   { href: "/admin/support", label: "Support", icon: Comments },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];

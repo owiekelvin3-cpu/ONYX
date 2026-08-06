@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
-import { BRAND } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { Mail, ArrowRight } from "@/components/icons";
 import { MARKET_PAIRS, type MarketPair } from "@/lib/market-data";
@@ -23,6 +23,7 @@ const ORDER_ROWS = [
 ];
 
 export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const reduce = useReducedMotion();
   const featured = pairs.slice(0, 5);
@@ -48,13 +49,14 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
 
             <HeroEnter delay={0.08}>
               <h1 className="text-[28px] xs:text-[32px] sm:text-[40px] lg:text-[48px] font-bold leading-[1.12] tracking-tight text-text-primary text-balance">
-                {BRAND.tagline}
+                {t("hero.title1")}{" "}
+                <span className="text-brand">{t("hero.title2")}</span>
               </h1>
             </HeroEnter>
 
             <HeroEnter delay={0.16}>
               <p className="mt-3 sm:mt-4 text-sm sm:text-base text-text-secondary leading-relaxed max-w-md">
-                {BRAND.description}
+                {t("hero.subtitle")}
               </p>
             </HeroEnter>
 
@@ -91,7 +93,7 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
                       className="w-full sm:w-auto shrink-0"
                     >
                       <Button size="lg" className="w-full sm:w-auto h-12 px-6 text-[15px] sm:text-sm">
-                        Get started
+                        {t("common.getStarted")}
                         <ArrowRight className="w-4 h-4 sm:hidden" aria-hidden />
                       </Button>
                     </Link>
