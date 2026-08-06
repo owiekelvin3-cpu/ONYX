@@ -15,6 +15,7 @@ import { DEPOSIT_CRYPTO_LABELS } from "@/lib/deposit-options";
 import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
@@ -203,10 +204,10 @@ export default function DepositPage() {
       </Card>
 
       {deposits.length > 0 && (
-        <Card>
-          <h3 className="text-[13px] font-semibold text-text-primary mb-3">
-            Deposit History
-          </h3>
+        <CollapsibleSection
+          title="Deposit History"
+          subtitle={`${deposits.length} recent ${deposits.length === 1 ? "request" : "requests"}`}
+        >
           <div className="space-y-2">
             {deposits.map((d) => (
               <div
@@ -225,7 +226,7 @@ export default function DepositPage() {
               </div>
             ))}
           </div>
-        </Card>
+        </CollapsibleSection>
       )}
     </div>
   );

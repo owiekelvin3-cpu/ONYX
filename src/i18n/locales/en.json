@@ -524,11 +524,15 @@
       "wallet": "Wallet",
       "security": "Security",
       "notifications": "Notifications",
-      "preferences": "Preferences"
+      "preferences": "Preferences",
+      "account": "Account"
     },
     "profileTitle": "Profile information",
     "profileDesc": "Update your photo and personal details visible on your account.",
     "avatarHint": "Click your photo to upload a new profile picture (JPG, PNG, max 5MB).",
+    "changePhoto": "Change photo",
+    "avatarType": "Please upload a JPG, PNG, or WebP image.",
+    "avatarSize": "Profile picture must be 5MB or smaller.",
     "removeAvatar": "Remove photo",
     "avatarUpdated": "Profile picture updated.",
     "avatarRemoved": "Profile picture removed.",

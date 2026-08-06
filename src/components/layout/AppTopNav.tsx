@@ -38,11 +38,13 @@ export function AppTopNav({
   mode = "dashboard",
   userName,
   userEmail,
+  avatarUrl,
   authActions,
 }: {
   mode?: "marketing" | "dashboard";
   userName?: string;
   userEmail?: string;
+  avatarUrl?: string;
   authActions?: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -103,8 +105,13 @@ export function AppTopNav({
 
             {mode === "dashboard" ? (
               <div className="hidden items-center gap-2 rounded-full border border-border bg-bg-tertiary py-1 pl-1 pr-3 sm:flex">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-text">
-                  {initial}
+                <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-brand text-xs font-bold text-brand-text">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    initial
+                  )}
                 </span>
                 <span className="max-w-[120px] truncate text-sm font-medium text-text-primary">
                   {userName || userEmail?.split("@")[0] || "User"}

@@ -20,6 +20,7 @@ import {
   type EwalletProviderId,
 } from "@/lib/withdrawal-options";
 import { Card } from "@/components/ui/Card";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { Clock, Comments } from "@/components/icons";
@@ -500,13 +501,16 @@ export default function WithdrawPage() {
         </>
       )}
 
-      <Card className="rounded-2xl p-4 sm:p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Clock className="w-4 h-4 text-text-tertiary" />
-          <h3 className="text-sm font-semibold text-text-primary">Recent withdrawals</h3>
-        </div>
+      <CollapsibleSection
+        title="Recent withdrawals"
+        subtitle={
+          withdrawals.length > 0
+            ? `${withdrawals.length} ${withdrawals.length === 1 ? "payout" : "payouts"}`
+            : "Your payout history will appear here"
+        }
+      >
         <WithdrawalHistoryList withdrawals={withdrawals} />
-      </Card>
+      </CollapsibleSection>
 
       <p className="text-center text-xs text-text-tertiary pb-1">
         Need help with a payout?{" "}

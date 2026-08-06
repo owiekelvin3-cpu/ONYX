@@ -21,12 +21,17 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
 
   return (
-    <DashboardShell userName={profile?.full_name ?? undefined} userEmail={user.email}>
+    <DashboardShell
+      userId={user.id}
+      userName={profile?.full_name ?? undefined}
+      userEmail={user.email}
+      avatarUrl={profile?.avatar_url ?? undefined}
+    >
       {children}
     </DashboardShell>
   );

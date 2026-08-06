@@ -25,6 +25,7 @@ import {
   X,
 } from "@/components/icons";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { NotificationProvider } from "@/components/notifications/NotificationProvider";
 
 const MOBILE_TABS = [
   { labelKey: "dashboard.dock.home", href: "/dashboard", icon: LayoutDashboard },
@@ -63,12 +64,16 @@ export function shouldHideMobileBottomNav(pathname: string) {
 
 export function DashboardShell({
   children,
+  userId,
   userName,
   userEmail,
+  avatarUrl,
 }: {
   children: React.ReactNode;
+  userId?: string;
   userName?: string;
   userEmail?: string;
+  avatarUrl?: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -86,8 +91,14 @@ export function DashboardShell({
   }
 
   return (
-    <div className="dashboard-shell flex min-h-dvh flex-col">
-      <AppTopNav mode="dashboard" userName={userName} userEmail={userEmail} />
+    <NotificationProvider userId={userId}>
+      <div className="dashboard-shell flex min-h-dvh flex-col">
+        <AppTopNav
+          mode="dashboard"
+          userName={userName}
+          userEmail={userEmail}
+          avatarUrl={avatarUrl}
+        />
 
       <main
         className={cn(
@@ -231,6 +242,7 @@ export function DashboardShell({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </NotificationProvider>
   );
 }
