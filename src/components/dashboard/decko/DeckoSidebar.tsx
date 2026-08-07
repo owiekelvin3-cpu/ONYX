@@ -30,7 +30,7 @@ const MAIN_MENU = [
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
-  { label: "Market Analytics", href: "/dashboard/portfolio", icon: LineChart },
+  { label: "Market Analytics", href: "/dashboard/analytics", icon: LineChart },
 ] as const;
 
 const SETTINGS_MENU = [
