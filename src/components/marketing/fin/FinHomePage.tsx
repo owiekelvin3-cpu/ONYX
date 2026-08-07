@@ -8,8 +8,11 @@ import { FIN_CHART_COLORS } from "@/lib/theme";
 import { formatCompact, formatNumber, formatPercent } from "@/lib/utils";
 import {
   FinBar,
+  FinColorBars,
   FinHoverLift,
   FinProgressSegments,
+  FinPulseDot,
+  FinReveal,
   FinScrollStagger,
   FinStagger,
   FinStaggerItem,
@@ -88,30 +91,33 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
   return (
     <section className="mt-4">
       <FinScrollStagger>
-        <FinStaggerItem>
-          <motion.div
-            className="mb-4 flex items-end justify-between gap-4 px-1"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5 }}
-          >
-            <div>
-              <p className="fin-section-label">Live overview</p>
+        <div className="mb-4 flex items-end justify-between gap-4 px-1">
+          <div>
+            <FinReveal delay={0}>
+              <p className="fin-section-label flex items-center gap-2">
+                <FinPulseDot />
+                Live overview
+              </p>
+            </FinReveal>
+            <FinReveal delay={0.08}>
               <h2 className="mt-2 text-xl font-bold text-text-primary sm:text-2xl">
                 Real-time market intelligence
               </h2>
-            </div>
+            </FinReveal>
+            <FinReveal delay={0.14}>
+              <FinColorBars colors={FIN_CHART_COLORS} className="mt-3" />
+            </FinReveal>
+          </div>
+          <FinReveal delay={0.12} y={12}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 400, damping: 22 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
             >
               <FinPageActions />
             </motion.div>
-          </motion.div>
-        </FinStaggerItem>
+          </FinReveal>
+        </div>
 
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_320px]">
           <FinStaggerItem variant="scale">
