@@ -25,7 +25,7 @@ import { createClient } from "@/lib/supabase/client";
 import { clearAdminAuthCookie } from "@/lib/auth-guards";
 
 const MAIN_MENU = [
-  { label: "Business Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
+  { label: "Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
   { label: "Spot Trading", href: "/dashboard/trade", icon: TrendingUp },
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
