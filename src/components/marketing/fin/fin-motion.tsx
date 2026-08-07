@@ -103,7 +103,7 @@ export function FinProgressSegments({
 }) {
   const reduce = useReducedMotion();
   return (
-    <div className="flex h-2 overflow-hidden rounded-full bg-[#ECEEF2]">
+    <div className="flex h-2 overflow-hidden rounded-full bg-bg-tertiary">
       {segments.map((seg, i) => (
         <motion.div
           key={i}

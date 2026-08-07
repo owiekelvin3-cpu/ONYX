@@ -8,6 +8,7 @@ import { BRAND } from "@/lib/constants";
 import { MARKETING_MORE_LINKS, MARKETING_NAV } from "@/lib/marketing-nav";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Menu, X } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -43,10 +44,10 @@ export function FinMarketingSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fin-sidebar hidden lg:flex w-[72px] shrink-0 flex-col items-center gap-2 border-r border-[#E5E7EB] bg-[#F4F7F6] py-5">
+    <aside className="fin-sidebar hidden w-[72px] shrink-0 flex-col items-center gap-2 border-r py-5 lg:flex">
       <Link
         href="/"
-        className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm"
+        className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-bg-secondary shadow-sm"
       >
         <OnyxLogo size={24} />
       </Link>
@@ -62,8 +63,8 @@ export function FinMarketingSidebar() {
               className={cn(
                 "flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300",
                 active
-                  ? "bg-[#111111] text-[var(--brand-accent)] shadow-lg scale-105"
-                  : "text-[#9CA3AF] hover:bg-white hover:text-[#111111] hover:scale-105"
+                  ? "scale-105 bg-[var(--nav-active-bg)] text-[var(--nav-active-text)] shadow-lg"
+                  : "text-text-tertiary hover:scale-105 hover:bg-bg-secondary hover:text-text-primary"
               )}
             >
               <Icon className="h-[18px] w-[18px]" />
@@ -71,6 +72,7 @@ export function FinMarketingSidebar() {
           );
         })}
       </nav>
+      <ThemeToggle className="rounded-xl border border-border bg-bg-secondary" />
     </aside>
   );
 }
@@ -84,20 +86,21 @@ export function FinMarketingMobileBar() {
 
   return (
     <>
-      <header className="fin-mobile-bar sticky top-0 z-50 flex items-center justify-between border-b border-[#E5E7EB] bg-[#F4F7F6]/95 px-4 py-3 backdrop-blur-md lg:hidden safe-area-top">
+      <header className="fin-mobile-bar sticky top-0 z-50 flex items-center justify-between border-b px-4 py-3 backdrop-blur-md lg:hidden safe-area-top">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-bg-secondary shadow-sm">
             <OnyxLogo size={20} />
           </span>
-          <span className="font-bold text-[#111111]">{BRAND.name}</span>
+          <span className="font-bold text-text-primary">{BRAND.name}</span>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeToggle className="rounded-lg border border-border bg-bg-secondary" />
           <Link href="/register">
-            <Button size="sm" className="h-8 rounded-full bg-[#111111] px-3 text-xs text-white">
+            <Button size="sm" className="fin-btn-primary h-8 rounded-full px-3 text-xs">
               Join
             </Button>
           </Link>
-          <button type="button" onClick={() => setMenuOpen(true)} className="rounded-lg p-2">
+          <button type="button" onClick={() => setMenuOpen(true)} className="rounded-lg p-2 text-text-primary">
             <Menu className="h-5 w-5" />
           </button>
         </div>
@@ -106,9 +109,9 @@ export function FinMarketingMobileBar() {
       {menuOpen && (
         <div className="fixed inset-0 z-[70] lg:hidden">
           <button type="button" className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-[min(300px,88vw)] bg-white p-4 safe-area-top safe-area-bottom">
+          <div className="absolute right-0 top-0 h-full w-[min(300px,88vw)] bg-bg-secondary p-4 safe-area-top safe-area-bottom">
             <div className="mb-4 flex items-center justify-between">
-              <span className="font-bold">{BRAND.name}</span>
+              <span className="font-bold text-text-primary">{BRAND.name}</span>
               <button type="button" onClick={() => setMenuOpen(false)}>
                 <X className="h-5 w-5" />
               </button>
@@ -122,17 +125,18 @@ export function FinMarketingMobileBar() {
                   className={cn(
                     "block rounded-xl px-3 py-2.5 text-sm font-medium",
                     isActive(pathname, item.href)
-                      ? "bg-[var(--brand-accent)] text-[#111111]"
-                      : "text-[#6B7280]"
+                      ? "fin-badge text-[#111111]"
+                      : "text-text-secondary"
                   )}
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
-            <div className="mt-4 space-y-2 border-t border-[#E5E7EB] pt-4">
+            <div className="mt-4 space-y-2 border-t border-border pt-4">
               <LanguageSelector />
-              <Link href="/login" className="block text-sm text-[#6B7280]">
+              <ThemeToggle showLabel className="w-full justify-start px-2" />
+              <Link href="/login" className="block text-sm text-text-secondary">
                 {t("auth.login")}
               </Link>
             </div>
@@ -148,14 +152,14 @@ export function FinPageActions() {
     <div className="flex items-center gap-2">
       <Link
         href="/register"
-        className="flex h-11 w-11 items-center justify-center rounded-full bg-[#111111] text-white shadow-lg transition-transform hover:scale-105"
+        className="fin-btn-primary flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105"
         aria-label="Get started"
       >
         +
       </Link>
       <Link
         href="/dashboard"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-[#111111] text-white shadow-md transition-transform hover:scale-105"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-bg-secondary text-text-primary shadow-md transition-transform hover:scale-105"
         aria-label="Open dashboard"
       >
         ↑

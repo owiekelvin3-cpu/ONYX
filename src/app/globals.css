@@ -6,8 +6,8 @@
   color-scheme: light;
   --bg-primary: #f4f7f6;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #e3edf2;
-  --bg-hover: #eceef2;
+  --bg-tertiary: #eceef2;
+  --bg-hover: #e8ebe6;
   --border: #e5e7eb;
   --border-light: #d1d5db;
   --text-primary: #111111;
@@ -18,13 +18,15 @@
   --brand-light: #f0ffd6;
   --brand-accent: #e2ff4c;
   --brand-glow: rgba(226, 255, 76, 0.35);
-  --brand-text: #111111;
+  --brand-text: #ffffff;
   --gold: #fbbf24;
   --green: #34d399;
   --red: #f87171;
   --nav-active-bg: #111111;
   --nav-active-text: #e2ff4c;
   --nav-pill-bg: #eceef2;
+  --fin-btn-bg: #111111;
+  --fin-btn-fg: #ffffff;
   --shadow-card: 0 8px 30px rgba(17, 17, 17, 0.06);
   --shadow-premium: 0 12px 40px rgba(17, 17, 17, 0.08);
   --shadow-glow: 0 0 0 1px rgba(226, 255, 76, 0.4), 0 8px 24px rgba(226, 255, 76, 0.2);
@@ -34,30 +36,32 @@
 
 .dark {
   color-scheme: dark;
-  --bg-primary: #131722;
-  --bg-secondary: #1e222d;
-  --bg-tertiary: #2a2e39;
-  --bg-hover: #363a45;
-  --border: #2a2e39;
-  --border-light: #434651;
-  --text-primary: #d1d4dc;
-  --text-secondary: #b2b5be;
-  --text-tertiary: #787b86;
-  --brand: #2962ff;
-  --brand-hover: #1e53e5;
-  --brand-light: rgba(41, 98, 255, 0.15);
-  --brand-accent: #2196f3;
-  --brand-glow: rgba(41, 98, 255, 0.35);
-  --brand-text: #ffffff;
-  --gold: #ff9800;
-  --green: #089981;
-  --red: #f23645;
-  --nav-active-bg: #2962ff;
-  --nav-active-text: #ffffff;
-  --nav-pill-bg: #2a2e39;
-  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-premium: 0 4px 12px rgba(41, 98, 255, 0.15);
-  --shadow-glow: 0 0 0 1px rgba(41, 98, 255, 0.25), 0 4px 20px rgba(41, 98, 255, 0.2);
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #242424;
+  --bg-hover: #2e2e2e;
+  --border: #2e2e2e;
+  --border-light: #3f3f3f;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #737373;
+  --brand: #e2ff4c;
+  --brand-hover: #cce835;
+  --brand-light: rgba(226, 255, 76, 0.12);
+  --brand-accent: #e2ff4c;
+  --brand-glow: rgba(226, 255, 76, 0.25);
+  --brand-text: #111111;
+  --gold: #fbbf24;
+  --green: #34d399;
+  --red: #f87171;
+  --nav-active-bg: #e2ff4c;
+  --nav-active-text: #111111;
+  --nav-pill-bg: #242424;
+  --fin-btn-bg: #e2ff4c;
+  --fin-btn-fg: #111111;
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow-premium: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 0 1px rgba(226, 255, 76, 0.3), 0 8px 24px rgba(226, 255, 76, 0.15);
 }
 
 @theme inline {
@@ -667,28 +671,52 @@ html.support-chat-open body {
 
 /* Financial report marketing UI */
 .fin-marketing {
-  --brand-accent: #e2ff4c;
-  background: #f4f7f6;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .fin-card {
   border-radius: 1.75rem;
-  border: 1px solid #eceef2;
-  background: #ffffff;
-  box-shadow: 0 8px 30px rgba(17, 17, 17, 0.06);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-card);
 }
 
 .fin-panel {
-  background: #e3edf2;
+  background: var(--bg-tertiary);
   border-radius: 1.75rem;
+}
+
+.fin-btn-primary {
+  background: var(--fin-btn-bg);
+  color: var(--fin-btn-fg);
+}
+
+.fin-btn-primary:hover {
+  opacity: 0.92;
+}
+
+.fin-badge {
+  background: var(--brand-accent);
+  color: #111111;
+}
+
+.fin-sidebar {
+  border-color: var(--border);
+  background: var(--bg-primary);
+}
+
+.fin-mobile-bar {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--bg-primary) 92%, transparent);
 }
 
 .fin-page-content > section {
   margin-bottom: 1rem;
   border-radius: 1.75rem;
-  border: 1px solid #eceef2;
-  background: #ffffff;
-  box-shadow: 0 8px 30px rgba(17, 17, 17, 0.06);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -700,8 +728,16 @@ html.support-chat-open body {
 }
 
 .fin-footer {
-  border-top: 1px solid #e5e7eb;
-  background: #ffffff;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.fin-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brand);
 }
 
 /* Trading terminal home showcase */

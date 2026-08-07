@@ -1,4 +1,4 @@
-/** ONYX brand palette — Financial Report UI (neon lime + light bento) */
+/** ONYX brand palette — neon lime + neutral grays (no blue) */
 export const THEME = {
   brand: "#111111",
   brandHover: "#2A2A2A",
@@ -8,7 +8,7 @@ export const THEME = {
   brandLime: "#E2FF4C",
   pageBg: "#F4F7F6",
   cardBg: "#FFFFFF",
-  panelBg: "#E3EDF2",
+  panelBg: "#ECEEF2",
   textPrimary: "#111111",
   textSecondary: "#4B5563",
   textTertiary: "#9CA3AF",
@@ -16,11 +16,12 @@ export const THEME = {
   green: "#34D399",
   red: "#F87171",
   mint: "#A7F3D0",
-  sky: "#BAE6FD",
-  lavender: "#DDD6FE",
+  lime: "#E2FF4C",
+  amber: "#FDE68A",
   coral: "#FECACA",
+  neutral: "#E5E7EB",
   navActiveBg: "#111111",
   navPillBg: "#ECEEF2",
 } as const;
 
-export const FIN_CHART_COLORS = ["#A7F3D0", "#BAE6FD", "#DDD6FE", "#FECACA", "#FDE68A"] as const;
+export const FIN_CHART_COLORS = ["#E2FF4C", "#A7F3D0", "#FDE68A", "#FECACA", "#E5E7EB"] as const;

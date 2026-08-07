@@ -3,7 +3,7 @@ import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="fin-marketing flex min-h-dvh flex-col bg-[#F4F7F6] lg:flex-row">
+    <div className="fin-marketing flex min-h-dvh flex-col lg:flex-row">
       <FinMarketingSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <FinMarketingMobileBar />

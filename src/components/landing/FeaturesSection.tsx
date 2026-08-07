@@ -13,7 +13,7 @@ export function FeaturesSection() {
       <div
         className="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-30"
         style={{
-          background: "radial-gradient(circle, rgba(80,70,229,0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(226, 255, 76, 0.12) 0%, transparent 70%)",
         }}
         aria-hidden
       />

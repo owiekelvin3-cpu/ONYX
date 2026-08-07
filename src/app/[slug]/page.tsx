@@ -29,7 +29,7 @@ export default async function SitePage({
   if (!page) notFound();
 
   return (
-    <div className="fin-marketing flex min-h-dvh flex-col bg-[#F4F7F6] lg:flex-row">
+    <div className="fin-marketing flex min-h-dvh flex-col lg:flex-row">
       <FinMarketingSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <FinMarketingMobileBar />
@@ -38,15 +38,15 @@ export default async function SitePage({
             <div className="fin-card p-6 sm:p-8">
               <Link
                 href="/"
-                className="mb-6 inline-block text-[13px] font-medium text-[#6B7280] hover:text-[#111111]"
+                className="mb-6 inline-block text-[13px] font-medium text-text-secondary hover:text-text-primary"
               >
                 ← Back to home
               </Link>
-              <h1 className="text-2xl font-bold text-[#111111] sm:text-3xl">{page.title}</h1>
-              <p className="mt-2 text-sm text-[#9CA3AF]">{page.description}</p>
+              <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">{page.title}</h1>
+              <p className="mt-2 text-sm text-text-tertiary">{page.description}</p>
               <div className="mt-8 space-y-4">
                 {page.content.map((paragraph, i) => (
-                  <p key={i} className="text-[14px] leading-relaxed text-[#4B5563] sm:text-[15px]">
+                  <p key={i} className="text-[14px] leading-relaxed text-text-secondary sm:text-[15px]">
                     {paragraph}
                   </p>
                 ))}
@@ -54,13 +54,13 @@ export default async function SitePage({
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
                   href="/register"
-                  className="inline-flex h-11 items-center rounded-full bg-[#111111] px-6 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
+                  className="fin-btn-primary inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold transition-transform hover:scale-[1.02]"
                 >
                   Get Started
                 </Link>
                 <Link
                   href="/help"
-                  className="inline-flex h-11 items-center rounded-full border border-[#E5E7EB] px-6 text-sm text-[#111111] transition-colors hover:bg-[#ECEEF2]"
+                  className="inline-flex h-11 items-center rounded-full border border-border px-6 text-sm text-text-primary transition-colors hover:bg-bg-hover"
                 >
                   Contact Support
                 </Link>
