@@ -71,41 +71,36 @@ export function DeckoMobileDock({
 
   return (
     <>
-      <div className="decko-mobile-dock fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(0.65rem,var(--safe-bottom))] lg:hidden">
+      <div className="decko-mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.5rem,var(--safe-bottom))] lg:hidden">
         <nav
-          className="mx-auto max-w-[420px] rounded-[26px] border border-white/10 bg-[#111111]/92 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+          className="pointer-events-auto mx-auto max-w-[420px] overflow-visible rounded-[24px] border border-white/10 bg-[#111111]/94 p-1 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
           aria-label={t("dashboard.navLabel")}
         >
-          <div className="relative flex items-end justify-between gap-0.5">
+          <div className="grid grid-cols-4 items-center gap-0.5">
             {MOBILE_TABS.map((item) => {
               const Icon = item.icon;
               const isMore = item.href === null;
               const active = isMore
                 ? menuOpen || isMoreMenuActive(pathname)
-                : isActive(pathname, item.href);
+                : isActive(pathname, item.href!);
               const featured = "featured" in item && item.featured;
 
-              const tabBody = (
+              const inner = (
                 <>
-                  {active && !featured && (
+                  {!featured && active && (
                     <motion.span
                       layoutId="decko-dock-active"
-                      className="absolute inset-x-1 inset-y-0.5 rounded-[18px] bg-[var(--decko-accent)]/20"
+                      className="absolute inset-0 rounded-[18px] bg-[var(--decko-accent)]/18"
                       transition={{ type: "spring", stiffness: 420, damping: 34 }}
                     />
                   )}
                   <span
                     className={cn(
-                      "relative flex items-center justify-center transition-transform duration-200",
+                      "relative flex items-center justify-center rounded-2xl transition-all duration-200",
                       featured
-                        ? cn(
-                            "-mt-5 h-[52px] w-[52px] rounded-full border-4 border-[#111111] shadow-[0_8px_24px_rgba(226,255,76,0.45)]",
-                            active
-                              ? "bg-[var(--decko-accent)] text-[#111111] scale-105"
-                              : "bg-[var(--decko-accent)] text-[#111111]"
-                          )
+                        ? "h-11 w-11 rounded-full bg-[var(--decko-accent)] text-[#111111] shadow-[0_6px_18px_rgba(226,255,76,0.4)]"
                         : cn(
-                            "h-9 w-9 rounded-2xl",
+                            "h-9 w-9",
                             active ? "text-[var(--decko-accent)]" : "text-[#9CA3AF]"
                           )
                     )}
@@ -114,9 +109,8 @@ export function DeckoMobileDock({
                   </span>
                   <span
                     className={cn(
-                      "relative mt-0.5 max-w-full truncate text-[10px] font-medium leading-none",
-                      active ? "text-white" : "text-[#737373]",
-                      featured && "mt-1"
+                      "relative mt-1 max-w-[72px] truncate text-[10px] font-medium leading-none",
+                      active || featured ? "text-white" : "text-[#737373]"
                     )}
                   >
                     {t(item.labelKey)}
@@ -124,10 +118,8 @@ export function DeckoMobileDock({
                 </>
               );
 
-              const tabClass = cn(
-                "relative flex min-h-[58px] min-w-0 flex-1 flex-col items-center justify-end px-1 pb-1 pt-2 touch-target",
-                featured && "z-10"
-              );
+              const tabClass =
+                "relative flex min-h-[62px] flex-col items-center justify-center px-1 py-1.5 touch-target";
 
               if (isMore) {
                 return (
@@ -139,14 +131,14 @@ export function DeckoMobileDock({
                     aria-label={t("nav.more")}
                     aria-expanded={menuOpen}
                   >
-                    {tabBody}
+                    {inner}
                   </button>
                 );
               }
 
               return (
-                <Link key={item.href} href={item.href} className={tabClass}>
-                  {tabBody}
+                <Link key={item.href} href={item.href!} className={tabClass}>
+                  {inner}
                 </Link>
               );
             })}
@@ -173,7 +165,7 @@ export function DeckoMobileDock({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="absolute bottom-0 left-0 right-0 max-h-[min(82vh,680px)] overflow-hidden rounded-t-[28px] border-t border-[#E5E7EB] bg-white shadow-[0_-20px_60px_rgba(0,0,0,0.18)] safe-area-bottom"
+              className="absolute bottom-0 left-0 right-0 max-h-[min(82vh,680px)] overflow-hidden rounded-t-[28px] border-t border-[#E5E7EB] bg-white pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-20px_60px_rgba(0,0,0,0.18)]"
             >
               <div className="flex justify-center pt-3">
                 <span className="h-1 w-10 rounded-full bg-[#E5E7EB]" aria-hidden />
@@ -194,8 +186,8 @@ export function DeckoMobileDock({
                 </button>
               </div>
 
-              <div className="max-h-[calc(min(82vh,680px)-11rem)] overflow-y-auto px-4 pb-3">
-                <div className="grid grid-cols-4 gap-2.5">
+              <div className="max-h-[calc(min(82vh,680px)-11.5rem)] overflow-y-auto px-4 pb-2">
+                <div className="grid grid-cols-4 gap-2">
                   {MORE_MENU_ITEMS.map((item, i) => {
                     const Icon = item.icon;
                     const active = isActive(pathname, item.href);
@@ -209,11 +201,11 @@ export function DeckoMobileDock({
                         <Link
                           href={item.href}
                           onClick={onMenuClose}
-                          className="group flex flex-col items-center gap-2 rounded-2xl p-2 text-center"
+                          className="group flex flex-col items-center gap-1.5 rounded-2xl p-1.5 text-center"
                         >
                           <span
                             className={cn(
-                              "flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-200 group-active:scale-95",
+                              "flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-200 group-active:scale-95",
                               active
                                 ? "bg-[var(--decko-accent)] text-[#111111] shadow-[0_8px_20px_rgba(226,255,76,0.35)]"
                                 : "bg-[#F4F6F8] text-[#111111] group-hover:bg-[#ECEEF2]"
@@ -223,7 +215,7 @@ export function DeckoMobileDock({
                           </span>
                           <span
                             className={cn(
-                              "line-clamp-2 text-[10px] font-medium leading-tight",
+                              "line-clamp-2 min-h-[2rem] text-[10px] font-medium leading-tight",
                               active ? "text-[#111111]" : "text-[#6B7280]"
                             )}
                           >
@@ -243,7 +235,7 @@ export function DeckoMobileDock({
                     onMenuClose();
                     onLogout();
                   }}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#FEF2F2] px-4 py-3.5 text-sm font-semibold text-[#DC2626] transition-colors active:bg-[#FEE2E2]"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#DC2626] transition-colors active:bg-[#FEE2E2]"
                 >
                   <LogOut className="h-4 w-4" />
                   {t("common.signOut")}

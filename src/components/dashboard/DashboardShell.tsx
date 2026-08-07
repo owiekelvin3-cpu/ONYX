@@ -61,7 +61,7 @@ export function DashboardShell({
               "decko-main relative z-[1] flex-1 overflow-y-auto px-3 py-4 sm:px-5 sm:py-6 lg:px-8",
               hideBottomNav
                 ? "pb-[max(0.75rem,var(--safe-bottom))]"
-                : "pb-[calc(6.25rem+var(--safe-bottom))] lg:pb-8"
+                : "pb-[calc(5.75rem+var(--safe-bottom))] lg:pb-8"
             )}
           >
             {children}
