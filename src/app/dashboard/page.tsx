@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, avatar_url")
         .eq("id", user.id)
         .maybeSingle()
     : { data: null };
@@ -53,6 +53,8 @@ export default async function DashboardPage() {
   return (
     <DashboardOverview
       displayName={displayName}
+      userEmail={user?.email}
+      avatarUrl={profile?.avatar_url ?? undefined}
       summary={summary}
       pnl24h={pnl24h}
       openOrders={openOrders}

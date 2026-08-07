@@ -678,6 +678,45 @@ html.support-chat-open body {
   min-height: 100%;
 }
 
+/* Decko dashboard theme */
+.decko-shell {
+  --decko-accent: #d4ff42;
+  --decko-sidebar: #111111;
+  --decko-main: #f3f4f6;
+  background: var(--decko-sidebar);
+}
+
+.decko-sidebar {
+  background: var(--decko-sidebar);
+  border-right: 1px solid #1f1f1f;
+}
+
+.decko-main {
+  background: var(--decko-main);
+}
+
+.decko-card {
+  border-radius: 1.25rem;
+  border: 1px solid #eceef2;
+  background: #ffffff;
+  box-shadow: 0 8px 30px rgba(17, 17, 17, 0.04);
+}
+
+.decko-dashboard {
+  animation: decko-fade-in 0.5s ease-out;
+}
+
+@keyframes decko-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .tv-hero {
   background:
     radial-gradient(ellipse 90% 55% at 50% -10%, rgba(41, 98, 255, 0.12), transparent 60%),
