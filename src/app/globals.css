@@ -665,7 +665,19 @@ html.support-chat-open body {
   overflow: hidden;
 }
 
-/* TradingView-style landing hero video */
+/* Trading terminal home showcase */
+.terminal-showcase {
+  color-scheme: dark;
+}
+
+.terminal-showcase-shell {
+  isolation: isolate;
+}
+
+.terminal-showcase .tradingview-widget-container {
+  min-height: 100%;
+}
+
 .tv-hero {
   background:
     radial-gradient(ellipse 90% 55% at 50% -10%, rgba(41, 98, 255, 0.12), transparent 60%),

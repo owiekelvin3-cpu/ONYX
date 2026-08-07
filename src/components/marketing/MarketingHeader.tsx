@@ -26,13 +26,27 @@ export function MarketingHeader() {
   const [moreOpen, setMoreOpen] = useState(false);
   useBodyScrollLock(menuOpen);
 
+  const isTerminalHome = pathname === "/";
+
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-border bg-bg-secondary/95 backdrop-blur-md safe-area-top safe-area-x tv-header">
+      <header
+        className={cn(
+          "sticky top-0 z-50 border-b backdrop-blur-md safe-area-top safe-area-x tv-header",
+          isTerminalHome
+            ? "border-[#1A2332] bg-[#0B1222]/95"
+            : "border-border bg-bg-secondary/95"
+        )}
+      >
         <div className="container-app flex h-[54px] items-center gap-2 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2 mr-1">
             <OnyxLogo size={28} />
-            <span className="hidden sm:inline text-[15px] font-bold text-text-primary tracking-tight">
+            <span
+              className={cn(
+                "hidden sm:inline text-[15px] font-bold tracking-tight",
+                isTerminalHome ? "text-white" : "text-text-primary"
+              )}
+            >
               {BRAND.name}
             </span>
           </Link>
@@ -45,8 +59,12 @@ export function MarketingHeader() {
                 className={cn(
                   "px-3 py-1.5 text-[14px] font-medium rounded-md transition-colors",
                   isActive(pathname, item.href)
-                    ? "text-brand"
-                    : "text-text-secondary hover:text-text-primary hover:bg-bg-hover/60"
+                    ? isTerminalHome
+                      ? "text-[#43D9D9]"
+                      : "text-brand"
+                    : isTerminalHome
+                      ? "text-[#787B86] hover:text-white hover:bg-[#151D2B]"
+                      : "text-text-secondary hover:text-text-primary hover:bg-bg-hover/60"
                 )}
               >
                 {item.label}
