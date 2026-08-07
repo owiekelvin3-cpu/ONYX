@@ -36,7 +36,7 @@ export function AuthShell({
   const reduce = useReducedMotion();
 
   return (
-    <div className="auth-page relative min-h-dvh flex flex-col overflow-hidden lg:flex-row">
+    <div className="auth-page relative flex h-dvh max-h-dvh flex-col overflow-hidden lg:flex-row">
       <AuthBackground />
 
       {/* Brand panel — desktop */}
@@ -64,11 +64,11 @@ export function AuthShell({
           </div>
         </div>
 
-        <AuthStagger className="relative z-10 flex flex-1 flex-col justify-center px-8 py-10 xl:px-12">
+        <AuthStagger className="relative z-10 flex min-h-0 flex-1 flex-col justify-center overflow-hidden px-8 py-6 xl:px-12">
           <AuthItem>
             <Link
               href="/"
-              className="mb-8 inline-flex w-fit items-center gap-1.5 text-[13px] text-text-tertiary transition-colors hover:text-brand"
+              className="mb-4 inline-flex w-fit items-center gap-1.5 text-[13px] text-text-tertiary transition-colors hover:text-brand xl:mb-8"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to home
@@ -84,7 +84,7 @@ export function AuthShell({
               />
               Live markets
             </p>
-            <h2 className="max-w-md text-[32px] font-bold leading-tight tracking-tight text-text-primary xl:text-[38px]">
+            <h2 className="max-w-md text-[28px] font-bold leading-tight tracking-tight text-text-primary xl:text-[38px]">
               {panelTitle ?? BRAND.tagline}
             </h2>
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-text-secondary">
@@ -92,7 +92,7 @@ export function AuthShell({
             </p>
           </AuthItem>
 
-          <AuthItem className="mt-8">
+          <AuthItem className="mt-5 xl:mt-8">
             <div className="flex flex-wrap gap-2">
               {LIVE_STATS.map((stat, i) => (
                 <motion.div
@@ -101,16 +101,16 @@ export function AuthShell({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.35 + i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   whileHover={reduce ? undefined : { y: -3, scale: 1.02 }}
-                  className="rounded-2xl border border-border/70 bg-bg-secondary/50 px-4 py-3 backdrop-blur-sm"
+                  className="rounded-2xl border border-border/70 bg-bg-secondary/50 px-3 py-2 backdrop-blur-sm xl:px-4 xl:py-3"
                 >
-                  <p className="text-lg font-bold tabular-nums text-text-primary">{stat.value}</p>
+                  <p className="text-base font-bold tabular-nums text-text-primary xl:text-lg">{stat.value}</p>
                   <p className="text-[11px] text-text-tertiary">{stat.label}</p>
                 </motion.div>
               ))}
             </div>
           </AuthItem>
 
-          <ul className="mt-8 space-y-3">
+          <ul className="mt-5 hidden space-y-2 xl:block xl:mt-8 xl:space-y-3">
             {PLATFORM_HIGHLIGHTS.map((item, i) => {
               const Icon = FEATURE_ICONS[i];
               return (
@@ -132,7 +132,7 @@ export function AuthShell({
             })}
           </ul>
 
-          <AuthItem className="mt-10">
+          <AuthItem className="mt-6 hidden xl:block xl:mt-10">
             <Link
               href="/markets"
               className="group inline-flex items-center gap-2 text-sm font-semibold text-brand transition-colors hover:text-brand-hover"
@@ -145,9 +145,9 @@ export function AuthShell({
       </aside>
 
       {/* Form panel */}
-      <div className="relative z-10 flex min-h-dvh min-w-0 flex-1 flex-col">
+      <div className="relative z-10 flex h-dvh max-h-dvh min-w-0 flex-1 flex-col overflow-hidden">
         <header className="safe-area-top shrink-0 border-b border-border/60 lg:hidden">
-          <div className="flex h-14 items-center justify-between px-4">
+          <div className="flex h-12 items-center justify-between px-4">
             <Link href="/" className="flex items-center gap-2">
               <AuthLogoPulse>
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--brand-accent)]/15">
@@ -165,20 +165,22 @@ export function AuthShell({
           </div>
         </header>
 
-        <main className="flex flex-1 items-start justify-center overflow-y-auto px-4 py-8 sm:py-10 lg:items-center lg:py-12">
+        <main className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 py-2 sm:px-4 sm:py-3 lg:px-6">
           <AuthStagger
             className={
               wide
-                ? "auth-form-card relative w-full max-w-[520px]"
+                ? "auth-form-card auth-form-card--wide relative w-full max-w-[520px]"
                 : "auth-form-card relative w-full max-w-[420px]"
             }
           >
             <AuthFormBackground />
-            <AuthItem variant="scale">{children}</AuthItem>
+            <AuthItem variant="scale" className="min-h-0">
+              {children}
+            </AuthItem>
           </AuthStagger>
         </main>
 
-        <footer className="safe-area-bottom shrink-0 border-t border-border/40 px-4 pb-[max(1rem,var(--safe-bottom))] pt-4 lg:border-0">
+        <footer className="safe-area-bottom hidden shrink-0 border-t border-border/40 px-4 pb-[max(0.75rem,var(--safe-bottom))] pt-3 lg:block">
           <p className="text-center text-[11px] text-text-tertiary">
             &copy; {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
           </p>
@@ -205,16 +207,16 @@ export function AuthCardHeader({
 
   return (
     <motion.div
-      className="mb-6 sm:mb-8"
+      className="mb-4 sm:mb-5"
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
     >
-      <h1 className="text-[26px] font-bold tracking-tight text-text-primary sm:text-[32px]">
+      <h1 className="text-[22px] font-bold tracking-tight text-text-primary sm:text-[26px] lg:text-[30px]">
         {title}
       </h1>
-      <p className="mt-2 text-[14px] text-text-tertiary">{subtitle}</p>
-      <p className="mt-4 border-t border-border pt-4 text-[14px] text-text-tertiary">
+      <p className="mt-1 text-[13px] text-text-tertiary sm:text-[14px]">{subtitle}</p>
+      <p className="mt-3 border-t border-border pt-3 text-[13px] text-text-tertiary sm:mt-4 sm:pt-4 sm:text-[14px]">
         {alternate.prompt}{" "}
         <Link
           href={alternate.href}

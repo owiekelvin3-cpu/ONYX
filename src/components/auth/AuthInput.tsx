@@ -54,8 +54,8 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
     const inputType = isPassword && showPassword ? "text" : type;
 
     return (
-      <div className="space-y-1.5">
-        <label htmlFor={id} className="block text-[13px] font-medium text-text-secondary">
+      <div className="space-y-1">
+        <label htmlFor={id} className="block text-[12px] font-medium text-text-secondary sm:text-[13px]">
           {label}
           {(showRequired ?? required) && (
             <span className="ml-0.5 text-red" aria-hidden>
@@ -82,7 +82,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
               props.onBlur?.(e);
             }}
             className={cn(
-              "h-[48px] min-w-0 flex-1 bg-transparent text-[15px] text-text-primary placeholder:text-text-tertiary/60 focus:outline-none",
+              "auth-field min-w-0 flex-1 bg-transparent text-[15px] text-text-primary placeholder:text-text-tertiary/60 focus:outline-none",
               icon ? "pl-2.5 pr-3" : "px-3.5",
               isPassword && "pr-11",
               type === "date" && "cursor-pointer pr-3 [color-scheme:dark]",
@@ -132,8 +132,8 @@ export const AuthSelect = forwardRef<HTMLSelectElement, AuthSelectProps>(
     const [focused, setFocused] = useState(false);
 
     return (
-      <div className="space-y-1.5">
-        <label htmlFor={id} className="block text-[13px] font-medium text-text-secondary">
+      <div className="space-y-1">
+        <label htmlFor={id} className="block text-[12px] font-medium text-text-secondary sm:text-[13px]">
           {label}
           {(showRequired ?? required) && (
             <span className="ml-0.5 text-red" aria-hidden>
@@ -155,7 +155,7 @@ export const AuthSelect = forwardRef<HTMLSelectElement, AuthSelectProps>(
               props.onBlur?.(e);
             }}
             className={cn(
-              "h-[48px] min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pl-3.5 pr-10 text-[15px] text-text-primary focus:outline-none",
+              "auth-field min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pl-3.5 pr-10 text-[15px] text-text-primary focus:outline-none",
               className
             )}
             {...props}

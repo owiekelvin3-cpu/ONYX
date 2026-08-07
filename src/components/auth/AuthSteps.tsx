@@ -13,7 +13,7 @@ export function AuthSteps({
   const reduce = useReducedMotion();
 
   return (
-    <div className="mb-8">
+    <div className="mb-4 sm:mb-5">
       <div className="flex items-center justify-between gap-2">
         {steps.map((step, i) => {
           const index = i + 1;
@@ -42,7 +42,7 @@ export function AuthSteps({
                   }}
                   transition={{ type: "spring", stiffness: 420, damping: 26 }}
                   className={cn(
-                    "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+                    "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold sm:h-8 sm:w-8 sm:text-[11px]",
                     done && "text-white",
                     active && "text-[var(--fin-btn-fg)] shadow-[var(--shadow-glow)]",
                     !done && !active && "border border-border text-text-tertiary"

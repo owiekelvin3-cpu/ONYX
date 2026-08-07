@@ -83,7 +83,7 @@ export default function LoginForm() {
         }}
       />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <AuthInput
           id="email"
           label="Email"
@@ -108,7 +108,7 @@ export default function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <div className="flex items-center justify-between mt-3 gap-3">
+          <div className="mt-2 flex items-center justify-between gap-3">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -135,7 +135,7 @@ export default function LoginForm() {
           type="submit"
           disabled={loading || !email.trim() || !password}
           loading={loading}
-          className="auth-submit-btn mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3.5 text-[15px] font-semibold text-[var(--fin-btn-fg)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="auth-submit-btn mt-0.5 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3 text-[15px] font-semibold text-[var(--fin-btn-fg)] disabled:cursor-not-allowed disabled:opacity-50 sm:py-3.5"
         >
           {loading ? (
             <>
@@ -148,7 +148,7 @@ export default function LoginForm() {
         </AuthSubmitButton>
       </form>
 
-      <p className="text-[12px] text-text-tertiary text-center mt-6 leading-relaxed">
+      <p className="mt-3 text-center text-[10px] leading-snug text-text-tertiary sm:mt-4 sm:text-[11px]">
         Protected by encryption. By signing in you agree to our{" "}
         <Link href="/terms" className="text-brand hover:underline">
           Terms

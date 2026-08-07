@@ -616,6 +616,15 @@ body {
 /* Auth pages */
 .auth-page {
   background-color: var(--bg-primary);
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+html:has(.auth-page),
+html:has(.auth-page) body {
+  overflow: hidden;
+  height: 100%;
 }
 
 .auth-mesh {
@@ -666,11 +675,44 @@ body {
   overflow: hidden;
   background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
   border: 1px solid color-mix(in srgb, var(--border) 80%, var(--brand-accent) 20%);
-  border-radius: 1.35rem;
-  padding: 1.25rem;
+  border-radius: 1.25rem;
+  padding: 1rem 1.125rem;
   box-shadow: var(--shadow-premium);
   backdrop-filter: blur(16px);
   transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.auth-form-card--wide {
+  padding: 1rem 1.125rem;
+}
+
+.auth-form-card .auth-field {
+  height: 42px;
+}
+
+@media (min-width: 640px) {
+  .auth-form-card {
+    padding: 1.5rem 1.75rem;
+    border-radius: 1.35rem;
+  }
+
+  .auth-form-card--wide {
+    padding: 1.5rem 1.75rem;
+  }
+
+  .auth-form-card .auth-field {
+    height: 44px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-form-card {
+    padding: 2rem 2.25rem;
+  }
+
+  .auth-form-card .auth-field {
+    height: 48px;
+  }
 }
 
 .auth-form-card:hover {
@@ -679,8 +721,8 @@ body {
 }
 
 @media (min-width: 640px) {
-  .auth-form-card {
-    padding: 2rem 2.25rem;
+  .auth-form-card:hover {
+    border-color: color-mix(in srgb, var(--brand-accent) 35%, var(--border));
   }
 }
 

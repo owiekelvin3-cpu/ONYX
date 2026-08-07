@@ -203,11 +203,11 @@ export default function RegisterForm() {
 
       <AuthSteps steps={REGISTER_STEPS} current={step} />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <AuthSlidePanel panelKey={step}>
         {step === 1 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <AuthInput
                 id="firstName"
                 label="First name"
@@ -258,16 +258,16 @@ export default function RegisterForm() {
               error={fieldErrors.dateOfBirth}
               required
             />
-            <p className="text-[12px] text-text-tertiary -mt-2">
-              Tap to open the calendar — you must be 18 or older.
+            <p className="-mt-1 text-[11px] text-text-tertiary">
+              You must be 18 or older.
             </p>
           </>
         )}
 
         {step === 2 && (
           <>
-            <p className="text-[13px] text-text-secondary -mt-2 mb-1">
-              Optional — helps us personalize your experience and comply with regulations.
+            <p className="-mt-1 mb-1 text-[12px] text-text-secondary">
+              Optional profile details.
             </p>
             <AuthInput
               id="phone"
@@ -331,7 +331,7 @@ export default function RegisterForm() {
               error={fieldErrors.confirmPassword}
               required
             />
-            <p className="text-[12px] text-text-tertiary leading-relaxed">
+            <p className="text-[11px] leading-snug text-text-tertiary">
               By creating an account, I agree to the{" "}
               <Link href="/terms" className="text-brand hover:underline">
                 Terms of Use
@@ -348,12 +348,12 @@ export default function RegisterForm() {
         {error && <AuthAlert show={!!error} variant="error">{error}</AuthAlert>}
         </AuthSlidePanel>
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-2 pt-1 sm:gap-3 sm:pt-2">
           {step > 1 && (
             <AuthSubmitButton
               type="button"
               onClick={handleBack}
-              className="auth-submit-btn flex flex-1 items-center justify-center gap-1 rounded-xl border border-border bg-bg-secondary px-4 py-3.5 text-[15px] font-semibold text-text-primary"
+              className="auth-submit-btn flex flex-1 items-center justify-center gap-1 rounded-xl border border-border bg-bg-secondary px-3 py-2.5 text-sm font-semibold text-text-primary sm:px-4 sm:py-3.5 sm:text-[15px]"
             >
               <ChevronLeft className="h-4 w-4" />
               Back
@@ -364,7 +364,7 @@ export default function RegisterForm() {
             <AuthSubmitButton
               type="button"
               onClick={handleNext}
-              className="auth-submit-btn flex flex-1 items-center justify-center gap-1 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3.5 text-[15px] font-semibold text-[var(--fin-btn-fg)]"
+              className="auth-submit-btn flex flex-1 items-center justify-center gap-1 rounded-xl bg-[var(--fin-btn-bg)] px-3 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)] sm:px-4 sm:py-3.5 sm:text-[15px]"
             >
               Continue
               <ChevronRight className="h-4 w-4" />
@@ -374,7 +374,7 @@ export default function RegisterForm() {
               type="submit"
               disabled={loading}
               loading={loading}
-              className="auth-submit-btn flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3.5 text-[15px] font-semibold text-[var(--fin-btn-fg)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="auth-submit-btn flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-3 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)] disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3.5 sm:text-[15px]"
             >
               {loading ? (
                 <>
