@@ -47,7 +47,7 @@ export function DashboardOverview({
     <div className="mx-auto max-w-6xl space-y-5 sm:space-y-6">
       <DashboardBalanceStrip displayName={displayName} summary={summary} pnl24h={pnl24h} />
 
-      <div className="coinix-card p-4 sm:p-5">
+      <div className="onyx-card p-4 sm:p-5 backdrop-blur-sm">
         <PortfolioChart balance={summary.totalValue} chartData={chartData} compact />
       </div>
 

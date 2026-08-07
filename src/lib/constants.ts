@@ -1,9 +1,9 @@
 export const BRAND = {
   name: "ONYX",
   fullName: "Onyx Exchange",
-  tagline: "Markets move fast. Your exchange shouldn't slow you down.",
+  tagline: "Institutional-grade trading. Built for everyone.",
   description:
-    "Trade crypto, stocks, and forex from one dashboard — live prices, clear fees, no clutter.",
+    "Trade crypto, stocks, and forex on a platform engineered for speed, security, and clarity — trusted by traders worldwide.",
   domain: "onyx.exchange",
 } as const;
 
@@ -26,25 +26,25 @@ export const FOOTER = {
 export const PRODUCTS = [
   {
     title: "Spot Trading",
-    desc: "Market and limit orders with a book that updates in real time. 0.10% fees, shown upfront.",
+    desc: "Sub-millisecond execution with deep liquidity across 500+ pairs. Transparent 0.10% fees.",
     cta: "Open trade desk",
     href: "/dashboard/trade",
   },
   {
     title: "Futures",
-    desc: "Perpetuals and contracts when you want more than spot — with the same clean interface.",
+    desc: "Perpetuals and dated contracts with up to 100x leverage and institutional risk controls.",
     cta: "View futures",
     href: "/dashboard/trade",
   },
   {
     title: "Copy Trading",
-    desc: "Pick a trader, set how much to allocate, and mirror their moves. Pause or stop anytime.",
+    desc: "Mirror top performers with one click. Set allocation limits and pause anytime.",
     cta: "Browse traders",
     href: "/dashboard/copy-trading",
   },
   {
     title: "AI Bots",
-    desc: "Define your rules once and let automation handle the repetitive entries and exits.",
+    desc: "Automated strategies powered by machine learning. Backtested, monitored, always on.",
     cta: "See strategies",
     href: "/dashboard/ai-trading",
   },
@@ -52,25 +52,92 @@ export const PRODUCTS = [
 
 export const PLATFORM_HIGHLIGHTS = [
   {
-    title: "Secure by default",
-    desc: "Two-factor auth, encrypted sessions, and account alerts.",
+    title: "Bank-grade security",
+    desc: "256-bit encryption, cold storage, and real-time fraud monitoring.",
   },
   {
-    title: "Fees you can read",
-    desc: "0.10% spot trading. What you see is what you pay.",
+    title: "Transparent pricing",
+    desc: "0.10% spot fees. No hidden spreads. What you see is what you pay.",
   },
   {
-    title: "One dashboard",
-    desc: "Crypto, stocks, and forex without switching platforms.",
+    title: "Unified platform",
+    desc: "Crypto, stocks, forex, and derivatives — one account, one interface.",
   },
   {
-    title: "Markets stay open",
-    desc: "Place orders any time — weekends and holidays included.",
+    title: "24/7 global markets",
+    desc: "Trade around the clock with 99.99% uptime and sub-50ms latency.",
   },
 ] as const;
 
 export const STEPS = [
-  { step: "01", title: "Sign up", desc: "Email, password, done — no lengthy forms." },
-  { step: "02", title: "Verify", desc: "Quick KYC so withdrawals stay secure." },
-  { step: "03", title: "Fund & trade", desc: "Deposit crypto and place your first order." },
+  { step: "01", title: "Create account", desc: "Sign up in under 60 seconds with email verification." },
+  { step: "02", title: "Verify identity", desc: "Quick KYC unlocks full platform access and higher limits." },
+  { step: "03", title: "Start trading", desc: "Fund your account and execute your first order instantly." },
+] as const;
+
+export const PLATFORM_STATS = [
+  { value: 12, suffix: "M+", label: "Registered users" },
+  { value: 500, suffix: "+", label: "Trading pairs" },
+  { value: 180, suffix: "+", label: "Countries served" },
+  { value: 99.99, suffix: "%", label: "Platform uptime" },
+] as const;
+
+export const PREMIUM_FEATURES = [
+  {
+    title: "Lightning execution",
+    desc: "Orders routed through our proprietary matching engine with median latency under 8ms.",
+    tag: "Performance",
+  },
+  {
+    title: "Deep liquidity",
+    desc: "Aggregated order books across tier-1 venues ensure tight spreads even in volatile markets.",
+    tag: "Markets",
+  },
+  {
+    title: "Smart portfolio",
+    desc: "Real-time P&L, allocation breakdowns, and performance analytics in one unified view.",
+    tag: "Analytics",
+  },
+  {
+    title: "Institutional API",
+    desc: "REST and WebSocket APIs with FIX connectivity for professional trading desks.",
+    tag: "Developers",
+  },
+  {
+    title: "Multi-asset custody",
+    desc: "Segregated wallets with proof-of-reserves audits published quarterly.",
+    tag: "Security",
+  },
+  {
+    title: "Global compliance",
+    desc: "Licensed and regulated across major jurisdictions with full AML/KYC infrastructure.",
+    tag: "Trust",
+  },
+] as const;
+
+export const TESTIMONIALS = [
+  {
+    quote: "ONYX replaced three separate platforms for me. The dashboard alone is worth the switch.",
+    name: "Sarah Chen",
+    role: "Portfolio Manager, Apex Capital",
+  },
+  {
+    quote: "Sub-10ms execution on spot orders. I've never seen retail infrastructure this polished.",
+    name: "Marcus Webb",
+    role: "Professional Trader",
+  },
+  {
+    quote: "Our team moved $40M in monthly volume here. Support and compliance are world-class.",
+    name: "Elena Rodriguez",
+    role: "Head of Trading, Meridian Fund",
+  },
+] as const;
+
+export const SECURITY_FEATURES = [
+  "Cold storage for 95% of assets",
+  "Multi-signature withdrawal approval",
+  "Real-time anomaly detection",
+  "SOC 2 Type II certified",
+  "Insurance fund coverage",
+  "Bug bounty program",
 ] as const;

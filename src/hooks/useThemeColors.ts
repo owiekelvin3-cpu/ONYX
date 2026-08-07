@@ -14,20 +14,20 @@ function readCssVar(name: string, fallback: string) {
 export function useThemeColors() {
   const { theme, mounted } = useTheme();
   const [colors, setColors] = useState({
-    brand: "#6B4AE3",
-    textTertiary: "#94A3B8",
+    brand: "#5046E5",
+    textTertiary: "#A1A1AA",
     bgSecondary: "#FFFFFF",
-    border: "#E5E9EE",
-    textPrimary: "#0F172A",
+    border: "#E4E4EC",
+    textPrimary: "#0A0A0F",
   });
 
   useEffect(() => {
     setColors({
-      brand: readCssVar("--brand", "#6B4AE3"),
-      textTertiary: readCssVar("--text-tertiary", "#94A3B8"),
+      brand: readCssVar("--brand", "#5046E5"),
+      textTertiary: readCssVar("--text-tertiary", "#A1A1AA"),
       bgSecondary: readCssVar("--bg-secondary", "#FFFFFF"),
-      border: readCssVar("--border", "#E5E9EE"),
-      textPrimary: readCssVar("--text-primary", "#0F172A"),
+      border: readCssVar("--border", "#E4E4EC"),
+      textPrimary: readCssVar("--text-primary", "#0A0A0F"),
     });
   }, [theme, mounted]);
 

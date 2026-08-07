@@ -4,50 +4,60 @@
 
 :root {
   color-scheme: light;
-  --bg-primary: #f2f6f7;
+  --bg-primary: #f8f9fc;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f8fafb;
-  --bg-hover: #eef1f4;
-  --border: #e5e9ee;
-  --border-light: #d8dee6;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
-  --brand: #6b4ae3;
-  --brand-hover: #7860e8;
-  --brand-light: #eeeafd;
+  --bg-tertiary: #f4f4f8;
+  --bg-hover: #ececf2;
+  --border: #e4e4ec;
+  --border-light: #d4d4de;
+  --text-primary: #0a0a0f;
+  --text-secondary: #52525b;
+  --text-tertiary: #a1a1aa;
+  --brand: #5046e5;
+  --brand-hover: #4338ca;
+  --brand-light: #eef2ff;
+  --brand-accent: #8b5cf6;
+  --brand-glow: rgba(80, 70, 229, 0.35);
   --brand-text: #ffffff;
-  --green: #22c55e;
+  --gold: #d4a853;
+  --green: #10b981;
   --red: #ef4444;
-  --nav-active-bg: #0b0b0f;
+  --nav-active-bg: linear-gradient(135deg, #5046e5 0%, #7c3aed 100%);
   --nav-active-text: #ffffff;
-  --nav-pill-bg: #f3f4f6;
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
+  --nav-pill-bg: #f4f4f5;
+  --shadow-card: 0 1px 2px rgba(10, 10, 15, 0.04), 0 12px 40px rgba(10, 10, 15, 0.06);
+  --shadow-premium: 0 4px 6px rgba(10, 10, 15, 0.03), 0 24px 60px rgba(80, 70, 229, 0.08);
+  --shadow-glow: 0 0 0 1px rgba(80, 70, 229, 0.08), 0 8px 32px rgba(80, 70, 229, 0.12);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
 }
 
 .dark {
   color-scheme: dark;
-  --bg-primary: #0b0e11;
-  --bg-secondary: #181a20;
-  --bg-tertiary: #1e2329;
-  --bg-hover: #2b3139;
-  --border: #2b3139;
-  --border-light: #363c45;
-  --text-primary: #eaecef;
-  --text-secondary: #b7bdc6;
-  --text-tertiary: #848e9c;
-  --brand: #7860e8;
-  --brand-hover: #8b75f0;
-  --brand-light: rgba(107, 74, 227, 0.15);
-  --brand-text: #ffffff;
-  --green: #22c55e;
-  --red: #ef4444;
-  --nav-active-bg: #6b4ae3;
+  --bg-primary: #050508;
+  --bg-secondary: #0c0e14;
+  --bg-tertiary: #12141c;
+  --bg-hover: #1a1d28;
+  --border: #1e2130;
+  --border-light: #2a2d3d;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --brand: #818cf8;
+  --brand-hover: #a5b4fc;
+  --brand-light: rgba(129, 140, 248, 0.12);
+  --brand-accent: #a78bfa;
+  --brand-glow: rgba(129, 140, 248, 0.25);
+  --brand-text: #050508;
+  --gold: #fbbf24;
+  --green: #34d399;
+  --red: #f87171;
+  --nav-active-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   --nav-active-text: #ffffff;
-  --nav-pill-bg: #1e2329;
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --nav-pill-bg: #12141c;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-premium: 0 4px 6px rgba(0, 0, 0, 0.3), 0 24px 60px rgba(99, 102, 241, 0.1);
+  --shadow-glow: 0 0 0 1px rgba(129, 140, 248, 0.15), 0 8px 32px rgba(99, 102, 241, 0.15);
 }
 
 @theme inline {
@@ -64,12 +74,15 @@
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-text: var(--brand-text);
-  --color-nav-active: var(--nav-active-bg);
+  --color-brand-accent: var(--brand-accent);
+  --color-gold: var(--gold);
+  --color-nav-active: var(--brand);
   --color-nav-active-text: var(--nav-active-text);
   --color-nav-pill: var(--nav-pill-bg);
   --color-green: var(--green);
   --color-red: var(--red);
   --font-sans: var(--font-inter);
+  --font-display: var(--font-display);
 }
 
 html {
@@ -94,6 +107,28 @@ body {
   min-height: 100dvh;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-x: none;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+.text-gradient-brand {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-gradient-brand {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-accent) 100%);
+}
+
+.border-gradient-brand {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+    linear-gradient(135deg, rgba(80, 70, 229, 0.4), rgba(139, 92, 246, 0.2)) border-box;
 }
 
 ::selection {
@@ -264,25 +299,26 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 55% at 15% 20%, rgba(107, 74, 227, 0.12), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 85% 60%, rgba(107, 74, 227, 0.06), transparent 50%);
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(80, 70, 229, 0.18), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 70%, rgba(139, 92, 246, 0.08), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(212, 168, 83, 0.04), transparent 40%);
 }
 
 .dark .landing-hero-glow {
   background:
-    radial-gradient(ellipse 70% 55% at 15% 20%, rgba(120, 96, 232, 0.14), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 85% 60%, rgba(120, 96, 232, 0.08), transparent 50%);
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.2), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 70%, rgba(139, 92, 246, 0.1), transparent 50%);
 }
 
 .landing-hero-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(107, 74, 227, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(107, 74, 227, 0.04) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
-  animation: landing-grid-drift 28s linear infinite;
+    linear-gradient(rgba(80, 70, 229, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80, 70, 229, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 35%, black 15%, transparent 78%);
+  animation: landing-grid-drift 32s linear infinite;
 }
 
 @keyframes landing-grid-drift {
@@ -417,7 +453,7 @@ body {
   background: var(--bg-hover);
 }
 
-/* Dashboard shell — light Coinix-style */
+/* Dashboard shell — premium ONYX */
 .dashboard-shell {
   position: relative;
   background-color: var(--bg-primary);
@@ -430,37 +466,41 @@ body {
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 55% 45% at 10% 0%, rgba(107, 74, 227, 0.08), transparent 55%),
-    radial-gradient(ellipse 40% 35% at 90% 10%, rgba(107, 74, 227, 0.04), transparent 50%);
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(80, 70, 229, 0.06), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 100% 0%, rgba(139, 92, 246, 0.04), transparent 45%),
+    radial-gradient(ellipse 40% 30% at 50% 100%, rgba(80, 70, 229, 0.03), transparent 40%);
 }
 
 .dark .dashboard-shell::before {
   background:
-    radial-gradient(ellipse 55% 45% at 10% 0%, rgba(120, 96, 232, 0.1), transparent 55%),
-    radial-gradient(ellipse 40% 35% at 90% 10%, rgba(120, 96, 232, 0.06), transparent 50%);
-}
-
-.dashboard-sidebar {
-  background: var(--bg-secondary);
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(99, 102, 241, 0.08), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 100% 0%, rgba(139, 92, 246, 0.05), transparent 45%);
 }
 
 .dashboard-nav-active {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
-  box-shadow: none;
+  box-shadow: var(--shadow-glow);
 }
 
 .dashboard-hero-glow {
   background:
-    radial-gradient(ellipse 70% 60% at 0% 0%, rgba(107, 74, 227, 0.08), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(107, 74, 227, 0.04), transparent 50%);
+    radial-gradient(ellipse 80% 70% at 0% 0%, rgba(80, 70, 229, 0.1), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(139, 92, 246, 0.06), transparent 50%);
 }
 
 .dashboard-stat-card,
 .dashboard-quick-action {
   box-shadow: var(--shadow-card);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
 }
 
+.dashboard-stat-card:hover,
+.dashboard-quick-action:hover {
+  box-shadow: var(--shadow-premium);
+}
+
+.onyx-card,
 .coinix-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
@@ -468,8 +508,84 @@ body {
   box-shadow: var(--shadow-card);
 }
 
-.dashboard-mobile-dock {
-  -webkit-tap-highlight-color: transparent;
+.onyx-card-premium {
+  background: var(--bg-secondary);
+  border: 1px solid transparent;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-premium);
+  background-image:
+    linear-gradient(var(--bg-secondary), var(--bg-secondary)),
+    linear-gradient(135deg, rgba(80, 70, 229, 0.25), rgba(139, 92, 246, 0.08));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.landing-section-dark {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+}
+
+.dark .landing-section-dark {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, #0a0c12 100%);
+}
+
+@keyframes stat-count-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-animate {
+  animation: stat-count-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+.landing-float {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.landing-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.nav-pill-active {
+  background: linear-gradient(135deg, #5046e5 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: var(--shadow-glow);
+}
+
+.dark .nav-pill-active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
 }
 
 @media (max-width: 1023px) {

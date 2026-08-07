@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Purple stripe mark matching the reference dashboard video. */
+/** ONYX premium mark — indigo gradient chevron */
 export function OnyxLogo({
   size = 28,
   className,
@@ -17,21 +17,31 @@ export function OnyxLogo({
       className={cn("shrink-0", className)}
       aria-hidden
     >
-      <rect width="32" height="32" rx="8" fill="#EEEAFD" />
+      <defs>
+        <linearGradient id="onyx-bg" x1="0" y1="0" x2="32" y2="32">
+          <stop stopColor="#EEF2FF" />
+          <stop offset="1" stopColor="#E0E7FF" />
+        </linearGradient>
+        <linearGradient id="onyx-mark" x1="8" y1="22" x2="24" y2="10">
+          <stop stopColor="#5046E5" />
+          <stop offset="1" stopColor="#8B5CF6" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#onyx-bg)" />
       <path
-        d="M8 22L14 10L20 22"
-        stroke="#6B4AE3"
+        d="M8 22L16 8L24 22"
+        stroke="url(#onyx-mark)"
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M11 22L17 10L23 22"
-        stroke="#9B87F5"
-        strokeWidth="2.5"
+        d="M11 22L16 12L21 22"
+        stroke="#A5B4FC"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.65"
+        opacity="0.7"
       />
     </svg>
   );

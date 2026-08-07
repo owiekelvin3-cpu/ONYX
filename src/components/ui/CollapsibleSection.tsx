@@ -20,7 +20,7 @@ export function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className={cn("coinix-card overflow-hidden", className)}>
+    <div className={cn("onyx-card overflow-hidden", className)}>
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

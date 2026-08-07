@@ -57,11 +57,13 @@ export function AppTopNav({
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-border/80 bg-bg-secondary/90 backdrop-blur-xl safe-area-top safe-area-x">
+      <header className="sticky top-0 z-50 border-b border-border/60 bg-bg-secondary/80 backdrop-blur-2xl safe-area-top safe-area-x">
         <div className="container-app flex h-16 items-center gap-3">
-          <Link href={mode === "dashboard" ? "/dashboard" : "/"} className="flex shrink-0 items-center gap-2.5">
-            <OnyxLogo size={32} />
-            <span className="text-base font-bold tracking-tight text-text-primary">{BRAND.name}</span>
+          <Link href={mode === "dashboard" ? "/dashboard" : "/"} className="flex shrink-0 items-center gap-2.5 group">
+            <OnyxLogo size={34} />
+            <span className="font-display text-base font-bold tracking-tight text-text-primary group-hover:text-brand transition-colors">
+              {BRAND.name}
+            </span>
           </Link>
 
           {mode === "dashboard" && (
@@ -73,10 +75,10 @@ export function AppTopNav({
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                      "whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
                       active
-                        ? "bg-nav-active text-nav-active-text shadow-sm"
-                        : "bg-nav-pill text-text-secondary hover:bg-bg-hover hover:text-text-primary"
+                        ? "nav-pill-active"
+                        : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
                     )}
                   >
                     {t(link.labelKey)}
@@ -104,8 +106,11 @@ export function AppTopNav({
             <LanguageSelector className="hidden sm:block" />
 
             {mode === "dashboard" ? (
-              <div className="hidden items-center gap-2 rounded-full border border-border bg-bg-tertiary py-1 pl-1 pr-3 sm:flex">
-                <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-brand text-xs font-bold text-brand-text">
+              <Link
+                href="/dashboard/settings/profile"
+                className="hidden items-center gap-2 rounded-full border border-border/80 bg-bg-tertiary/80 py-1 pl-1 pr-3 backdrop-blur-sm transition-colors hover:border-brand/30 sm:flex"
+              >
+                <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-brand text-xs font-bold text-white shadow-[var(--shadow-glow)]">
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -116,7 +121,7 @@ export function AppTopNav({
                 <span className="max-w-[120px] truncate text-sm font-medium text-text-primary">
                   {userName || userEmail?.split("@")[0] || "User"}
                 </span>
-              </div>
+              </Link>
             ) : (
               authActions
             )}
@@ -159,7 +164,7 @@ export function AppTopNav({
                   className={cn(
                     "block rounded-xl px-4 py-3 text-sm font-medium",
                     isActive(pathname, link.href, link.exact)
-                      ? "bg-nav-active text-nav-active-text"
+                      ? "nav-pill-active"
                       : "text-text-secondary hover:bg-bg-hover"
                   )}
                 >

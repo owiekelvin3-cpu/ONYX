@@ -48,9 +48,9 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
             </HeroEnter>
 
             <HeroEnter delay={0.08}>
-              <h1 className="text-[28px] xs:text-[32px] sm:text-[40px] lg:text-[48px] font-bold leading-[1.12] tracking-tight text-text-primary text-balance">
+              <h1 className="font-display text-[28px] xs:text-[32px] sm:text-[42px] lg:text-[52px] font-bold leading-[1.08] tracking-tight text-text-primary text-balance">
                 {t("hero.title1")}{" "}
-                <span className="text-brand">{t("hero.title2")}</span>
+                <span className="text-gradient-brand">{t("hero.title2")}</span>
               </h1>
             </HeroEnter>
 

@@ -113,7 +113,7 @@ export function DashboardShell({
 
       {!hideBottomNav && (
         <nav
-          className="dashboard-mobile-dock fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-bg-secondary/95 shadow-[0_-8px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl safe-area-x lg:hidden"
+          className="dashboard-mobile-dock fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-bg-secondary/90 shadow-[0_-12px_40px_rgba(10,10,15,0.08)] backdrop-blur-2xl safe-area-x lg:hidden"
           aria-label={t("dashboard.navLabel")}
         >
           <div className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1.5 pb-[max(0.5rem,var(--safe-bottom))]">
@@ -125,7 +125,7 @@ export function DashboardShell({
                 : isActive(pathname, item.href);
 
               const className = cn(
-                "touch-target relative flex min-h-[52px] min-w-0 flex-1 max-w-[88px] flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[10px] leading-none transition-colors",
+                "touch-target relative flex min-h-[52px] min-w-0 flex-1 max-w-[88px] flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[10px] leading-none transition-all duration-200",
                 active ? "text-brand" : "text-text-tertiary active:text-text-secondary"
               );
 
@@ -133,8 +133,8 @@ export function DashboardShell({
                 <>
                   <span
                     className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
-                      active ? "bg-brand/10" : ""
+                      "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200",
+                      active ? "bg-gradient-brand text-white shadow-[var(--shadow-glow)]" : ""
                     )}
                   >
                     <Icon className="h-[18px] w-[18px] shrink-0" />
@@ -205,7 +205,7 @@ export function DashboardShell({
                       className={cn(
                         "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
                         active
-                          ? "bg-nav-active text-nav-active-text"
+                          ? "nav-pill-active"
                           : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
                       )}
                     >
