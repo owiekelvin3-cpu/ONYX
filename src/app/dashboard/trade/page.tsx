@@ -1,24 +1,82 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { executeTrade, getUsdBalance } from "@/lib/api/trading";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { formatNumber, formatPercent, formatCurrency } from "@/lib/utils";
-import { Loader2 } from "@/components/icons";
+import { formatNumber, formatPercent } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { TradingViewTickerTape } from "@/components/trading/TradingViewTickerTape";
+import { TradingViewAdvancedChart } from "@/components/trading/TradingViewAdvancedChart";
+import { TradingViewTechnicalAnalysis } from "@/components/trading/TradingViewTechnicalAnalysis";
+import { SpotMarketList } from "@/components/trading/SpotMarketList";
+import { SpotOrderPanel } from "@/components/trading/SpotOrderPanel";
+import type { MarketPair } from "@/lib/market-data";
+import { toTradingViewSymbol } from "@/lib/tradingview-symbols";
+
+function SymbolHeader({
+  pair,
+  onToggleMarkets,
+  marketsOpen,
+}: {
+  pair: MarketPair;
+  onToggleMarkets?: () => void;
+  marketsOpen?: boolean;
+}) {
+  const isUp = pair.change24h >= 0;
+  const priceDecimals = pair.price < 10 ? 4 : 2;
+
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-3 px-3 sm:px-4 py-3 border-b border-border bg-bg-secondary">
+      <div className="min-w-0">
+        {onToggleMarkets ? (
+          <button
+            type="button"
+            onClick={onToggleMarkets}
+            className="flex items-center gap-1.5 text-left touch-target"
+          >
+            <span className="text-base sm:text-lg font-bold text-text-primary">
+              {pair.symbol}
+            </span>
+            <span className="text-brand text-sm">{marketsOpen ? "▴" : "▾"}</span>
+          </button>
+        ) : (
+          <h2 className="text-base sm:text-lg font-bold text-text-primary">
+            {pair.symbol}
+          </h2>
+        )}
+        <p className="text-[12px] text-text-tertiary mt-0.5">{pair.name}</p>
+        <p className="text-[11px] text-text-tertiary mt-1 font-mono">
+          {toTradingViewSymbol(pair.symbol)}
+        </p>
+      </div>
+
+      <div className="text-right shrink-0">
+        <p className="text-xl sm:text-2xl font-bold font-mono text-text-primary">
+          ${formatNumber(pair.price, priceDecimals)}
+        </p>
+        <p
+          className={cn(
+            "text-sm font-mono mt-0.5",
+            isUp ? "text-green" : "text-red"
+          )}
+        >
+          {formatPercent(pair.change24h)}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function TradePage() {
   const router = useRouter();
-  const { pairs, loading: pricesLoading } = useLivePrices();
-  const [selectedPair, setSelectedPair] = useState(pairs[0]);
+  const { pairs } = useLivePrices();
+  const [selectedPair, setSelectedPair] = useState<MarketPair | null>(null);
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
-  const [showPairs, setShowPairs] = useState(false);
+  const [showMobileMarkets, setShowMobileMarkets] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,10 +101,24 @@ export default function TradePage() {
     });
   }, [pairs]);
 
+  if (!selectedPair) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-base sm:text-lg font-bold text-text-primary">
+          Spot Trading
+        </h1>
+        <div className="animate-pulse h-96 rounded-2xl bg-bg-secondary border border-border" />
+      </div>
+    );
+  }
+
   const qty = amount ? parseFloat(amount) : 0;
   const total = qty * selectedPair.price;
 
   async function handleTrade() {
+    const pair = selectedPair;
+    if (!pair) return;
+
     setError("");
     setSuccess("");
 
@@ -65,17 +137,17 @@ export default function TradePage() {
       const supabase = createClient();
       await executeTrade(supabase, {
         userId,
-        asset: selectedPair.symbol,
+        asset: pair.symbol,
         type: side,
         amount: qty,
-        price: selectedPair.price,
+        price: pair.price,
       });
 
       const bal = await getUsdBalance(supabase, userId);
       setBalance(bal);
       setAmount("");
       setSuccess(
-        `${side === "buy" ? "Bought" : "Sold"} ${qty} ${selectedPair.symbol.split("/")[0]} for ${formatCurrency(total)}`
+        `${side === "buy" ? "Bought" : "Sold"} ${qty} ${pair.symbol.split("/")[0]} for $${formatNumber(total, 2)}`
       );
       router.refresh();
     } catch (err) {
@@ -85,232 +157,119 @@ export default function TradePage() {
     }
   }
 
-  const orderPanel = (
-    <>
-      <div className="flex mb-3 sm:mb-4">
-        <button
-          type="button"
-          onClick={() => setSide("buy")}
-          className={`flex-1 h-9 sm:h-10 text-sm font-semibold rounded-l cursor-pointer touch-target ${
-            side === "buy"
-              ? "bg-green text-white"
-              : "bg-bg-primary text-text-tertiary border border-border"
-          }`}
-        >
-          Buy
-        </button>
-        <button
-          type="button"
-          onClick={() => setSide("sell")}
-          className={`flex-1 h-9 sm:h-10 text-sm font-semibold rounded-r cursor-pointer touch-target ${
-            side === "sell"
-              ? "bg-red text-white"
-              : "bg-bg-primary text-text-tertiary border border-border"
-          }`}
-        >
-          Sell
-        </button>
-      </div>
-
-      {userId && balance !== null && (
-        <p className="text-[12px] text-text-tertiary mb-3">
-          Available:{" "}
-          <span className="font-mono text-text-secondary">
-            {formatCurrency(balance)}
-          </span>
-        </p>
-      )}
-
-
-      <div className="space-y-2.5 sm:space-y-3">
-        <Input
-          id="amount"
-          label="Amount"
-          type="number"
-          placeholder="0.00"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <div className="flex justify-between text-[12px]">
-          <span className="text-text-tertiary">Total</span>
-          <span className="font-mono">${formatNumber(total, 2)}</span>
-        </div>
-
-        {error && (
-          <p role="alert" className="text-[12px] text-red">
-            {error}
-          </p>
-        )}
-        {success && (
-          <p className="text-[12px] text-green">{success}</p>
-        )}
-
-        <Button
-          type="button"
-          onClick={handleTrade}
-          disabled={loading}
-          className={`w-full touch-target ${side === "sell" ? "!bg-red !text-white" : "!bg-green !text-white"}`}
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Processing...
-            </span>
-          ) : (
-            `${side === "buy" ? "Buy" : "Sell"} ${selectedPair.symbol.split("/")[0]}`
-          )}
-        </Button>
-      </div>
-    </>
-  );
+  function selectPair(pair: MarketPair) {
+    setSelectedPair(pair);
+    setShowMobileMarkets(false);
+  }
 
   return (
     <div className="space-y-3 sm:space-y-4 min-w-0">
-      <h1 className="text-base sm:text-lg font-bold text-text-primary">
-        Spot Trading
-      </h1>
-
-      <div className="lg:hidden">
-        <Card className="!p-3 sm:!p-4">
-          <div className="flex items-center justify-between mb-3 gap-2 min-w-0">
-            <div className="min-w-0">
-              <button
-                type="button"
-                onClick={() => setShowPairs(!showPairs)}
-                className="text-sm font-semibold text-brand cursor-pointer touch-target"
-              >
-                {selectedPair.symbol} ▾
-              </button>
-              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                <span className="text-lg font-bold font-mono">
-                  ${formatNumber(selectedPair.price, selectedPair.price < 10 ? 4 : 2)}
-                </span>
-                <span
-                  className={`text-xs font-mono ${selectedPair.change24h >= 0 ? "text-green" : "text-red"}`}
-                >
-                  {formatPercent(selectedPair.change24h)}
-                </span>
-              </div>
-            </div>
-          </div>
-          {orderPanel}
-          <div className="mt-4 h-32 border-t border-border pt-3">
-            <svg viewBox="0 0 600 120" className="w-full h-full" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="tradeFillMobile" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#22C55E" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M0,90 L60,85 L120,75 L180,80 L240,60 L300,55 L360,40 L420,45 L480,30 L540,35 L600,25 L600,120 L0,120 Z"
-                fill="url(#tradeFillMobile)"
-              />
-              <path
-                d="M0,90 L60,85 L120,75 L180,80 L240,60 L300,55 L360,40 L420,45 L480,30 L540,35 L600,25"
-                fill="none"
-                stroke="#22C55E"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </div>
-        </Card>
-
-        {showPairs && (
-          <Card className="!p-0 mt-2 max-h-48 overflow-y-auto">
-            {pairs.map((pair) => (
-              <button
-                key={pair.symbol}
-                type="button"
-                onClick={() => {
-                  setSelectedPair(pair);
-                  setShowPairs(false);
-                }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 text-[13px] border-b border-border last:border-0 cursor-pointer touch-target ${
-                  selectedPair.symbol === pair.symbol ? "bg-bg-hover" : ""
-                }`}
-              >
-                <span className="font-medium">{pair.symbol}</span>
-                <span
-                  className={`font-mono text-[11px] ${pair.change24h >= 0 ? "text-green" : "text-red"}`}
-                >
-                  {formatPercent(pair.change24h)}
-                </span>
-              </button>
-            ))}
-          </Card>
-        )}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h1 className="text-base sm:text-lg font-bold text-text-primary">
+            Spot Trading
+          </h1>
+          <p className="text-[12px] text-text-tertiary mt-0.5">
+            Live charts powered by{" "}
+            <a
+              href="https://www.tradingview.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand hover:underline"
+            >
+              TradingView
+            </a>
+          </p>
+        </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-3 sm:gap-4 hidden lg:grid">
-        <Card className="lg:col-span-2 !p-0 overflow-hidden min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-4 py-3 border-b border-border">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
-              <span className="text-sm font-semibold">{selectedPair.symbol}</span>
-              <span className="text-base sm:text-lg font-bold font-mono">
-                ${formatNumber(selectedPair.price, selectedPair.price < 10 ? 4 : 2)}
-              </span>
-              <span
-                className={`text-xs font-mono ${selectedPair.change24h >= 0 ? "text-green" : "text-red"}`}
-              >
-                {formatPercent(selectedPair.change24h)}
-              </span>
+      <TradingViewTickerTape />
+
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_340px] gap-3 sm:gap-4">
+        <div className="space-y-3 min-w-0">
+          <Card className="!p-0 overflow-hidden min-w-0">
+            <SymbolHeader
+              pair={selectedPair}
+              onToggleMarkets={() => setShowMobileMarkets((v) => !v)}
+              marketsOpen={showMobileMarkets}
+            />
+
+            <div className="h-[280px] sm:h-[360px] lg:h-[420px] xl:h-[480px] bg-[#131722]">
+              <TradingViewAdvancedChart
+                key={selectedPair.symbol}
+                symbol={selectedPair.symbol}
+              />
             </div>
-          </div>
 
-          <div className="h-40 sm:h-52 px-2">
-            <svg
-              viewBox="0 0 600 180"
-              className="w-full h-full"
-              preserveAspectRatio="none"
-            >
-              <defs>
-                <linearGradient id="tradeFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#22C55E" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M0,140 L40,130 L80,120 L120,125 L160,100 L200,90 L240,100 L280,70 L320,75 L360,50 L400,55 L440,35 L480,40 L520,25 L560,30 L600,20 L600,180 L0,180 Z"
-                fill="url(#tradeFill)"
+            <div className="hidden lg:block">
+              <SpotMarketList
+                pairs={pairs}
+                selectedSymbol={selectedPair.symbol}
+                onSelect={selectPair}
               />
-              <path
-                d="M0,140 L40,130 L80,120 L120,125 L160,100 L200,90 L240,100 L280,70 L320,75 L360,50 L400,55 L440,35 L480,40 L520,25 L560,30 L600,20"
-                fill="none"
-                stroke="#22C55E"
-                strokeWidth="1.5"
+            </div>
+          </Card>
+
+          {showMobileMarkets && (
+            <SpotMarketList
+              pairs={pairs}
+              selectedSymbol={selectedPair.symbol}
+              onSelect={selectPair}
+              compact
+            />
+          )}
+
+          <div className="lg:hidden">
+            <Card className="!p-3 sm:!p-4">
+              <SpotOrderPanel
+                symbol={selectedPair.symbol}
+                side={side}
+                onSideChange={setSide}
+                amount={amount}
+                onAmountChange={setAmount}
+                total={total}
+                balance={balance}
+                userId={userId}
+                loading={loading}
+                error={error}
+                success={success}
+                onSubmit={handleTrade}
               />
-            </svg>
+            </Card>
           </div>
+        </div>
 
-          <div className="hidden sm:block max-h-40 lg:max-h-48 overflow-y-auto border-t border-border">
-            <table className="w-full">
-              <tbody>
-                {pairs.map((pair) => (
-                  <tr
-                    key={pair.symbol}
-                    onClick={() => setSelectedPair(pair)}
-                    className={`market-row cursor-pointer text-[13px] ${selectedPair.symbol === pair.symbol ? "bg-bg-hover" : ""}`}
-                  >
-                    <td className="px-3 sm:px-4 py-2 font-medium">{pair.symbol}</td>
-                    <td className="px-3 sm:px-4 py-2 text-right font-mono">
-                      ${formatNumber(pair.price, pair.price < 10 ? 4 : 2)}
-                    </td>
-                    <td
-                      className={`px-3 sm:px-4 py-2 text-right font-mono text-[11px] ${pair.change24h >= 0 ? "text-green" : "text-red"}`}
-                    >
-                      {formatPercent(pair.change24h)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <div className="hidden lg:flex flex-col gap-3">
+          <Card className="!p-4 flex-1">
+            <p className="text-[11px] uppercase tracking-wide text-text-tertiary mb-3">
+              Order
+            </p>
+            <SpotOrderPanel
+              symbol={selectedPair.symbol}
+              side={side}
+              onSideChange={setSide}
+              amount={amount}
+              onAmountChange={setAmount}
+              total={total}
+              balance={balance}
+              userId={userId}
+              loading={loading}
+              error={error}
+              success={success}
+              onSubmit={handleTrade}
+            />
+          </Card>
 
-        <Card className="!p-3 sm:!p-4 hidden lg:block">
-          {orderPanel}
-        </Card>
+          <Card className="!p-3">
+            <p className="text-[11px] uppercase tracking-wide text-text-tertiary mb-2 px-1">
+              Technical Analysis
+            </p>
+            <TradingViewTechnicalAnalysis
+              key={selectedPair.symbol}
+              symbol={selectedPair.symbol}
+            />
+          </Card>
+        </div>
       </div>
     </div>
   );
