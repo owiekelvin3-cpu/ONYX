@@ -1045,3 +1045,259 @@ html.support-chat-open body {
   transform: scale(1.05);
   background: rgba(41, 98, 255, 1);
 }
+
+/* Legal pages — cinematic Terms & Privacy */
+.legal-page {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.legal-hero-bg {
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+
+.legal-mesh {
+  background-image:
+    linear-gradient(rgba(226, 255, 76, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 255, 76, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.legal-orb {
+  filter: blur(70px);
+  opacity: 0.5;
+}
+
+.legal-orb-a {
+  background: radial-gradient(circle, var(--brand-accent) 0%, transparent 70%);
+}
+
+.legal-orb-b {
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.4) 0%, transparent 70%);
+}
+
+.legal-orb-c {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+}
+
+.legal-shield-ring {
+  box-shadow: 0 0 60px rgba(226, 255, 76, 0.08);
+}
+
+.legal-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.legal-progress {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--brand-accent) 50%, transparent);
+}
+
+.legal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--brand-accent) 30%);
+  background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  backdrop-filter: blur(8px);
+}
+
+.legal-hero-title {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+.legal-meta-chip {
+  display: inline-flex;
+  padding: 0.35rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
+}
+
+.legal-fact-pill {
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 90%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.legal-section-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem 1.25rem;
+  padding: 1.35rem 1.25rem;
+  border-radius: 1.35rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
+  scroll-margin-top: 6rem;
+}
+
+@media (min-width: 640px) {
+  .legal-section-card {
+    padding: 1.75rem 1.75rem 1.75rem 1.5rem;
+    gap: 1.25rem 1.5rem;
+  }
+}
+
+.legal-section-index {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--brand-accent) 12%, var(--bg-tertiary));
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand);
+}
+
+.legal-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.legal-section-summary {
+  margin-top: 0.35rem;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.legal-section-body {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.legal-paragraph {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+@media (min-width: 640px) {
+  .legal-paragraph {
+    font-size: 15px;
+  }
+}
+
+.legal-bullet-list {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.legal-bullet-list li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  list-style-type: disc;
+}
+
+.legal-highlight {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.25rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--brand-accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--brand-accent) 8%, var(--bg-tertiary));
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.legal-highlight-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, color-mix(in srgb, var(--brand-accent) 18%, transparent) 50%, transparent 60%);
+}
+
+.legal-toc-label {
+  margin-bottom: 0.75rem;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.legal-toc ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.legal-toc-link {
+  position: relative;
+  width: 100%;
+  padding: 0.45rem 0.65rem 0.45rem 1rem;
+  border-radius: 0.65rem;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.legal-toc-link:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.legal-toc-link-active {
+  color: var(--text-primary);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--brand-accent) 10%, var(--bg-tertiary));
+}
+
+.legal-toc-indicator {
+  position: absolute;
+  left: 0.35rem;
+  top: 50%;
+  width: 3px;
+  height: 60%;
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  background: var(--brand-accent);
+}
+
+.legal-cta {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--brand-accent) 25%, var(--border));
+  background:
+    radial-gradient(ellipse 80% 120% at 0% 0%, color-mix(in srgb, var(--brand-accent) 10%, transparent), transparent 55%),
+    var(--bg-secondary);
+}
+
+.legal-cta-shimmer {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  pointer-events: none;
+}
+
+.dark .legal-cta-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+}

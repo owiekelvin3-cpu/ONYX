@@ -97,29 +97,20 @@ export const SITE_PAGES: Record<
   },
   terms: {
     title: "Terms of Use",
-    description: "Terms and conditions for using Onyx Exchange.",
+    description:
+      "The rules, rights, and responsibilities that govern your use of Onyx Exchange.",
     content: [
       "Last updated: August 2026",
-      "By accessing or using Onyx Exchange, you agree to be bound by these Terms of Use.",
-      "You must be at least 18 years old and comply with all applicable laws in your jurisdiction to use our services.",
-      "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.",
-      "Past performance is not indicative of future results.",
-      "ONYX reserves the right to suspend or terminate accounts that violate these terms or engage in fraudulent activity.",
-      "We may modify these terms at any time. Continued use of the platform constitutes acceptance of updated terms.",
+      "See the full Terms of Use for eligibility, trading rules, risk disclosures, and legal contact information.",
     ],
   },
   privacy: {
     title: "Privacy Policy",
-    description: "How Onyx Exchange collects, uses, and protects your data.",
+    description:
+      "How Onyx Exchange collects, uses, shares, and protects your personal information.",
     content: [
       "Last updated: August 2026",
-      "Onyx Exchange is committed to protecting your personal information.",
-      "We collect information you provide during registration (name, email, phone) and usage data necessary to operate our services.",
-      "Your data is encrypted in transit and at rest. We use industry-standard security measures including cold storage for digital assets.",
-      "We do not sell your personal information to third parties.",
-      "We may share data with regulatory authorities when required by law.",
-      "You may request access to or deletion of your personal data by contacting privacy@onyx.exchange.",
-      "Cookie Preferences: We use essential cookies for authentication and optional analytics cookies. You can manage preferences in your browser settings.",
+      "See the full Privacy Policy for data collection, security measures, your rights, and cookie preferences.",
     ],
   },
   fees: {

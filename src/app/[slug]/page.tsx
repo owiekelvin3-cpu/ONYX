@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { FinMarketingMobileBar, FinMarketingSidebar } from "@/components/marketing/fin/FinMarketingShell";
+import { FinLegalPage } from "@/components/marketing/fin/FinLegalPage";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
+import { isLegalSlug, LEGAL_PAGES } from "@/lib/legal-content";
 import { SITE_PAGES } from "@/lib/routes";
 import { notFound } from "next/navigation";
 
@@ -27,6 +29,21 @@ export default async function SitePage({
   const { slug } = await params;
   const page = SITE_PAGES[slug];
   if (!page) notFound();
+
+  if (isLegalSlug(slug)) {
+    return (
+      <div className="fin-marketing flex min-h-dvh flex-col lg:flex-row">
+        <FinMarketingSidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <FinMarketingMobileBar />
+          <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+            <FinLegalPage page={LEGAL_PAGES[slug]} />
+          </main>
+          <MarketingFooter />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fin-marketing flex min-h-dvh flex-col lg:flex-row">
