@@ -19,6 +19,7 @@ export type AdminBalanceDirection = "credit" | "debit";
 export interface AdminUserDetails {
   profile: Profile;
   balance: number;
+  profit_total?: number;
   outstanding_fees_total: number;
   stats: {
     deposits_count: number;
@@ -27,6 +28,16 @@ export interface AdminUserDetails {
     withdrawals_total: number;
     trades_count: number;
   };
+  profit_adjustments?: Array<{
+    id: string;
+    amount: number;
+    note: string | null;
+    balance_before: number;
+    balance_after: number;
+    created_at: string;
+    admin_email?: string | null;
+    admin_name?: string | null;
+  }>;
   moderation_actions: Array<{
     id: string;
     action_type: string;

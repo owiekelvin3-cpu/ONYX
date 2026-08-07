@@ -9,7 +9,7 @@ type Props = {
   userEmail?: string;
   avatarUrl?: string;
   summary: PortfolioSummary;
-  pnl24h: number | null;
+  profitTotal: number;
   openOrders: number;
   tradesCount: number;
   chartData: ChartPoint[];

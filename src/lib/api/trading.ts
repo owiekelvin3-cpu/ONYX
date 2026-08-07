@@ -124,6 +124,28 @@ export async function get24hProfit(
   return data.reduce((sum, row) => sum + (row.profit ?? 0), 0);
 }
 
+/** Total realized profit: trade credits + admin profit/loss adjustments */
+export async function getProfitTotal(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<number> {
+  const [tradesRes, adjustmentsRes] = await Promise.all([
+    supabase.from("trades").select("profit").eq("user_id", userId),
+    supabase.from("user_profit_adjustments").select("amount").eq("user_id", userId),
+  ]);
+
+  if (tradesRes.error) throw new Error(tradesRes.error.message);
+  if (adjustmentsRes.error) throw new Error(adjustmentsRes.error.message);
+
+  const tradeProfit = (tradesRes.data ?? []).reduce((sum, row) => sum + Number(row.profit ?? 0), 0);
+  const adjustmentTotal = (adjustmentsRes.data ?? []).reduce(
+    (sum, row) => sum + Number(row.amount ?? 0),
+    0
+  );
+
+  return Math.round((tradeProfit + adjustmentTotal) * 100) / 100;
+}
+
 export async function getHoldings(
   supabase: SupabaseClient,
   userId: string

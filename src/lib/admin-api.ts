@@ -53,6 +53,25 @@ export async function adjustAdminUserBalance(params: {
   if (error) throw new Error(rpcError(error, "Could not adjust balance."));
 }
 
+export async function adjustAdminUserProfit(params: {
+  userId: string;
+  amount: number;
+  note?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_adjust_user_profit", {
+    p_user_id: params.userId,
+    p_amount: params.amount,
+    p_note: params.note?.trim() || null,
+  });
+  if (error) throw new Error(rpcError(error, "Could not adjust profit."));
+  return data as {
+    profit_total?: number;
+    balance_after?: number;
+    amount?: number;
+  };
+}
+
 export async function approveDeposit(depositId: string, userId: string, amount: number) {
   const supabase = createClient();
   const { error: depErr } = await supabase

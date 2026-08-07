@@ -31,7 +31,7 @@ type Props = {
   userEmail?: string;
   avatarUrl?: string;
   summary: PortfolioSummary;
-  pnl24h: number | null;
+  profitTotal: number;
   openOrders: number;
   tradesCount: number;
   chartData: ChartPoint[];
@@ -123,7 +123,7 @@ export function DeckoDashboardOverview({
   userEmail,
   avatarUrl,
   summary,
-  pnl24h,
+  profitTotal,
   openOrders,
   tradesCount,
   chartData: _chartData,
@@ -140,10 +140,8 @@ export function DeckoDashboardOverview({
   const holdingsPct =
     summary.totalValue > 0 ? (summary.holdingsValue / summary.totalValue) * 100 : 50;
 
-  const pnlTrend =
-    summary.totalValue > 0 && pnl24h !== null
-      ? (pnl24h / summary.totalValue) * 100
-      : 0;
+  const profitTrend =
+    summary.totalValue > 0 ? (profitTotal / summary.totalValue) * 100 : 0;
   const depositTrend =
     summary.totalDeposits > 0
       ? ((summary.totalValue - summary.totalWithdrawals) / summary.totalDeposits - 1) * 100
@@ -223,9 +221,9 @@ export function DeckoDashboardOverview({
         />
         <KpiCard
           label="Profit Total"
-          value={pnl24h === null ? "—" : formatCurrency(pnl24h, summary.currency)}
-          trend={pnlTrend}
-          trendLabel="24h change"
+          value={formatCurrency(profitTotal, summary.currency)}
+          trend={profitTrend}
+          trendLabel="realized P&L"
           icon={TrendingUp}
           delay={0.1}
         />

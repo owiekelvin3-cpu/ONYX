@@ -3,7 +3,7 @@ import {
   getRecentTrades,
   getPortfolioSummary,
   getPendingTradesCount,
-  get24hProfit,
+  getProfitTotal,
 } from "@/lib/api/trading";
 import { getCachedLiveMarketPairs } from "@/lib/live-prices";
 import { chartFromTrades } from "@/lib/chart-data";
@@ -23,7 +23,7 @@ export default async function DashboardPage() {
         .maybeSingle()
     : { data: null };
 
-  const [summary, recentTrades, openOrders, pnl24h, marketPairs, tradesCount] =
+  const [summary, recentTrades, openOrders, profitTotal, marketPairs, tradesCount] =
     await Promise.all([
       user ? getPortfolioSummary(supabase, user.id) : Promise.resolve({
         cashBalance: 0,
@@ -36,7 +36,7 @@ export default async function DashboardPage() {
       }),
       user ? getRecentTrades(supabase, user.id, 5) : Promise.resolve([]),
       user ? getPendingTradesCount(supabase, user.id) : Promise.resolve(0),
-      user ? get24hProfit(supabase, user.id) : Promise.resolve(null),
+      user ? getProfitTotal(supabase, user.id) : Promise.resolve(0),
       getCachedLiveMarketPairs(),
       user
         ? supabase
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       userEmail={user?.email}
       avatarUrl={profile?.avatar_url ?? undefined}
       summary={summary}
-      pnl24h={pnl24h}
+      profitTotal={profitTotal}
       openOrders={openOrders}
       tradesCount={tradesCount}
       chartData={chartData}
