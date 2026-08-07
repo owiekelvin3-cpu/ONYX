@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { FinMarketingMobileBar, FinMarketingSidebar } from "@/components/marketing/fin/FinMarketingShell";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { SITE_PAGES } from "@/lib/routes";
 import { notFound } from "next/navigation";
@@ -29,47 +29,47 @@ export default async function SitePage({
   if (!page) notFound();
 
   return (
-    <>
-      <MarketingHeader />
-      <main className="min-h-[60vh] bg-bg-primary">
-        <div className="container-app py-8 sm:py-10 lg:py-12 max-w-3xl safe-area-x">
-          <Link
-            href="/"
-            className="text-[13px] text-brand hover:underline mb-6 inline-block"
-          >
-            ← Back to home
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
-            {page.title}
-          </h1>
-          <p className="text-sm text-text-tertiary mt-2">{page.description}</p>
-          <div className="mt-8 space-y-4">
-            {page.content.map((paragraph, i) => (
-              <p
-                key={i}
-                className="text-[14px] sm:text-[15px] text-text-secondary leading-relaxed"
+    <div className="fin-marketing flex min-h-dvh flex-col bg-[#F4F7F6] lg:flex-row">
+      <FinMarketingSidebar />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <FinMarketingMobileBar />
+        <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="mx-auto max-w-3xl">
+            <div className="fin-card p-6 sm:p-8">
+              <Link
+                href="/"
+                className="mb-6 inline-block text-[13px] font-medium text-[#6B7280] hover:text-[#111111]"
               >
-                {paragraph}
-              </p>
-            ))}
+                ← Back to home
+              </Link>
+              <h1 className="text-2xl font-bold text-[#111111] sm:text-3xl">{page.title}</h1>
+              <p className="mt-2 text-sm text-[#9CA3AF]">{page.description}</p>
+              <div className="mt-8 space-y-4">
+                {page.content.map((paragraph, i) => (
+                  <p key={i} className="text-[14px] leading-relaxed text-[#4B5563] sm:text-[15px]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-10 flex flex-wrap gap-3">
+                <Link
+                  href="/register"
+                  className="inline-flex h-11 items-center rounded-full bg-[#111111] px-6 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
+                >
+                  Get Started
+                </Link>
+                <Link
+                  href="/help"
+                  className="inline-flex h-11 items-center rounded-full border border-[#E5E7EB] px-6 text-sm text-[#111111] transition-colors hover:bg-[#ECEEF2]"
+                >
+                  Contact Support
+                </Link>
+              </div>
+            </div>
           </div>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              href="/register"
-              className="inline-flex h-10 px-5 items-center bg-brand text-brand-text text-sm font-semibold rounded hover:bg-brand-hover transition-colors"
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/help"
-              className="inline-flex h-10 px-5 items-center border border-border text-sm text-text-primary rounded hover:bg-bg-hover transition-colors"
-            >
-              Contact Support
-            </Link>
-          </div>
-        </div>
-      </main>
-      <MarketingFooter />
-    </>
+        </main>
+        <MarketingFooter />
+      </div>
+    </div>
   );
 }

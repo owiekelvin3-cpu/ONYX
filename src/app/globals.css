@@ -4,30 +4,30 @@
 
 :root {
   color-scheme: light;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fd;
-  --bg-tertiary: #f0f3fa;
-  --bg-hover: #e0e3eb;
-  --border: #e0e3eb;
-  --border-light: #d1d4dc;
-  --text-primary: #131722;
-  --text-secondary: #434651;
-  --text-tertiary: #787b86;
-  --brand: #2962ff;
-  --brand-hover: #1e53e5;
-  --brand-light: #e3effd;
-  --brand-accent: #2196f3;
-  --brand-glow: rgba(41, 98, 255, 0.25);
-  --brand-text: #ffffff;
-  --gold: #ff9800;
-  --green: #089981;
-  --red: #f23645;
-  --nav-active-bg: #2962ff;
-  --nav-active-text: #ffffff;
-  --nav-pill-bg: #f0f3fa;
-  --shadow-card: 0 2px 4px rgba(19, 23, 34, 0.04), 0 8px 16px rgba(19, 23, 34, 0.06);
-  --shadow-premium: 0 4px 12px rgba(41, 98, 255, 0.12);
-  --shadow-glow: 0 0 0 1px rgba(41, 98, 255, 0.2), 0 4px 16px rgba(41, 98, 255, 0.15);
+  --bg-primary: #f4f7f6;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e3edf2;
+  --bg-hover: #eceef2;
+  --border: #e5e7eb;
+  --border-light: #d1d5db;
+  --text-primary: #111111;
+  --text-secondary: #4b5563;
+  --text-tertiary: #9ca3af;
+  --brand: #111111;
+  --brand-hover: #2a2a2a;
+  --brand-light: #f0ffd6;
+  --brand-accent: #e2ff4c;
+  --brand-glow: rgba(226, 255, 76, 0.35);
+  --brand-text: #111111;
+  --gold: #fbbf24;
+  --green: #34d399;
+  --red: #f87171;
+  --nav-active-bg: #111111;
+  --nav-active-text: #e2ff4c;
+  --nav-pill-bg: #eceef2;
+  --shadow-card: 0 8px 30px rgba(17, 17, 17, 0.06);
+  --shadow-premium: 0 12px 40px rgba(17, 17, 17, 0.08);
+  --shadow-glow: 0 0 0 1px rgba(226, 255, 76, 0.4), 0 8px 24px rgba(226, 255, 76, 0.2);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
 }
@@ -665,6 +665,45 @@ html.support-chat-open body {
   overflow: hidden;
 }
 
+/* Financial report marketing UI */
+.fin-marketing {
+  --brand-accent: #e2ff4c;
+  background: #f4f7f6;
+}
+
+.fin-card {
+  border-radius: 1.75rem;
+  border: 1px solid #eceef2;
+  background: #ffffff;
+  box-shadow: 0 8px 30px rgba(17, 17, 17, 0.06);
+}
+
+.fin-panel {
+  background: #e3edf2;
+  border-radius: 1.75rem;
+}
+
+.fin-page-content > section {
+  margin-bottom: 1rem;
+  border-radius: 1.75rem;
+  border: 1px solid #eceef2;
+  background: #ffffff;
+  box-shadow: 0 8px 30px rgba(17, 17, 17, 0.06);
+  overflow: hidden;
+}
+
+.fin-page-content > section .container-app,
+.fin-page-content > div > .container-app {
+  max-width: none;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.fin-footer {
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
 /* Trading terminal home showcase */
 .terminal-showcase {
   color-scheme: dark;
@@ -680,7 +719,7 @@ html.support-chat-open body {
 
 /* Decko dashboard theme */
 .decko-shell {
-  --decko-accent: #d4ff42;
+  --decko-accent: #e2ff4c;
   --decko-sidebar: #111111;
   --decko-main: #f3f4f6;
   background: var(--decko-sidebar);
