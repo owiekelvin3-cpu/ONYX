@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/Button";
 import { ArrowRight } from "@/components/icons";
 import { FinPageActions } from "@/components/marketing/fin/FinMarketingShell";
 import { FinStagger, FinStaggerItem } from "@/components/marketing/fin/fin-motion";
@@ -33,10 +32,10 @@ export function MarketingPageShell({
                 {subtitle}
               </p>
               <Link href={ctaHref} className="mt-6 inline-block">
-                <Button className="fin-btn-primary h-11 rounded-full px-6 hover:opacity-90">
+                <span className="fin-btn-primary inline-flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold">
                   {ctaLabel}
                   <ArrowRight className="h-4 w-4" />
-                </Button>
+                </span>
               </Link>
             </div>
             <FinPageActions />

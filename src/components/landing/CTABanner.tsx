@@ -27,10 +27,10 @@ export function CTABanner() {
               aria-hidden
             />
             <div className="relative">
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-brand-text">
                 Ready to trade on {BRAND.fullName}?
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-white/80 max-w-xl mx-auto">
+              <p className="mt-3 text-sm sm:text-base text-brand-text/80 max-w-xl mx-auto">
                 Join millions of traders on a platform built for performance, security, and clarity.
                 Open your account in under a minute.
               </p>
@@ -39,7 +39,7 @@ export function CTABanner() {
                   <Button
                     size="lg"
                     variant="secondary"
-                    className="bg-white text-brand hover:bg-white/90 border-0 min-w-[180px]"
+                    className="bg-bg-secondary text-text-primary hover:bg-bg-hover border border-border min-w-[180px]"
                   >
                     Get started free
                     <ArrowRight className="h-4 w-4" />
@@ -49,7 +49,7 @@ export function CTABanner() {
                   <Button
                     size="lg"
                     variant="ghost"
-                    className="text-white hover:bg-white/10 min-w-[180px]"
+                    className="text-brand-text hover:bg-brand-text/10 min-w-[180px]"
                   >
                     Explore platform
                   </Button>

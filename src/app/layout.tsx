@@ -62,16 +62,19 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: "#131722",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f7f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0f0f" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} dark h-full overflow-x-hidden`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} h-full overflow-x-hidden`} suppressHydrationWarning>
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-dvh antialiased overflow-x-hidden tv-theme">
+      <body className="min-h-dvh antialiased overflow-x-hidden bg-bg-primary text-text-primary">
         <ThemeProvider>
           <I18nProvider>{children}</I18nProvider>
         </ThemeProvider>

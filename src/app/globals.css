@@ -139,7 +139,7 @@ body {
   border: 1px solid transparent;
   background:
     linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
-    linear-gradient(135deg, rgba(80, 70, 229, 0.4), rgba(139, 92, 246, 0.2)) border-box;
+    linear-gradient(135deg, rgba(226, 255, 76, 0.45), rgba(226, 255, 76, 0.15)) border-box;
 }
 
 ::selection {
@@ -536,7 +536,7 @@ body {
 }
 
 .dark .landing-section-dark {
-  background: linear-gradient(180deg, var(--bg-primary) 0%, #0a0c12 100%);
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
 }
 
 @keyframes stat-count-up {
@@ -688,8 +688,9 @@ html.support-chat-open body {
 }
 
 .fin-btn-primary {
-  background: var(--fin-btn-bg);
-  color: var(--fin-btn-fg);
+  background: var(--fin-btn-bg) !important;
+  color: var(--fin-btn-fg) !important;
+  border-color: transparent;
 }
 
 .fin-btn-primary:hover {
@@ -715,7 +716,7 @@ html.support-chat-open body {
   margin-bottom: 1rem;
   border-radius: 1.75rem;
   border: 1px solid var(--border);
-  background: var(--bg-secondary);
+  background: var(--bg-secondary) !important;
   box-shadow: var(--shadow-card);
   overflow: hidden;
 }
