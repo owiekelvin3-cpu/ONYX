@@ -616,41 +616,101 @@ body {
 /* Auth pages */
 .auth-page {
   background-color: var(--bg-primary);
+}
+
+.auth-mesh {
   background-image:
-    linear-gradient(rgba(107, 74, 227, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(107, 74, 227, 0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(rgba(226, 255, 76, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 255, 76, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 20%, transparent 75%);
 }
 
-.auth-page::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-    ellipse 80% 50% at 50% -20%,
-    rgba(107, 74, 227, 0.1),
-    transparent
-  );
-  pointer-events: none;
-  z-index: 0;
+.auth-orb {
+  filter: blur(60px);
+  opacity: 0.55;
 }
 
-.auth-page > * {
-  position: relative;
-  z-index: 1;
+.auth-orb-a {
+  background: radial-gradient(circle, var(--brand-accent) 0%, transparent 70%);
+}
+
+.auth-orb-b {
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.45) 0%, transparent 70%);
+}
+
+.auth-orb-c {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, transparent 70%);
+}
+
+.auth-panel {
+  background:
+    radial-gradient(ellipse 120% 80% at 0% 0%, rgba(226, 255, 76, 0.08), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(52, 211, 153, 0.06), transparent 50%),
+    var(--bg-secondary);
+}
+
+.dark .auth-panel {
+  background:
+    radial-gradient(ellipse 120% 80% at 0% 0%, rgba(226, 255, 76, 0.12), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(52, 211, 153, 0.08), transparent 50%),
+    #111111;
+}
+
+.auth-panel-label {
+  color: var(--brand);
 }
 
 .auth-form-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--brand-accent) 20%);
+  border-radius: 1.35rem;
   padding: 1.25rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-premium);
+  backdrop-filter: blur(16px);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.auth-form-card:hover {
+  border-color: color-mix(in srgb, var(--brand-accent) 35%, var(--border));
+  box-shadow: var(--shadow-glow), var(--shadow-premium);
 }
 
 @media (min-width: 640px) {
   .auth-form-card {
     padding: 2rem 2.25rem;
+  }
+}
+
+.auth-submit-btn {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
+}
+
+.auth-submit-btn:not(:disabled):hover {
+  box-shadow: var(--shadow-glow);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .auth-submit-btn:not(:disabled)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 60%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.55s ease;
+  }
+
+  .auth-submit-btn:not(:disabled):hover::after {
+    transform: translateX(120%);
   }
 }
 

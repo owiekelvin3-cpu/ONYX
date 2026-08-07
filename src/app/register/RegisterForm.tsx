@@ -13,7 +13,7 @@ import {
   AuthSteps,
   PasswordStrength,
 } from "@/components/auth/AuthSteps";
-import { Button } from "@/components/ui/Button";
+import { AuthSlidePanel, AuthAlert, AuthSubmitButton } from "@/components/auth/auth-motion";
 import {
   Calendar,
   ChevronLeft,
@@ -204,6 +204,7 @@ export default function RegisterForm() {
       <AuthSteps steps={REGISTER_STEPS} current={step} />
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthSlidePanel panelKey={step}>
         {step === 1 && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -344,52 +345,46 @@ export default function RegisterForm() {
           </>
         )}
 
-        {error && (
-          <div
-            role="alert"
-            className="text-[13px] text-red bg-red/[0.08] border border-red/30 rounded-lg px-4 py-3"
-          >
-            {error}
-          </div>
-        )}
+        {error && <AuthAlert show={!!error} variant="error">{error}</AuthAlert>}
+        </AuthSlidePanel>
 
         <div className="flex gap-3 pt-2">
           {step > 1 && (
-            <Button
+            <AuthSubmitButton
               type="button"
-              variant="outline"
-              className="!h-[50px] flex-1 !rounded-lg"
               onClick={handleBack}
+              className="auth-submit-btn flex flex-1 items-center justify-center gap-1 rounded-xl border border-border bg-bg-secondary px-4 py-3.5 text-[15px] font-semibold text-text-primary"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="h-4 w-4" />
               Back
-            </Button>
+            </AuthSubmitButton>
           )}
 
           {step < 3 ? (
-            <Button
+            <AuthSubmitButton
               type="button"
-              className="!h-[50px] flex-1 !rounded-lg !text-[15px]"
               onClick={handleNext}
+              className="auth-submit-btn flex flex-1 items-center justify-center gap-1 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3.5 text-[15px] font-semibold text-[var(--fin-btn-fg)]"
             >
               Continue
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+              <ChevronRight className="h-4 w-4" />
+            </AuthSubmitButton>
           ) : (
-            <Button
+            <AuthSubmitButton
               type="submit"
-              className="!h-[50px] flex-1 !rounded-lg !text-[15px] !font-semibold"
               disabled={loading}
+              loading={loading}
+              className="auth-submit-btn flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3.5 text-[15px] font-semibold text-[var(--fin-btn-fg)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
                   Creating account...
-                </span>
+                </>
               ) : (
                 "Create Account"
               )}
-            </Button>
+            </AuthSubmitButton>
           )}
         </div>
       </form>

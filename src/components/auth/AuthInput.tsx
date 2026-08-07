@@ -1,8 +1,43 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { forwardRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { Eye, EyeOff, ChevronDown } from "@/components/icons";
+
+function AuthFieldShell({
+  focused,
+  error,
+  children,
+}: {
+  focused: boolean;
+  error?: string;
+  children: ReactNode;
+}) {
+  return (
+    <motion.div
+      animate={{
+        borderColor: error
+          ? "var(--red)"
+          : focused
+            ? "var(--brand-accent)"
+            : "var(--border)",
+        boxShadow: focused
+          ? "0 0 0 3px color-mix(in srgb, var(--brand-accent) 18%, transparent)"
+          : error
+            ? "0 0 0 3px color-mix(in srgb, var(--red) 12%, transparent)"
+            : "none",
+      }}
+      transition={{ duration: 0.2 }}
+      className={cn(
+        "relative flex items-center rounded-xl border bg-bg-secondary/80",
+        error && "border-red"
+      )}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 interface AuthInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -20,28 +55,17 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
 
     return (
       <div className="space-y-1.5">
-        <label
-          htmlFor={id}
-          className="block text-[13px] font-medium text-text-secondary"
-        >
+        <label htmlFor={id} className="block text-[13px] font-medium text-text-secondary">
           {label}
           {(showRequired ?? required) && (
-            <span className="text-red ml-0.5" aria-hidden>
+            <span className="ml-0.5 text-red" aria-hidden>
               *
             </span>
           )}
         </label>
-        <div
-          className={cn(
-            "relative flex items-center rounded-md border bg-bg-secondary transition-all duration-200",
-            focused
-              ? "border-brand ring-2 ring-brand/20"
-              : "border-border hover:border-border-light",
-            error && "border-red ring-2 ring-red/15"
-          )}
-        >
+        <AuthFieldShell focused={focused} error={error}>
           {icon && (
-            <span className="pl-3.5 text-text-tertiary shrink-0 [&>svg]:w-[18px] [&>svg]:h-[18px]">
+            <span className="shrink-0 pl-3.5 text-text-tertiary [&>svg]:h-[18px] [&>svg]:w-[18px]">
               {icon}
             </span>
           )}
@@ -58,11 +82,10 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
               props.onBlur?.(e);
             }}
             className={cn(
-              "flex-1 min-w-0 h-[48px] bg-transparent text-[15px] text-text-primary placeholder:text-text-tertiary/60",
-              "focus:outline-none",
+              "h-[48px] min-w-0 flex-1 bg-transparent text-[15px] text-text-primary placeholder:text-text-tertiary/60 focus:outline-none",
               icon ? "pl-2.5 pr-3" : "px-3.5",
               isPassword && "pr-11",
-              type === "date" && "pr-3 [color-scheme:dark] cursor-pointer",
+              type === "date" && "cursor-pointer pr-3 [color-scheme:dark]",
               className
             )}
             {...props}
@@ -72,18 +95,26 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
               type="button"
               tabIndex={-1}
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-0 top-0 h-full px-3.5 text-text-tertiary hover:text-text-primary transition-colors cursor-pointer"
+              className="absolute right-0 top-0 flex h-full cursor-pointer items-center px-3.5 text-text-tertiary transition-colors hover:text-text-primary"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <EyeOff className="w-[18px] h-[18px]" />
+                <EyeOff className="h-[18px] w-[18px]" />
               ) : (
-                <Eye className="w-[18px] h-[18px]" />
+                <Eye className="h-[18px] w-[18px]" />
               )}
             </button>
           )}
-        </div>
-        {error && <p className="text-[12px] text-red pt-0.5">{error}</p>}
+        </AuthFieldShell>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pt-0.5 text-[12px] text-red"
+          >
+            {error}
+          </motion.p>
+        )}
       </div>
     );
   }
@@ -102,26 +133,15 @@ export const AuthSelect = forwardRef<HTMLSelectElement, AuthSelectProps>(
 
     return (
       <div className="space-y-1.5">
-        <label
-          htmlFor={id}
-          className="block text-[13px] font-medium text-text-secondary"
-        >
+        <label htmlFor={id} className="block text-[13px] font-medium text-text-secondary">
           {label}
           {(showRequired ?? required) && (
-            <span className="text-red ml-0.5" aria-hidden>
+            <span className="ml-0.5 text-red" aria-hidden>
               *
             </span>
           )}
         </label>
-        <div
-          className={cn(
-            "relative flex items-center rounded-md border bg-bg-secondary transition-all duration-200",
-            focused
-              ? "border-brand ring-2 ring-brand/20"
-              : "border-border hover:border-border-light",
-            error && "border-red ring-2 ring-red/15"
-          )}
-        >
+        <AuthFieldShell focused={focused} error={error}>
           <select
             ref={ref}
             id={id}
@@ -135,17 +155,24 @@ export const AuthSelect = forwardRef<HTMLSelectElement, AuthSelectProps>(
               props.onBlur?.(e);
             }}
             className={cn(
-              "flex-1 min-w-0 h-[48px] bg-transparent text-[15px] text-text-primary pl-3.5 pr-10",
-              "focus:outline-none appearance-none cursor-pointer",
+              "h-[48px] min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pl-3.5 pr-10 text-[15px] text-text-primary focus:outline-none",
               className
             )}
             {...props}
           >
             {children}
           </select>
-          <ChevronDown className="absolute right-3.5 w-4 h-4 text-text-tertiary pointer-events-none" />
-        </div>
-        {error && <p className="text-[12px] text-red pt-0.5">{error}</p>}
+          <ChevronDown className="pointer-events-none absolute right-3.5 h-4 w-4 text-text-tertiary" />
+        </AuthFieldShell>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pt-0.5 text-[12px] text-red"
+          >
+            {error}
+          </motion.p>
+        )}
       </div>
     );
   }
@@ -162,16 +189,16 @@ export function AuthTabs({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex border-b border-border mb-8">
+    <div className="mb-8 flex border-b border-border">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"
           onClick={() => onChange(tab.id)}
           className={cn(
-            "flex-1 pb-3 text-[15px] font-medium transition-colors relative cursor-pointer",
+            "relative flex-1 cursor-pointer pb-3 text-[15px] font-medium transition-colors",
             active === tab.id
-              ? "text-text-primary after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-brand"
+              ? "text-text-primary after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-brand"
               : "text-text-tertiary hover:text-text-secondary"
           )}
         >
