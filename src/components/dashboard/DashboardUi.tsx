@@ -62,10 +62,10 @@ export function DashboardStatCard({
 }
 
 const QUICK_ACTIONS = [
-  { label: "Trade", href: "/dashboard/trade", desc: "Spot desk", accent: "from-brand to-brand-accent" },
-  { label: "Deposit", href: "/dashboard/deposit", desc: "Add funds", accent: "from-green/80 to-green" },
-  { label: "Withdraw", href: "/dashboard/withdraw", desc: "Cash out", accent: "from-gold/80 to-gold" },
-  { label: "Support", href: "/dashboard/support", desc: "Get help", accent: "from-brand-accent to-brand" },
+  { label: "Trade", href: "/dashboard/trade", desc: "Spot desk" },
+  { label: "Deposit", href: "/dashboard/deposit", desc: "Add funds" },
+  { label: "Withdraw", href: "/dashboard/withdraw", desc: "Cash out" },
+  { label: "Support", href: "/dashboard/support", desc: "Get help" },
 ] as const;
 
 export function DashboardQuickActions({
@@ -81,12 +81,7 @@ export function DashboardQuickActions({
           href={item.href}
           className="dashboard-quick-action group flex flex-col gap-3 rounded-2xl border border-border/80 bg-bg-secondary/90 px-4 py-4 backdrop-blur-sm hover:border-brand/25"
         >
-          <span
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm transition-transform group-hover:scale-105",
-              item.accent
-            )}
-          >
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white shadow-sm transition-transform group-hover:scale-105">
             {icons[item.label]}
           </span>
           <div>

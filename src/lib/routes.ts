@@ -6,11 +6,11 @@ export const SITE_ROUTES: Record<string, string> = {
   Convert: "/register",
 
   // Markets
-  Spot: "/#markets",
+  Spot: "/markets",
   Futures: "/dashboard/trade",
   Options: "/dashboard/trade",
-  Stocks: "/#markets",
-  Forex: "/#markets",
+  Stocks: "/markets",
+  Forex: "/markets",
 
   // Trade nav
   "Spot Trading": "/dashboard/trade",
@@ -26,19 +26,24 @@ export const SITE_ROUTES: Record<string, string> = {
   API: "/help",
   Affiliate: "/register",
   Referral: "/register",
+  Features: "/features",
+  Pricing: "/pricing",
 
   // Footer — About
   "About Us": "/about",
   Careers: "/about",
   Press: "/about",
   Blog: "/about",
-  Community: "/about",
+  Community: "/community",
 
   // Footer — Products
-  Exchange: "/dashboard/trade",
+  Exchange: "/products",
   "Copy Trading": "/dashboard/copy-trading",
   Earn: "/dashboard/ai-trading",
   Institutional: "/about",
+  Products: "/products",
+  Markets: "/markets",
+  Trading: "/trading",
 
   // Footer — Service
   Fees: "/fees",

@@ -1,0 +1,25 @@
+import { MarketingPageShell } from "@/components/marketing/MarketingPageShell";
+import { MarketsSection } from "@/components/landing/MarketsSection";
+import { MarketTicker } from "@/components/landing/MarketTicker";
+import { getCachedLiveMarketPairs } from "@/lib/live-prices";
+
+export const metadata = {
+  title: "Markets",
+  description: "Live market prices for crypto, stocks, forex, and more on ONYX Exchange.",
+};
+
+export default async function MarketsPage() {
+  const pairs = await getCachedLiveMarketPairs();
+
+  return (
+    <MarketingPageShell
+      title="Markets"
+      subtitle="Track all markets in one place — live prices, movers, and volume leaders updated continuously."
+      ctaHref="/dashboard/trade"
+      ctaLabel="Open markets"
+    >
+      <MarketTicker pairs={pairs} />
+      <MarketsSection pairs={pairs} />
+    </MarketingPageShell>
+  );
+}

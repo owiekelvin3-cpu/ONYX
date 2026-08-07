@@ -1,6 +1,6 @@
-/** Runs before paint to avoid a flash of the wrong theme. */
+/** Runs before paint — default to TradingView-style dark theme. */
 export function ThemeScript() {
-  const script = `(function(){try{var k="onyx-theme";var s=localStorage.getItem(k);var d=s==="dark"||(!s&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+  const script = `(function(){try{var k="onyx-theme";var s=localStorage.getItem(k);var d=s!=="light";if(d)document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark");}catch(e){document.documentElement.classList.add("dark");}})();`;
 
   return <script dangerouslySetInnerHTML={{ __html: script }} />;
 }

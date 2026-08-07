@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import "@/lib/fontawesome";
 import { BRAND } from "@/lib/constants";
@@ -15,19 +15,12 @@ const inter = Inter({
   display: "swap",
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  display: "swap",
-});
-
 const appUrl = getAppUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: `${BRAND.fullName} | ${BRAND.tagline}`,
+    default: `${BRAND.fullName} | Track All Markets`,
     template: `%s | ${BRAND.name}`,
   },
   description: BRAND.description,
@@ -47,12 +40,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: appUrl,
     siteName: BRAND.fullName,
-    title: `${BRAND.fullName} | ${BRAND.tagline}`,
+    title: `${BRAND.fullName} | Track All Markets`,
     description: BRAND.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${BRAND.fullName} | ${BRAND.tagline}`,
+    title: `${BRAND.fullName} | Track All Markets`,
     description: BRAND.description,
   },
   robots: {
@@ -69,20 +62,16 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: "#5046E5",
+  themeColor: "#131722",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${plusJakarta.variable} h-full overflow-x-hidden`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`${inter.variable} dark h-full overflow-x-hidden`} suppressHydrationWarning>
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-dvh antialiased overflow-x-hidden">
+      <body className="min-h-dvh antialiased overflow-x-hidden tv-theme">
         <ThemeProvider>
           <I18nProvider>{children}</I18nProvider>
         </ThemeProvider>

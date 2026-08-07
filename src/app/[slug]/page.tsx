@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Header } from "@/components/landing/Header";
-import { Footer } from "@/components/landing/Footer";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { SITE_PAGES } from "@/lib/routes";
 import { notFound } from "next/navigation";
 
@@ -30,7 +30,7 @@ export default async function SitePage({
 
   return (
     <>
-      <Header />
+      <MarketingHeader />
       <main className="min-h-[60vh] bg-bg-primary">
         <div className="container-app py-8 sm:py-10 lg:py-12 max-w-3xl safe-area-x">
           <Link
@@ -69,7 +69,7 @@ export default async function SitePage({
           </div>
         </div>
       </main>
-      <Footer />
+      <MarketingFooter />
     </>
   );
 }
