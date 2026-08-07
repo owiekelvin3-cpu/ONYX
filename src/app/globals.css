@@ -595,8 +595,9 @@ body {
 }
 
 @media (max-width: 1023px) {
-  .dashboard-mobile-dock {
-    backdrop-filter: blur(16px);
+  .decko-mobile-dock nav {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }
 
