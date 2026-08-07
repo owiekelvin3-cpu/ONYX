@@ -664,3 +664,108 @@ body {
 html.support-chat-open body {
   overflow: hidden;
 }
+
+/* TradingView-style landing hero video */
+.tv-hero {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -10%, rgba(41, 98, 255, 0.12), transparent 60%),
+    var(--bg-primary);
+}
+
+.tv-hero-video-shell {
+  width: 100%;
+  padding: 0 0 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .tv-hero-video-shell {
+    padding: 0 1rem 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tv-hero-video-shell {
+    padding: 0 1.5rem 1rem;
+  }
+}
+
+.tv-hero-video-frame {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: #0b0e17;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+@media (min-width: 1024px) {
+  .tv-hero-video-frame {
+    border-radius: 1.25rem;
+  }
+}
+
+.tv-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.tv-hero-video-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(19, 23, 34, 0.35) 0%, transparent 22%, transparent 78%, rgba(19, 23, 34, 0.45) 100%),
+    linear-gradient(to right, rgba(19, 23, 34, 0.2) 0%, transparent 12%, transparent 88%, rgba(19, 23, 34, 0.2) 100%);
+}
+
+.tv-hero-video-badge {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(19, 23, 34, 0.72);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #d1d4dc;
+}
+
+.tv-hero-video-play {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(41, 98, 255, 0.85);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.tv-hero-video-play:hover {
+  transform: scale(1.05);
+  background: rgba(41, 98, 255, 1);
+}
