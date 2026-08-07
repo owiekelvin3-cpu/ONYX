@@ -165,57 +165,54 @@ export function DeckoMobileDock({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="absolute bottom-0 left-0 right-0 max-h-[min(82vh,680px)] overflow-hidden rounded-t-[28px] border-t border-border bg-bg-secondary pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-20px_60px_rgba(0,0,0,0.18)]"
+              className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-t-[24px] border-t border-border bg-bg-secondary pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-16px_48px_rgba(0,0,0,0.16)]"
             >
-              <div className="flex justify-center pt-3">
-                <span className="h-1 w-10 rounded-full bg-border" aria-hidden />
+              <div className="flex justify-center pt-2.5">
+                <span className="h-1 w-9 rounded-full bg-border" aria-hidden />
               </div>
 
-              <div className="flex items-center justify-between px-5 pb-3 pt-2">
-                <div>
-                  <p className="text-base font-bold text-text-primary">{t("nav.more")}</p>
-                  <p className="text-xs text-text-secondary">{t("dashboard.clientPortal")}</p>
-                </div>
+              <div className="flex items-center justify-between px-4 pb-2 pt-1.5">
+                <p className="text-sm font-bold text-text-primary">{t("nav.more")}</p>
                 <button
                   type="button"
                   onClick={onMenuClose}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
                   aria-label={t("common.close")}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </div>
 
-              <div className="max-h-[calc(min(82vh,680px)-11.5rem)] overflow-y-auto px-4 pb-2">
-                <div className="grid grid-cols-4 gap-2">
+              <div className="px-3 pb-2">
+                <div className="grid grid-cols-4 gap-1.5">
                   {MORE_MENU_ITEMS.map((item, i) => {
                     const Icon = item.icon;
                     const active = isActive(pathname, item.href);
                     return (
                       <motion.div
                         key={item.href}
-                        initial={{ opacity: 0, y: 12 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.04 + i * 0.03 }}
+                        transition={{ delay: 0.03 + i * 0.025 }}
                       >
                         <Link
                           href={item.href}
                           onClick={onMenuClose}
-                          className="group flex flex-col items-center gap-1.5 rounded-2xl p-1.5 text-center"
+                          className="group flex flex-col items-center gap-1 rounded-xl p-1 text-center"
                         >
                           <span
                             className={cn(
-                              "flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-200 group-active:scale-95",
+                              "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 group-active:scale-95",
                               active
-                                ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)] shadow-[0_8px_20px_rgba(226,255,76,0.35)]"
+                                ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)] shadow-[0_6px_16px_rgba(226,255,76,0.3)]"
                                 : "bg-bg-tertiary text-text-primary group-hover:bg-bg-hover"
                             )}
                           >
-                            <Icon className="h-5 w-5" />
+                            <Icon className="h-4 w-4" />
                           </span>
                           <span
                             className={cn(
-                              "line-clamp-2 min-h-[2rem] text-[10px] font-medium leading-tight",
+                              "line-clamp-1 w-full text-[9px] font-medium leading-none",
                               active ? "text-text-primary" : "text-text-secondary"
                             )}
                           >
@@ -228,16 +225,16 @@ export function DeckoMobileDock({
                 </div>
               </div>
 
-              <div className="border-t border-border px-4 py-3">
+              <div className="border-t border-border px-3 py-2.5">
                 <button
                   type="button"
                   onClick={() => {
                     onMenuClose();
                     onLogout();
                   }}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#FEF2F2] px-4 py-3 text-sm font-semibold text-[#DC2626] transition-colors active:bg-[#FEE2E2]"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-red/20 bg-red/8 px-3 py-2.5 text-xs font-semibold text-red transition-colors active:bg-red/12"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-3.5 w-3.5" />
                   {t("common.signOut")}
                 </button>
               </div>
