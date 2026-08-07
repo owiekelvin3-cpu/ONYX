@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   ArrowRight,
   Bot,
@@ -57,27 +58,27 @@ export function DeckoSidebar() {
   }
 
   return (
-    <aside className="decko-sidebar hidden lg:flex w-[248px] shrink-0 flex-col px-4 py-5">
+    <aside className="decko-sidebar hidden w-[248px] shrink-0 flex-col px-4 py-5 lg:flex">
       <Link href="/dashboard" className="mb-6 flex items-center gap-2.5 px-2">
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--decko-accent)]">
           <OnyxLogo size={22} />
         </span>
-        <span className="text-lg font-bold text-white">{BRAND.name}</span>
+        <span className="text-lg font-bold text-[var(--decko-sidebar-text)]">{BRAND.name}</span>
       </Link>
 
       <div className="relative mb-6">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--decko-sidebar-muted)]" />
         <input
           type="search"
           placeholder="Search here..."
-          className="h-10 w-full rounded-xl border border-[#2A2A2A] bg-[#1A1A1A] pl-10 pr-12 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[var(--decko-accent)]/40"
+          className="h-10 w-full rounded-xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-input)] pl-10 pr-12 text-sm text-[var(--decko-sidebar-text)] placeholder:text-[var(--decko-sidebar-muted)] outline-none focus:border-[var(--decko-accent)]/40"
         />
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md bg-[#262626] px-1.5 py-0.5 text-[10px] text-[#9CA3AF]">
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md bg-[var(--decko-sidebar-hover)] px-1.5 py-0.5 text-[10px] text-[var(--decko-sidebar-muted)]">
           ⌘K
         </span>
       </div>
 
-      <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6B7280]">
+      <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--decko-sidebar-muted)]">
         Main Menu
       </p>
       <nav className="space-y-1">
@@ -91,8 +92,8 @@ export function DeckoSidebar() {
               className={cn(
                 "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 active
-                  ? "bg-[var(--decko-accent)] text-[#111111] shadow-[0_8px_24px_rgba(212,255,66,0.25)]"
-                  : "text-[#D1D5DB] hover:bg-[#1A1A1A] hover:text-white"
+                  ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)] shadow-[0_8px_24px_rgba(212,255,66,0.25)]"
+                  : "text-[var(--decko-sidebar-muted)] hover:bg-[var(--decko-sidebar-hover)] hover:text-[var(--decko-sidebar-text)]"
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -102,7 +103,7 @@ export function DeckoSidebar() {
         })}
       </nav>
 
-      <p className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6B7280]">
+      <p className="mb-2 mt-6 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--decko-sidebar-muted)]">
         Settings
       </p>
       <nav className="space-y-1">
@@ -116,8 +117,8 @@ export function DeckoSidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 active
-                  ? "bg-[#1A1A1A] text-white"
-                  : "text-[#D1D5DB] hover:bg-[#1A1A1A] hover:text-white"
+                  ? "bg-[var(--decko-sidebar-hover)] text-[var(--decko-sidebar-text)]"
+                  : "text-[var(--decko-sidebar-muted)] hover:bg-[var(--decko-sidebar-hover)] hover:text-[var(--decko-sidebar-text)]"
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -130,19 +131,21 @@ export function DeckoSidebar() {
       <div className="mt-auto space-y-3 pt-6">
         <Link
           href="/dashboard/deposit"
-          className="block rounded-2xl border border-[#2A2A2A] bg-[#141414] p-4 transition-transform hover:scale-[1.02]"
+          className="block rounded-2xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-surface)] p-4 transition-transform hover:scale-[1.02]"
         >
-          <p className="text-[11px] uppercase tracking-wide text-[#9CA3AF]">Upcoming Event</p>
-          <p className="mt-1 text-sm font-semibold text-white">Fund your account</p>
-          <span className="mt-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--decko-accent)] text-[#111111]">
+          <p className="text-[11px] uppercase tracking-wide text-[var(--decko-sidebar-muted)]">Upcoming Event</p>
+          <p className="mt-1 text-sm font-semibold text-[var(--decko-sidebar-text)]">Fund your account</p>
+          <span className="mt-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--decko-accent)] text-[var(--decko-accent-text)]">
             <ArrowRight className="h-3.5 w-3.5" />
           </span>
         </Link>
 
+        <ThemeToggle className="w-full justify-start rounded-xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-surface)] px-3 text-[var(--decko-sidebar-text)] hover:bg-[var(--decko-sidebar-hover)]" showLabel />
+
         <button
           type="button"
           onClick={() => void logout()}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#F87171] transition-colors hover:bg-[#1A1A1A]"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red transition-colors hover:bg-[var(--decko-sidebar-hover)]"
         >
           <LogOut className="h-4 w-4" />
           {t("common.signOut")}
@@ -164,18 +167,19 @@ export function DeckoMobileTopBar({
   const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
 
   return (
-    <div className="decko-mobile-bar flex items-center justify-between border-b border-[#E5E7EB] bg-white px-4 py-3 lg:hidden">
+    <div className="decko-mobile-bar flex items-center justify-between border-b px-4 py-3 lg:hidden safe-area-top">
       <Link href="/dashboard" className="flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--decko-accent)]">
           <OnyxLogo size={18} />
         </span>
-        <span className="font-bold text-[#111111]">{BRAND.name}</span>
+        <span className="font-bold text-text-primary">{BRAND.name}</span>
       </Link>
       <div className="flex items-center gap-2">
+        <ThemeToggle className="rounded-lg border border-border bg-bg-tertiary" />
         {avatarUrl ? (
           <img src={avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
         ) : (
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#111111] text-xs font-bold text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fin-btn-bg)] text-xs font-bold text-[var(--fin-btn-fg)]">
             {initial}
           </span>
         )}

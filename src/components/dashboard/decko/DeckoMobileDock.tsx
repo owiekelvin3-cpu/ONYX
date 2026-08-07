@@ -73,7 +73,7 @@ export function DeckoMobileDock({
     <>
       <div className="decko-mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.5rem,var(--safe-bottom))] lg:hidden">
         <nav
-          className="pointer-events-auto mx-auto max-w-[420px] overflow-visible rounded-[24px] border border-white/10 bg-[#111111]/94 p-1 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+          className="pointer-events-auto mx-auto max-w-[420px] overflow-visible rounded-[24px] border border-[var(--decko-dock-border)] bg-[var(--decko-dock-bg)] p-1 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
           aria-label={t("dashboard.navLabel")}
         >
           <div className="grid grid-cols-4 items-center gap-0.5">
@@ -165,21 +165,21 @@ export function DeckoMobileDock({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="absolute bottom-0 left-0 right-0 max-h-[min(82vh,680px)] overflow-hidden rounded-t-[28px] border-t border-[#E5E7EB] bg-white pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-20px_60px_rgba(0,0,0,0.18)]"
+              className="absolute bottom-0 left-0 right-0 max-h-[min(82vh,680px)] overflow-hidden rounded-t-[28px] border-t border-border bg-bg-secondary pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-20px_60px_rgba(0,0,0,0.18)]"
             >
               <div className="flex justify-center pt-3">
-                <span className="h-1 w-10 rounded-full bg-[#E5E7EB]" aria-hidden />
+                <span className="h-1 w-10 rounded-full bg-border" aria-hidden />
               </div>
 
               <div className="flex items-center justify-between px-5 pb-3 pt-2">
                 <div>
-                  <p className="text-base font-bold text-[#111111]">{t("nav.more")}</p>
-                  <p className="text-xs text-[#6B7280]">{t("dashboard.clientPortal")}</p>
+                  <p className="text-base font-bold text-text-primary">{t("nav.more")}</p>
+                  <p className="text-xs text-text-secondary">{t("dashboard.clientPortal")}</p>
                 </div>
                 <button
                   type="button"
                   onClick={onMenuClose}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4F6F8] text-[#6B7280] transition-colors hover:bg-[#ECEEF2] hover:text-[#111111]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
                   aria-label={t("common.close")}
                 >
                   <X className="h-4 w-4" />
@@ -207,8 +207,8 @@ export function DeckoMobileDock({
                             className={cn(
                               "flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-200 group-active:scale-95",
                               active
-                                ? "bg-[var(--decko-accent)] text-[#111111] shadow-[0_8px_20px_rgba(226,255,76,0.35)]"
-                                : "bg-[#F4F6F8] text-[#111111] group-hover:bg-[#ECEEF2]"
+                                ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)] shadow-[0_8px_20px_rgba(226,255,76,0.35)]"
+                                : "bg-bg-tertiary text-text-primary group-hover:bg-bg-hover"
                             )}
                           >
                             <Icon className="h-5 w-5" />
@@ -216,7 +216,7 @@ export function DeckoMobileDock({
                           <span
                             className={cn(
                               "line-clamp-2 min-h-[2rem] text-[10px] font-medium leading-tight",
-                              active ? "text-[#111111]" : "text-[#6B7280]"
+                              active ? "text-text-primary" : "text-text-secondary"
                             )}
                           >
                             {t(item.labelKey)}
@@ -228,7 +228,7 @@ export function DeckoMobileDock({
                 </div>
               </div>
 
-              <div className="border-t border-[#ECEEF2] px-4 py-3">
+              <div className="border-t border-border px-4 py-3">
                 <button
                   type="button"
                   onClick={() => {

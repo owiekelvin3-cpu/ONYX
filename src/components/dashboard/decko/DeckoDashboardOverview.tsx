@@ -100,16 +100,16 @@ function KpiCard({
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm text-[#6B7280]">{label}</p>
-            <p className="mt-2 text-2xl font-bold tracking-tight text-[#111111]">{display}</p>
+            <p className="text-sm text-text-secondary">{label}</p>
+            <p className="mt-2 text-2xl font-bold tracking-tight text-text-primary">{display}</p>
             {trend !== undefined && (
-              <p className={cn("mt-2 text-xs font-medium", up ? "text-[#16A34A]" : "text-[#EF4444]")}>
+              <p className={cn("mt-2 text-xs font-medium", up ? "text-green" : "text-red")}>
                 {up ? "+" : ""}
                 {trend.toFixed(1)}% {trendLabel}
               </p>
             )}
           </div>
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F6F8] text-[#111111]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-tertiary text-text-primary">
             <Icon className="h-4 w-4" />
           </span>
         </div>
@@ -175,27 +175,27 @@ export function DeckoDashboardOverview({
     <div className="decko-dashboard mx-auto max-w-[1320px]">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111111] sm:text-3xl">
+          <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">
             Hello, {firstName}!
           </h1>
-          <p className="mt-1 text-sm text-[#6B7280]">
+          <p className="mt-1 text-sm text-text-secondary">
             Here&apos;s your overview of your trading business!
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <ThemeToggle className="rounded-xl border border-[#E5E7EB] bg-white" />
+          <ThemeToggle className="rounded-xl border border-border bg-bg-secondary" />
           <NotificationBell />
-          <div className="flex items-center gap-2 rounded-2xl border border-[#E5E7EB] bg-white py-1.5 pl-1.5 pr-3">
+          <div className="flex items-center gap-2 rounded-2xl border border-border bg-bg-secondary py-1.5 pl-1.5 pr-3">
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="h-9 w-9 rounded-xl object-cover" />
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#111111] text-sm font-bold text-white">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--fin-btn-bg)] text-sm font-bold text-[var(--fin-btn-fg)]">
                 {initial}
               </span>
             )}
             <div className="hidden sm:block min-w-0">
-              <p className="truncate text-sm font-semibold text-[#111111]">{displayName || "Trader"}</p>
-              <p className="truncate text-xs text-[#6B7280]">{userEmail}</p>
+              <p className="truncate text-sm font-semibold text-text-primary">{displayName || "Trader"}</p>
+              <p className="truncate text-xs text-text-secondary">{userEmail}</p>
             </div>
           </div>
         </div>
@@ -246,10 +246,10 @@ export function DeckoDashboardOverview({
           <div className="decko-card p-5 sm:p-6">
             <div className="mb-6 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-[#111111]">Portfolio Overview</h2>
-                <p className="text-sm text-[#6B7280]">Monthly profit performance</p>
+                <h2 className="text-lg font-bold text-text-primary">Portfolio Overview</h2>
+                <p className="text-sm text-text-secondary">Monthly profit performance</p>
               </div>
-              <select className="rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#111111] outline-none">
+              <select className="rounded-xl border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary outline-none">
                 <option>Month</option>
                 <option>Quarter</option>
               </select>
@@ -265,7 +265,7 @@ export function DeckoDashboardOverview({
                     onHover={() => setHoverBar(index)}
                     onLeave={() => setHoverBar(null)}
                   />
-                  <span className="text-[11px] text-[#9CA3AF]">{bar.label}</span>
+                  <span className="text-[11px] text-text-tertiary">{bar.label}</span>
                 </div>
               ))}
 
@@ -273,10 +273,10 @@ export function DeckoDashboardOverview({
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-xl bg-[#111111] px-3 py-2 text-xs text-white shadow-xl"
+                  className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-xl bg-[var(--fin-btn-bg)] px-3 py-2 text-xs text-[var(--fin-btn-fg)] shadow-xl"
                 >
                   <p>Profit: {formatNumber(monthly[hoverBar].profit / 1000, 1)}K</p>
-                  <p className="text-[#9CA3AF]">
+                  <p className="text-text-tertiary">
                     Expense: {formatNumber(monthly[hoverBar].expense / 1000, 1)}K
                   </p>
                 </motion.div>
@@ -288,19 +288,19 @@ export function DeckoDashboardOverview({
         <DeckoStaggerItem className="space-y-4">
           <div className="decko-card p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#111111]">
+              <h2 className="text-lg font-bold text-text-primary">
                 {today.toLocaleString(undefined, { month: "long", year: "numeric" })}
               </h2>
               <div className="flex gap-1">
-                <button type="button" className="rounded-lg px-2 py-1 text-[#9CA3AF] hover:bg-[#F4F6F8]">
+                <button type="button" className="rounded-lg px-2 py-1 text-text-tertiary hover:bg-bg-tertiary">
                   ‹
                 </button>
-                <button type="button" className="rounded-lg px-2 py-1 text-[#9CA3AF] hover:bg-[#F4F6F8]">
+                <button type="button" className="rounded-lg px-2 py-1 text-text-tertiary hover:bg-bg-tertiary">
                   ›
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-7 gap-1 text-center text-[11px] text-[#9CA3AF]">
+            <div className="grid grid-cols-7 gap-1 text-center text-[11px] text-text-tertiary">
               {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
                 <span key={d}>{d}</span>
               ))}
@@ -315,8 +315,8 @@ export function DeckoDashboardOverview({
                     className={cn(
                       "mx-auto flex h-8 w-8 items-center justify-center rounded-full",
                       day === today.getDate()
-                        ? "bg-[var(--decko-accent)] font-semibold text-[#111111]"
-                        : "text-[#374151]"
+                        ? "bg-[var(--decko-accent)] font-semibold text-[var(--decko-accent-text)]"
+                        : "text-text-secondary"
                     )}
                   >
                     {day}
@@ -328,8 +328,8 @@ export function DeckoDashboardOverview({
 
           <div className="decko-card p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#111111]">Upcoming Schedule</h2>
-              <Link href="/dashboard/transactions" className="text-xs font-medium text-[#6B7280] hover:text-[#111111]">
+              <h2 className="text-lg font-bold text-text-primary">Upcoming Schedule</h2>
+              <Link href="/dashboard/transactions" className="text-xs font-medium text-text-secondary hover:text-text-primary">
                 View all
               </Link>
             </div>
@@ -341,28 +341,28 @@ export function DeckoDashboardOverview({
                     initial={{ opacity: 0, x: 12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + index * 0.08 }}
-                    className="flex items-start gap-3 rounded-xl border border-[#EEF0F3] p-3"
+                    className="flex items-start gap-3 rounded-xl border border-border p-3"
                   >
-                    <input type="checkbox" checked={item.done} readOnly className="mt-1 accent-[#111111]" />
+                    <input type="checkbox" checked={item.done} readOnly className="mt-1 accent-brand" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-[#9CA3AF]">{item.time}</p>
-                      <p className="font-semibold text-[#111111]">{item.title}</p>
-                      <p className="text-sm text-[#6B7280]">{item.subtitle}</p>
+                      <p className="text-xs text-text-tertiary">{item.time}</p>
+                      <p className="font-semibold text-text-primary">{item.title}</p>
+                      <p className="text-sm text-text-secondary">{item.subtitle}</p>
                     </div>
                     <div className="flex -space-x-2">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#111111] text-[10px] text-white">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg-secondary bg-[var(--fin-btn-bg)] text-[10px] text-[var(--fin-btn-fg)]">
                         {initial}
                       </span>
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[var(--decko-accent)] text-[10px] text-[#111111]">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg-secondary bg-[var(--decko-accent)] text-[10px] text-text-primary">
                         OX
                       </span>
                     </div>
                   </motion.div>
                 ))
               ) : (
-                <div className="rounded-xl border border-dashed border-[#E5E7EB] px-4 py-8 text-center">
-                  <p className="text-sm text-[#6B7280]">No recent activity yet.</p>
-                  <Link href="/dashboard/trade" className="mt-2 inline-block text-sm font-medium text-[#111111] underline">
+                <div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
+                  <p className="text-sm text-text-secondary">No recent activity yet.</p>
+                  <Link href="/dashboard/trade" className="mt-2 inline-block text-sm font-medium text-text-primary underline">
                     Place your first trade
                   </Link>
                 </div>
@@ -375,23 +375,23 @@ export function DeckoDashboardOverview({
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <DeckoStaggerItem>
           <div className="decko-card p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#111111]">Portfolio Allocation</h2>
+            <h2 className="text-lg font-bold text-text-primary">Portfolio Allocation</h2>
             <div className="mt-6 space-y-5">
               <div>
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-[#374151]">Cash Balance</span>
-                  <span className="font-semibold text-[#111111]">{cashPct.toFixed(2)}%</span>
+                  <span className="text-text-secondary">Cash Balance</span>
+                  <span className="font-semibold text-text-primary">{cashPct.toFixed(2)}%</span>
                 </div>
                 <DeckoProgressBar value={cashPct} delay={0.2} />
-                <p className="mt-1 text-xs text-[#16A34A]">+{Math.max(1, cashPct * 0.08).toFixed(1)}%</p>
+                <p className="mt-1 text-xs text-green">+{Math.max(1, cashPct * 0.08).toFixed(1)}%</p>
               </div>
               <div>
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-[#374151]">Holdings Value</span>
-                  <span className="font-semibold text-[#111111]">{holdingsPct.toFixed(2)}%</span>
+                  <span className="text-text-secondary">Holdings Value</span>
+                  <span className="font-semibold text-text-primary">{holdingsPct.toFixed(2)}%</span>
                 </div>
                 <DeckoProgressBar value={holdingsPct} delay={0.35} />
-                <p className="mt-1 text-xs text-[#16A34A]">+{Math.max(1, holdingsPct * 0.05).toFixed(1)}%</p>
+                <p className="mt-1 text-xs text-green">+{Math.max(1, holdingsPct * 0.05).toFixed(1)}%</p>
               </div>
             </div>
           </div>
@@ -400,8 +400,8 @@ export function DeckoDashboardOverview({
         <DeckoStaggerItem>
           <div className="decko-card p-5 sm:p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#111111]">Quick Actions</h2>
-              <span className="rounded-full bg-[#F4F6F8] px-2.5 py-1 text-xs text-[#6B7280]">
+              <h2 className="text-lg font-bold text-text-primary">Quick Actions</h2>
+              <span className="rounded-full bg-bg-tertiary px-2.5 py-1 text-xs text-text-secondary">
                 {openOrders} open · {tradesCount} trades
               </span>
             </div>
@@ -423,12 +423,12 @@ export function DeckoDashboardOverview({
                   >
                     <Link
                       href={action.href}
-                      className="flex flex-col items-start gap-3 rounded-2xl border border-[#EEF0F3] bg-[#FAFBFC] p-4 transition-colors hover:border-[var(--decko-accent)]"
+                      className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-bg-primary p-4 transition-colors hover:border-[var(--decko-accent)]"
                     >
-                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#111111] shadow-sm">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-secondary text-text-primary shadow-sm">
                         <Icon className="h-4 w-4" />
                       </span>
-                      <span className="font-semibold text-[#111111]">{action.label}</span>
+                      <span className="font-semibold text-text-primary">{action.label}</span>
                     </Link>
                   </motion.div>
                 );

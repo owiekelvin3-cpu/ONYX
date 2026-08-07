@@ -772,25 +772,55 @@ html.support-chat-open body {
 /* Decko dashboard theme */
 .decko-shell {
   --decko-accent: #e2ff4c;
+  --decko-accent-text: #111111;
   --decko-sidebar: #111111;
-  --decko-main: #f3f4f6;
+  --decko-sidebar-border: #1f1f1f;
+  --decko-sidebar-muted: #9ca3af;
+  --decko-sidebar-text: #f5f5f5;
+  --decko-sidebar-hover: #1a1a1a;
+  --decko-sidebar-surface: #141414;
+  --decko-sidebar-input: #1a1a1a;
+  --decko-dock-bg: rgba(17, 17, 17, 0.94);
+  --decko-dock-border: rgba(255, 255, 255, 0.1);
   background: var(--decko-sidebar);
+}
+
+.dark .decko-shell {
+  --decko-sidebar: #0a0a0a;
+  --decko-sidebar-border: #262626;
+  --decko-sidebar-hover: #141414;
+  --decko-sidebar-surface: #111111;
+  --decko-sidebar-input: #141414;
+  --decko-dock-bg: rgba(10, 10, 10, 0.96);
 }
 
 .decko-sidebar {
   background: var(--decko-sidebar);
-  border-right: 1px solid #1f1f1f;
+  border-right: 1px solid var(--decko-sidebar-border);
 }
 
 .decko-main {
-  background: var(--decko-main);
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .decko-card {
   border-radius: 1.25rem;
-  border: 1px solid #eceef2;
-  background: #ffffff;
-  box-shadow: 0 8px 30px rgba(17, 17, 17, 0.04);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-card);
+}
+
+.decko-mobile-bar {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.decko-sheet {
+  border-color: var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .decko-dashboard {

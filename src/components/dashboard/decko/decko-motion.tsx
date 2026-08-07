@@ -123,7 +123,7 @@ export function DeckoProgressBar({
   const reduce = useReducedMotion();
 
   return (
-    <div className="h-3 overflow-hidden rounded-full bg-[#ECEEF2]">
+    <div className="h-3 overflow-hidden rounded-full bg-bg-tertiary">
       <motion.div
         className="h-full rounded-full bg-[var(--decko-accent)]"
         initial={reduce ? false : { width: 0 }}
