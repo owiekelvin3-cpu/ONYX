@@ -253,31 +253,32 @@ export default function AdminSupportPage() {
     await refreshList({ soft: true });
   };
 
-  const threadContent = active ? (
-    <>
-      <SupportMessageList
-        messages={messages}
-        currentUserId={adminId ?? ""}
-        loading={loadingMessages}
-        hasMore={hasMore}
-        onLoadMore={() => activeId && void loadThread(activeId, false)}
-      />
-      {active.status !== "resolved" ? (
-        <SupportComposer onSend={send} placeholder="Reply to customer…" compact />
-      ) : (
-        <div className="shrink-0 border-t border-border p-4 text-center text-sm text-text-tertiary">
-          This conversation is resolved.{" "}
-          <button
-            type="button"
-            className="font-medium text-brand hover:underline"
-            onClick={() => void reopen(active.id)}
-          >
-            Reopen
-          </button>
-        </div>
-      )}
-    </>
+  const threadMessages = active ? (
+    <SupportMessageList
+      messages={messages}
+      currentUserId={adminId ?? ""}
+      loading={loadingMessages}
+      hasMore={hasMore}
+      onLoadMore={() => activeId && void loadThread(activeId, false)}
+    />
   ) : null;
+
+  const threadComposer = active ? (
+    active.status !== "resolved" ? (
+      <SupportComposer onSend={send} placeholder="Reply to customer…" compact />
+    ) : (
+      <div className="shrink-0 border-t border-border p-4 text-center text-sm text-text-tertiary">
+        This conversation is resolved.{" "}
+        <button
+          type="button"
+          className="font-medium text-brand hover:underline"
+          onClick={() => void reopen(active.id)}
+        >
+          Reopen
+        </button>
+      </div>
+    )
+  ) : undefined;
 
   const statusActions = active ? (
     <div className="flex flex-wrap items-center justify-end gap-1.5">
@@ -413,8 +414,9 @@ export default function AdminSupportPage() {
             onBack={backToList}
             safeAreaTop
             trailing={statusActions}
+            composer={threadComposer}
           >
-            {threadContent}
+            {threadMessages}
           </SupportThreadFrame>
         )}
       </SupportMobileChatOverlay>
@@ -438,14 +440,15 @@ export default function AdminSupportPage() {
           </div>
         </aside>
 
-        <section className="flex min-h-0 min-w-0 flex-col">
+        <section className="flex h-full min-h-0 min-w-0 flex-col">
           {active ? (
             <SupportThreadFrame
               title={active.subject}
               subtitle={active.user?.full_name || active.user?.email || undefined}
               trailing={statusActions}
+              composer={threadComposer}
             >
-              {threadContent}
+              {threadMessages}
             </SupportThreadFrame>
           ) : (
             <SupportEmptyState />

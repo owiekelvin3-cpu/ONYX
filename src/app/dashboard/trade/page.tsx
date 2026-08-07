@@ -164,24 +164,9 @@ export default function TradePage() {
 
   return (
     <div className="space-y-3 sm:space-y-4 min-w-0">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h1 className="text-base sm:text-lg font-bold text-text-primary">
-            Spot Trading
-          </h1>
-          <p className="text-[12px] text-text-tertiary mt-0.5">
-            Live charts powered by{" "}
-            <a
-              href="https://www.tradingview.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand hover:underline"
-            >
-              TradingView
-            </a>
-          </p>
-        </div>
-      </div>
+      <h1 className="text-base sm:text-lg font-bold text-text-primary">
+        Spot Trading
+      </h1>
 
       <TradingViewTickerTape />
 
@@ -194,7 +179,7 @@ export default function TradePage() {
               marketsOpen={showMobileMarkets}
             />
 
-            <div className="h-[280px] sm:h-[360px] lg:h-[420px] xl:h-[480px] bg-[#131722]">
+            <div className="relative z-[1] h-[280px] sm:h-[360px] lg:h-[420px] xl:h-[480px] min-h-[280px] bg-[#131722]">
               <TradingViewAdvancedChart
                 key={selectedPair.symbol}
                 symbol={selectedPair.symbol}

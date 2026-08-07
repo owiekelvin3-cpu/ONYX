@@ -65,7 +65,7 @@ export default function SupportPage() {
     }
   };
 
-  const threadBody = composing ? (
+  const threadMessages = composing ? (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -116,30 +116,30 @@ export default function SupportPage() {
       </motion.div>
     </div>
   ) : active ? (
-    <>
-      <SupportMessageList
-        messages={support.messages}
-        currentUserId={userId ?? ""}
-        loading={support.loadingMessages}
-        hasMore={support.hasMore}
-        onLoadMore={support.loadOlder}
-      />
-      {active.status === "resolved" ? (
-        <div className="shrink-0 border-t border-border p-4 text-center text-sm text-text-tertiary">
-          This conversation has been resolved.{" "}
-          <button
-            type="button"
-            className="font-medium text-brand hover:underline"
-            onClick={() => void support.reopen(active.id)}
-          >
-            Reopen
-          </button>
-        </div>
-      ) : (
-        <SupportComposer onSend={support.send} compact />
-      )}
-    </>
+    <SupportMessageList
+      messages={support.messages}
+      currentUserId={userId ?? ""}
+      loading={support.loadingMessages}
+      hasMore={support.hasMore}
+      onLoadMore={support.loadOlder}
+    />
   ) : null;
+
+  const threadComposer =
+    active && active.status === "resolved" ? (
+      <div className="shrink-0 border-t border-border p-4 text-center text-sm text-text-tertiary">
+        This conversation has been resolved.{" "}
+        <button
+          type="button"
+          className="font-medium text-brand hover:underline"
+          onClick={() => void support.reopen(active.id)}
+        >
+          Reopen
+        </button>
+      </div>
+    ) : active ? (
+      <SupportComposer onSend={support.send} compact />
+    ) : undefined;
 
   const threadTitle = composing
     ? "Start conversation"
@@ -263,8 +263,9 @@ export default function SupportPage() {
           onBack={backToList}
           safeAreaTop
           trailing={active ? <SupportStatusBadge status={active.status} /> : undefined}
+          composer={threadComposer}
         >
-          {threadBody}
+          {threadMessages}
         </SupportThreadFrame>
       </SupportMobileChatOverlay>
 
@@ -297,7 +298,7 @@ export default function SupportPage() {
           </div>
         </aside>
 
-        <section className="flex min-h-0 min-w-0 flex-col">
+        <section className="flex h-full min-h-0 min-w-0 flex-col">
           {composing || active ? (
             <SupportThreadFrame
               title={threadTitle}
@@ -314,8 +315,9 @@ export default function SupportPage() {
                   </div>
                 ) : undefined
               }
+              composer={threadComposer}
             >
-              {threadBody}
+              {threadMessages}
             </SupportThreadFrame>
           ) : (
             <SupportEmptyState onNew={() => setComposing(true)} />
