@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -9,19 +8,11 @@ import {
   subscribeToTrader,
 } from "@/lib/api/subscriptions";
 import type { CopySubscriptionRow } from "@/lib/supabase/types";
+import { COPY_TRADERS } from "@/lib/copy-traders";
+import { CopyTraderCard } from "@/components/dashboard/copy-trading/CopyTraderCard";
+import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { formatPercent, formatCurrency } from "@/lib/utils";
-import { Users, TrendingUp, Star, Loader2 } from "@/components/icons";
-
-const TRADERS = [
-  { name: "AlphaTrader", roi: 142.5, followers: 2840, winRate: 78, rating: 4.9 },
-  { name: "CryptoKing", roi: 98.3, followers: 5620, winRate: 72, rating: 4.8 },
-  { name: "QuantMaster", roi: 67.1, followers: 1890, winRate: 81, rating: 4.7 },
-  { name: "SwingPro", roi: 54.8, followers: 3210, winRate: 69, rating: 4.6 },
-  { name: "DeFiWhale", roi: 203.2, followers: 8900, winRate: 65, rating: 4.9 },
-  { name: "SteadyGains", roi: 38.4, followers: 1450, winRate: 85, rating: 4.5 },
-];
+import { formatCurrency } from "@/lib/utils";
 
 const DEFAULT_ALLOCATION = 1000;
 
@@ -71,101 +62,65 @@ export default function CopyTradingPage() {
   );
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold text-text-primary">Copy Trading</h1>
-      <p className="text-xs text-text-tertiary -mt-2">
-        Past performance is not indicative of future results. Allocations can be paused or stopped anytime.
-      </p>
+    <div className="decko-dashboard mx-auto max-w-[1320px] space-y-5 pb-8">
+      <div>
+        <h1 className="text-2xl font-bold text-text-primary">Copy Trading</h1>
+        <p className="mt-1 max-w-2xl text-sm text-text-secondary">
+          Follow top performers like a social feed — each trader has their own style, stats, and profile.
+          Past performance is not indicative of future results.
+        </p>
+      </div>
 
       {error && (
-        <p role="alert" className="text-[13px] text-red bg-red/10 border border-red/30 rounded px-3 py-2">
+        <p role="alert" className="rounded-xl border border-red/30 bg-red/10 px-4 py-3 text-sm text-red">
           {error}
         </p>
       )}
 
       {subscriptions.length > 0 && (
-        <Card>
-          <h3 className="text-[13px] font-semibold mb-3">Your Copy Subscriptions</h3>
-          {subscriptions.map((sub) => (
-            <div
-              key={sub.id}
-              className="flex items-center justify-between py-2 border-b border-border last:border-0 text-[13px]"
-            >
-              <div>
-                <p className="font-medium">{sub.trader_name}</p>
-                <p className="text-[11px] text-text-tertiary capitalize">
-                  {sub.status} · {formatCurrency(sub.allocation)}
-                </p>
-              </div>
-            </div>
-          ))}
+        <Card className="p-4 sm:p-5">
+          <h2 className="text-sm font-semibold text-text-primary">Following</h2>
+          <div className="mt-3 space-y-3">
+            {subscriptions.map((sub) => {
+              const profile = COPY_TRADERS.find((t) => t.name === sub.trader_name);
+              return (
+                <div
+                  key={sub.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border px-3 py-2.5"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    {profile ? (
+                      <TraderAvatar trader={profile} size="sm" />
+                    ) : (
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-tertiary text-xs font-bold">
+                        {sub.trader_name.charAt(0)}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-text-primary">{sub.trader_name}</p>
+                      <p className="text-xs capitalize text-text-tertiary">
+                        {sub.status} · {formatCurrency(sub.allocation)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </Card>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {TRADERS.map((trader) => (
-          <Card key={trader.name}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-bg-hover flex items-center justify-center text-xs font-bold">
-                {trader.name.charAt(0)}
-              </div>
-              <div>
-                <p className="text-[13px] font-semibold">{trader.name}</p>
-                <div className="flex items-center gap-1 text-[11px] text-text-tertiary">
-                  <Star className="w-3 h-3 text-brand fill-brand" />
-                  {trader.rating}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <p className="text-[10px] text-text-tertiary">30d ROI</p>
-                <p className="text-sm font-bold text-green">
-                  {formatPercent(trader.roi)}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-text-tertiary">Win Rate</p>
-                <p className="text-sm font-bold">{trader.winRate}%</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1 text-[11px] text-text-tertiary mb-3">
-              <Users className="w-3 h-3" />
-              {trader.followers.toLocaleString()} followers
-            </div>
-
-            {activeTraders.has(trader.name) ? (
-              <Button className="w-full" size="sm" variant="secondary" disabled>
-                Copying
-              </Button>
-            ) : userId ? (
-              <Button
-                type="button"
-                className="w-full"
-                size="sm"
-                disabled={loadingTrader === trader.name}
-                onClick={() => handleCopy(trader.name)}
-              >
-                {loadingTrader === trader.name ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <>
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Link href="/register">
-                <Button className="w-full" size="sm">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  Copy
-                </Button>
-              </Link>
-            )}
-          </Card>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {COPY_TRADERS.map((trader, index) => (
+          <CopyTraderCard
+            key={trader.name}
+            trader={trader}
+            index={index}
+            isActive={activeTraders.has(trader.name)}
+            userId={userId}
+            loading={loadingTrader === trader.name}
+            onCopy={() => handleCopy(trader.name)}
+          />
         ))}
       </div>
     </div>
