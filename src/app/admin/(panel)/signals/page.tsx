@@ -16,7 +16,7 @@ import { SIGNAL_PLANS, signalTierLabel } from "@/lib/signal-plans";
 import { getSignalStrength } from "@/lib/signal-strength";
 import type { TradingSignalRow } from "@/lib/supabase/types";
 import { cn, formatDate, formatPercent } from "@/lib/utils";
-import { Loader2, Plus, RefreshCw, Search, TrendingUp, Zap } from "@/components/icons";
+import { Loader2, Plus, RefreshCw } from "@/components/icons";
 
 type UserRow = {
   id: string;
@@ -39,11 +39,9 @@ export default function AdminSignalsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
-
-  const [userQuery, setUserQuery] = useState("");
-  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
-  const [targetPct, setTargetPct] = useState("0");
-  const [pctNote, setPctNote] = useState("");
+  const [draftPct, setDraftPct] = useState<Record<string, string>>({});
+  const [savingUserId, setSavingUserId] = useState<string | null>(null);
+  const [grantUserId, setGrantUserId] = useState("");
   const [bulkNote, setBulkNote] = useState("Platform signal adjustment");
   const [grantDays, setGrantDays] = useState("30");
   const [grantTier, setGrantTier] = useState("basic");
@@ -75,7 +73,13 @@ export default function AdminSignalsPage() {
         .limit(40),
     ]);
     if (usersRes.error) setError(usersRes.error.message);
-    else setUsers((usersRes.data as UserRow[]) ?? []);
+    else {
+      const rows = (usersRes.data as UserRow[]) ?? [];
+      setUsers(rows);
+      setDraftPct(
+        Object.fromEntries(rows.map((u) => [u.id, String(u.signal_pct ?? 0)]))
+      );
+    }
     if (signalsRes.error) setError(signalsRes.error.message);
     else setSignals((signalsRes.data as TradingSignalRow[]) ?? []);
     setLoading(false);
@@ -85,16 +89,6 @@ export default function AdminSignalsPage() {
     void load();
   }, [load]);
 
-  const filteredUsers = useMemo(() => {
-    const q = userQuery.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) =>
-        u.email.toLowerCase().includes(q) ||
-        (u.full_name ?? "").toLowerCase().includes(q)
-    );
-  }, [users, userQuery]);
-
   const stats = useMemo(() => {
     const total = users.length;
     const avg = total ? users.reduce((s, u) => s + (u.signal_pct ?? 0), 0) / total : 0;
@@ -103,17 +97,13 @@ export default function AdminSignalsPage() {
     return { total, avg, atZero, activeDesk };
   }, [users, signals]);
 
-  const previewStrength = getSignalStrength(parseFloat(targetPct) || 0);
+  function setDraftForUser(userId: string, pct: string) {
+    setDraftPct((prev) => ({ ...prev, [userId]: pct }));
+  }
 
   function flash(msg: string) {
     setSuccess(msg);
     setError("");
-  }
-
-  function selectUser(u: UserRow) {
-    setSelectedUser(u);
-    setTargetPct(String(u.signal_pct ?? 0));
-    setPctNote("");
   }
 
   async function runBulk(delta: number) {
@@ -131,40 +121,34 @@ export default function AdminSignalsPage() {
     }
   }
 
-  async function saveUserPct() {
-    if (!selectedUser) {
-      setError("Select a user from the list first.");
-      return;
-    }
-    const pct = parseFloat(targetPct);
+  async function saveUserPct(user: UserRow) {
+    const pct = parseFloat(draftPct[user.id] ?? "0");
     if (!Number.isFinite(pct) || pct < 0 || pct > 100) {
       setError("Enter a percentage between 0 and 100.");
       return;
     }
-    setBusy(true);
+    setSavingUserId(user.id);
     setError("");
     setSuccess("");
     try {
-      await setAdminUserSignalPct({
-        userId: selectedUser.id,
-        pct,
-        note: pctNote || undefined,
-      });
-      flash(`Set ${selectedUser.email} to ${pct}%.`);
-      await load();
-      setSelectedUser((prev) => (prev ? { ...prev, signal_pct: pct } : null));
+      await setAdminUserSignalPct({ userId: user.id, pct });
+      flash(`Set ${user.email} to ${pct}%.`);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === user.id ? { ...u, signal_pct: pct } : u))
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not update user.");
     } finally {
-      setBusy(false);
+      setSavingUserId(null);
     }
   }
 
   async function grantPackage() {
-    if (!selectedUser) {
-      setError("Select a user from the allocation list first.");
+    if (!grantUserId) {
+      setError("Select a user for package access.");
       return;
     }
+    const user = users.find((u) => u.id === grantUserId);
     const plan = SIGNAL_PLANS.find((p) => p.id === grantTier);
     if (!plan) return;
     const days = parseInt(grantDays, 10);
@@ -173,12 +157,12 @@ export default function AdminSignalsPage() {
     setSuccess("");
     try {
       await grantAdminUserSignal({
-        userId: selectedUser.id,
+        userId: grantUserId,
         packageId: plan.id,
         packageName: plan.name,
         durationDays: Number.isFinite(days) ? days : 30,
       });
-      flash(`Granted ${plan.name} to ${selectedUser.email}.`);
+      flash(`Granted ${plan.name} to ${user?.email ?? "user"}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Grant failed.");
     } finally {
@@ -345,150 +329,113 @@ export default function AdminSignalsPage() {
             </div>
           </Card>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="overflow-hidden p-0">
-              <div className="border-b border-border px-4 py-3">
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
-                  <input
-                    type="search"
-                    value={userQuery}
-                    onChange={(e) => setUserQuery(e.target.value)}
-                    placeholder="Search by email or name…"
-                    className="h-10 w-full rounded-lg border border-border bg-bg-primary pl-9 pr-3 text-sm outline-none focus:border-brand"
-                  />
-                </div>
-                <p className="mt-2 text-xs text-text-tertiary">
-                  {filteredUsers.length} user{filteredUsers.length === 1 ? "" : "s"}
+          <Card className="overflow-hidden p-0">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div>
+                <h2 className="text-sm font-semibold text-text-primary">All users</h2>
+                <p className="text-xs text-text-tertiary mt-0.5">
+                  Set signal % for each user — no search needed.
                 </p>
               </div>
-              {loading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-6 w-6 animate-spin text-text-tertiary" />
-                </div>
-              ) : filteredUsers.length === 0 ? (
-                <p className="py-12 text-center text-sm text-text-tertiary">No users match your search.</p>
-              ) : (
-                <ul className="max-h-[28rem] divide-y divide-border overflow-y-auto">
-                  {filteredUsers.map((u) => {
-                    const strength = getSignalStrength(u.signal_pct ?? 0);
-                    return (
-                      <li key={u.id}>
-                        <button
-                          type="button"
-                          onClick={() => selectUser(u)}
-                          className={cn(
-                            "flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-bg-hover",
-                            selectedUser?.id === u.id && "bg-brand/5"
-                          )}
-                        >
-                          <div className="min-w-0">
-                            <p className="truncate font-medium text-text-primary">
+              <p className="text-xs text-text-tertiary">{users.length} users</p>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="h-6 w-6 animate-spin text-text-tertiary" />
+              </div>
+            ) : users.length === 0 ? (
+              <p className="py-16 text-center text-sm text-text-tertiary">No users found.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-bg-secondary/60 text-[11px] uppercase tracking-wide text-text-tertiary">
+                      <th className="px-4 py-3 font-medium">User</th>
+                      <th className="px-4 py-3 font-medium">Current</th>
+                      <th className="px-4 py-3 font-medium">New %</th>
+                      <th className="px-4 py-3 font-medium">Quick set</th>
+                      <th className="px-4 py-3 font-medium" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {users.map((u) => {
+                      const strength = getSignalStrength(u.signal_pct ?? 0);
+                      const draft = draftPct[u.id] ?? String(u.signal_pct ?? 0);
+                      const draftStrength = getSignalStrength(parseFloat(draft) || 0);
+                      const isDirty = draft !== String(u.signal_pct ?? 0);
+                      const saving = savingUserId === u.id;
+
+                      return (
+                        <tr key={u.id} className="hover:bg-bg-hover/40">
+                          <td className="px-4 py-3">
+                            <p className="font-medium text-text-primary truncate max-w-[200px]">
                               {u.full_name || u.email}
                             </p>
-                            <p className="truncate text-xs text-text-tertiary">{u.email}</p>
-                          </div>
-                          <div className="shrink-0 text-right">
-                            <p className="text-sm font-bold" style={{ color: strength.color }}>
+                            <p className="text-xs text-text-tertiary truncate max-w-[220px]">{u.email}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="font-bold" style={{ color: strength.color }}>
                               {formatPercent(u.signal_pct ?? 0)}
                             </p>
                             <p className="text-[10px] text-text-tertiary">{strength.label}</p>
-                          </div>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Card>
-
-            <Card className="p-4 sm:p-5">
-              {!selectedUser ? (
-                <div className="flex min-h-[20rem] flex-col items-center justify-center px-4 text-center">
-                  <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                    <Zap className="h-5 w-5" />
-                  </span>
-                  <p className="text-sm font-medium text-text-primary">Select a user</p>
-                  <p className="mt-1 max-w-xs text-xs text-text-tertiary">
-                    Choose someone from the list to set their signal percentage for the overview widget.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  <div>
-                    <h2 className="text-lg font-semibold text-text-primary">
-                      {selectedUser.full_name || selectedUser.email}
-                    </h2>
-                    <p className="text-sm text-text-tertiary">{selectedUser.email}</p>
-                    <p className="mt-1 text-xs text-text-tertiary">
-                      Current: {formatPercent(selectedUser.signal_pct ?? 0)}
-                    </p>
-                  </div>
-
-                  <div
-                    className="rounded-xl border px-4 py-3"
-                    style={{
-                      borderColor: `${previewStrength.color}40`,
-                      background: `${previewStrength.color}10`,
-                    }}
-                  >
-                    <p className="text-[11px] uppercase tracking-wide text-text-tertiary">User preview</p>
-                    <p className="mt-1 text-2xl font-bold" style={{ color: previewStrength.color }}>
-                      {Math.round(parseFloat(targetPct) || 0)}%{" "}
-                      <span className="text-lg">{previewStrength.label}</span>
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="mb-2 flex items-center justify-between">
-                      <label className="text-sm font-medium text-text-primary" htmlFor="signal-slider">
-                        Signal %
-                      </label>
-                      <span className="text-sm font-bold text-text-primary">{targetPct}%</span>
-                    </div>
-                    <input
-                      id="signal-slider"
-                      type="range"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={Math.min(100, Math.max(0, parseFloat(targetPct) || 0))}
-                      onChange={(e) => setTargetPct(e.target.value)}
-                      className="w-full accent-brand"
-                    />
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {QUICK_PCTS.map((pct) => (
-                        <button
-                          key={pct}
-                          type="button"
-                          onClick={() => setTargetPct(String(pct))}
-                          className={cn(
-                            "rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors",
-                            String(pct) === targetPct
-                              ? "border-brand bg-brand/10 text-text-primary"
-                              : "border-border text-text-tertiary hover:bg-bg-hover"
-                          )}
-                        >
-                          {pct}%
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Input
-                    label="Note (optional)"
-                    value={pctNote}
-                    onChange={(e) => setPctNote(e.target.value)}
-                    placeholder="Reason for this allocation"
-                  />
-
-                  <Button className="w-full" disabled={busy} onClick={saveUserPct}>
-                    {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save allocation"}
-                  </Button>
-                </div>
-              )}
-            </Card>
-          </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="number"
+                                min={0}
+                                max={100}
+                                step={1}
+                                value={draft}
+                                onChange={(e) => setDraftForUser(u.id, e.target.value)}
+                                className="h-9 w-20 rounded-lg border border-border bg-bg-primary px-2 text-sm font-mono outline-none focus:border-brand"
+                              />
+                              <span
+                                className="hidden sm:inline text-xs font-medium"
+                                style={{ color: draftStrength.color }}
+                              >
+                                {draftStrength.label}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex flex-wrap gap-1">
+                              {QUICK_PCTS.map((pct) => (
+                                <button
+                                  key={pct}
+                                  type="button"
+                                  onClick={() => setDraftForUser(u.id, String(pct))}
+                                  className={cn(
+                                    "rounded border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+                                    draft === String(pct)
+                                      ? "border-brand bg-brand/10 text-text-primary"
+                                      : "border-border text-text-tertiary hover:bg-bg-hover"
+                                  )}
+                                >
+                                  {pct}%
+                                </button>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button
+                              size="sm"
+                              variant={isDirty ? "brand" : "outline"}
+                              disabled={saving || busy}
+                              onClick={() => void saveUserPct(u)}
+                            >
+                              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
         </div>
       )}
 
@@ -544,43 +491,53 @@ export default function AdminSignalsPage() {
             </Button>
           </Card>
 
-          {selectedUser && (
-            <Card className="p-4 sm:p-5">
-              <h2 className="text-sm font-semibold text-text-primary">Grant package access</h2>
-              <p className="mt-1 text-xs text-text-tertiary">
-                Free desk tier for{" "}
-                <strong className="text-text-secondary">{selectedUser.email}</strong> (select user on Allocation tab).
-              </p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <label className="block text-xs text-text-tertiary">
-                  Tier
-                  <select
-                    className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
-                    value={grantTier}
-                    onChange={(e) => setGrantTier(e.target.value)}
-                  >
-                    {SIGNAL_PLANS.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <Input
-                  label="Days"
-                  type="number"
-                  min={1}
-                  value={grantDays}
-                  onChange={(e) => setGrantDays(e.target.value)}
-                />
-                <div className="flex items-end">
-                  <Button className="w-full" variant="outline" disabled={busy} onClick={grantPackage}>
-                    Grant access
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          )}
+          <Card className="p-4 sm:p-5">
+            <h2 className="text-sm font-semibold text-text-primary">Grant package access</h2>
+            <p className="mt-1 text-xs text-text-tertiary">
+              Give a user free desk tier access for a limited time.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="block text-xs text-text-tertiary sm:col-span-2">
+                User
+                <select
+                  className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
+                  value={grantUserId}
+                  onChange={(e) => setGrantUserId(e.target.value)}
+                >
+                  <option value="">Select user…</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.full_name ? `${u.full_name} (${u.email})` : u.email}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-xs text-text-tertiary">
+                Tier
+                <select
+                  className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
+                  value={grantTier}
+                  onChange={(e) => setGrantTier(e.target.value)}
+                >
+                  {SIGNAL_PLANS.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Input
+                label="Days"
+                type="number"
+                min={1}
+                value={grantDays}
+                onChange={(e) => setGrantDays(e.target.value)}
+              />
+            </div>
+            <Button className="mt-4" variant="outline" disabled={busy || !grantUserId} onClick={grantPackage}>
+              Grant access
+            </Button>
+          </Card>
 
           <Card className="overflow-hidden p-0">
             <div className="border-b border-border px-4 py-3">
