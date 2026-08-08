@@ -8,7 +8,7 @@ import {
   subscribeToTrader,
 } from "@/lib/api/subscriptions";
 import type { CopySubscriptionRow } from "@/lib/supabase/types";
-import { COPY_TRADERS } from "@/lib/copy-traders";
+import { COPY_TRADER_SECTIONS, COPY_TRADERS } from "@/lib/copy-traders";
 import { CopyTraderCard } from "@/components/dashboard/copy-trading/CopyTraderCard";
 import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
@@ -62,7 +62,7 @@ export default function CopyTradingPage() {
   );
 
   return (
-    <div className="decko-dashboard mx-auto max-w-[1320px] space-y-5 pb-8">
+    <div className="decko-dashboard mx-auto max-w-[1320px] space-y-8 pb-8">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Copy Trading</h1>
         <p className="mt-1 max-w-2xl text-sm text-text-secondary">
@@ -110,19 +110,33 @@ export default function CopyTradingPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {COPY_TRADERS.map((trader, index) => (
-          <CopyTraderCard
-            key={trader.name}
-            trader={trader}
-            index={index}
-            isActive={activeTraders.has(trader.name)}
-            userId={userId}
-            loading={loadingTrader === trader.name}
-            onCopy={() => handleCopy(trader.name)}
-          />
-        ))}
-      </div>
+      {COPY_TRADER_SECTIONS.map((section, sectionIndex) => (
+        <section key={section.id} className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-text-primary">{section.title}</h2>
+              <p className="mt-0.5 max-w-2xl text-sm text-text-tertiary">{section.subtitle}</p>
+            </div>
+            <p className="text-xs text-text-tertiary shrink-0">
+              {section.traders.length} trader{section.traders.length === 1 ? "" : "s"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {section.traders.map((trader, index) => (
+              <CopyTraderCard
+                key={trader.name}
+                trader={trader}
+                index={sectionIndex * 6 + index}
+                isActive={activeTraders.has(trader.name)}
+                userId={userId}
+                loading={loadingTrader === trader.name}
+                onCopy={() => handleCopy(trader.name)}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }
