@@ -39,6 +39,7 @@ export async function submitDeposit(
     amount: number;
     method: string;
     notes?: string;
+    relatedFeeId?: string;
   }
 ): Promise<DepositRow> {
   const { data, error } = await supabase
@@ -50,6 +51,7 @@ export async function submitDeposit(
       method: params.method,
       status: "pending",
       notes: params.notes ?? null,
+      related_fee_id: params.relatedFeeId ?? null,
     })
     .select("id, user_id, amount, currency, method, status, notes, created_at")
     .single();

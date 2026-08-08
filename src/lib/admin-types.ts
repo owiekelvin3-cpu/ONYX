@@ -17,11 +17,26 @@ export interface Profile {
 export type AdminModerationUiAction = "suspend" | "unsuspend" | "reset_kyc" | "note";
 export type AdminBalanceDirection = "credit" | "debit";
 
+export interface AdminUserFee {
+  id: string;
+  fee_type: string;
+  label: string;
+  amount: number;
+  currency: string;
+  status: string;
+  notes: string | null;
+  assigned_by: string | null;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AdminUserDetails {
   profile: Profile;
   balance: number;
   profit_total?: number;
   outstanding_fees_total: number;
+  fees?: AdminUserFee[];
   stats: {
     deposits_count: number;
     deposits_total: number;

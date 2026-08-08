@@ -182,6 +182,38 @@ export async function bulkAdjustAdminSignalPct(params: { delta: number; note?: s
   return data as { users_updated?: number; delta?: number };
 }
 
+export async function assignAdminUserFee(params: {
+  userId: string;
+  feeType: string;
+  label: string;
+  amount: number;
+  notes?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_assign_user_fee", {
+    p_user_id: params.userId,
+    p_fee_type: params.feeType,
+    p_label: params.label.trim(),
+    p_amount: params.amount,
+    p_notes: params.notes?.trim() || null,
+  });
+  if (error) throw new Error(rpcError(error, "Could not assign withdrawal fee."));
+  return data as { id?: string; amount?: number; label?: string };
+}
+
+export async function updateAdminUserFeeStatus(params: {
+  feeId: string;
+  status: "paid" | "waived" | "cancelled";
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_update_user_fee_status", {
+    p_fee_id: params.feeId,
+    p_status: params.status,
+  });
+  if (error) throw new Error(rpcError(error, "Could not update fee status."));
+  return data as { id?: string; status?: string };
+}
+
 export async function grantAdminUserSignal(params: {
   userId: string;
   packageId: string;

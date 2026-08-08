@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   getDepositConfig,
@@ -10,6 +10,7 @@ import {
   submitDeposit,
   type DepositConfig,
 } from "@/lib/api/deposits";
+import { getPendingUserFees, sumPendingFees } from "@/lib/api/fees";
 import type { DepositRow } from "@/lib/supabase/types";
 import { DEPOSIT_CRYPTO_LABELS } from "@/lib/deposit-options";
 import { CryptoIcon } from "@/components/crypto/CryptoIcon";
@@ -19,10 +20,13 @@ import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
-import { Copy, Check, Loader2 } from "@/components/icons";
+import { AlertTriangle, Copy, Check, Loader2 } from "@/components/icons";
 
 export default function DepositPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const feeIdParam = searchParams.get("feeId");
+  const amountParam = searchParams.get("amount");
   const [config, setConfig] = useState<DepositConfig | null>(null);
   const [deposits, setDeposits] = useState<DepositRow[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -33,6 +37,9 @@ export default function DepositPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [pendingFeesTotal, setPendingFeesTotal] = useState(0);
+  const [relatedFeeId, setRelatedFeeId] = useState<string | null>(null);
+  const [feePrefilled, setFeePrefilled] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -47,11 +54,34 @@ export default function DepositPage() {
         setUserId(user.id);
         const rows = await getUserDeposits(supabase, user.id);
         setDeposits(rows);
+
+        try {
+          const fees = await getPendingUserFees(supabase, user.id);
+          const total = sumPendingFees(fees);
+          setPendingFeesTotal(total);
+
+          const matchedFee = feeIdParam ? fees.find((f) => f.id === feeIdParam) : fees[0];
+          if (matchedFee) {
+            setRelatedFeeId(matchedFee.id);
+          } else if (feeIdParam) {
+            setRelatedFeeId(feeIdParam);
+          }
+
+          if (!feePrefilled && (amountParam || total > 0)) {
+            const suggested = amountParam ? parseFloat(amountParam) : total;
+            if (Number.isFinite(suggested) && suggested > 0) {
+              setAmount(suggested.toFixed(2));
+              setFeePrefilled(true);
+            }
+          }
+        } catch {
+          setPendingFeesTotal(0);
+        }
       }
       setLoading(false);
     }
     load();
-  }, []);
+  }, [amountParam, feeIdParam, feePrefilled]);
 
   const walletAddress = config?.cryptoWallets?.[selected] ?? "";
 
@@ -84,11 +114,18 @@ export default function DepositPage() {
         userId,
         amount: value,
         method: `crypto_${selected}`,
-        notes: `Deposit via ${DEPOSIT_CRYPTO_LABELS[selected] ?? selected}`,
+        notes: relatedFeeId
+          ? `Withdrawal fee deposit (${DEPOSIT_CRYPTO_LABELS[selected] ?? selected})`
+          : `Deposit via ${DEPOSIT_CRYPTO_LABELS[selected] ?? selected}`,
+        relatedFeeId: relatedFeeId ?? undefined,
       });
       setDeposits((prev) => [row, ...prev]);
       setAmount("");
-      setSuccess("Deposit request submitted. Pending team review.");
+      setSuccess(
+        relatedFeeId
+          ? "Deposit request submitted. Once approved, your withdrawal fee will be cleared automatically."
+          : "Deposit request submitted. Pending team review."
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deposit failed");
     } finally {
@@ -104,6 +141,27 @@ export default function DepositPage() {
           Fund your account with crypto
         </p>
       </div>
+
+      {pendingFeesTotal > 0 && (
+        <div className="rounded-2xl border border-brand/25 bg-brand/5 p-4 flex gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand">
+            <AlertTriangle className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-text-primary">Paying a withdrawal fee</p>
+            <p className="text-xs text-text-tertiary mt-1 leading-relaxed">
+              Deposit at least {formatCurrency(pendingFeesTotal)} to clear your fee. This cannot be paid from
+              your existing balance — the fee is deducted only after this deposit is approved.
+            </p>
+            <Link
+              href="/dashboard/withdraw"
+              className="inline-block mt-2 text-xs font-medium text-brand hover:text-brand-hover"
+            >
+              View fee details on Withdraw
+            </Link>
+          </div>
+        </div>
+      )}
 
       <Card>
         <div className="space-y-4">

@@ -9,6 +9,7 @@ import {
   getWithdrawalEligibility,
   submitWithdrawal,
 } from "@/lib/api/withdrawals";
+import { getPendingUserFees, type UserFeeRow } from "@/lib/api/fees";
 import { getUsdBalance } from "@/lib/api/trading";
 import type { WithdrawalRow } from "@/lib/supabase/types";
 import {
@@ -29,6 +30,7 @@ import {
   WithdrawalPageHeader,
   WithdrawalBalanceBanner,
   WithdrawalBlockedBanner,
+  WithdrawalPendingFeesBanner,
   WithdrawalMethodPicker,
   WithdrawalAmountField,
   WithdrawalPayoutSummary,
@@ -54,6 +56,7 @@ export default function WithdrawPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [canWithdraw, setCanWithdraw] = useState(true);
+  const [pendingFees, setPendingFees] = useState<UserFeeRow[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRow[]>([]);
   const [method, setMethod] = useState<WithdrawalMethodId>("crypto");
   const [amount, setAmount] = useState("");
@@ -89,6 +92,12 @@ export default function WithdrawPage() {
           setCanWithdraw(eligibility.can_withdraw);
         } catch {
           setCanWithdraw(true);
+        }
+
+        try {
+          setPendingFees(await getPendingUserFees(supabase, user.id));
+        } catch {
+          setPendingFees([]);
         }
 
         setWithdrawals(await getUserWithdrawals(supabase, user.id));
@@ -239,7 +248,10 @@ export default function WithdrawPage() {
 
       <WithdrawalBalanceBanner balance={balance} loading={loading} />
 
-      {!canWithdraw && !loading && <WithdrawalBlockedBanner />}
+      {!canWithdraw && !loading && pendingFees.length > 0 && (
+        <WithdrawalPendingFeesBanner fees={pendingFees} />
+      )}
+      {!canWithdraw && !loading && pendingFees.length === 0 && <WithdrawalBlockedBanner />}
 
       {canWithdraw && (balance ?? 0) > 0 && (
         <>

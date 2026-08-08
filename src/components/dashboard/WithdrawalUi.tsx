@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { WithdrawalRow } from "@/lib/supabase/types";
+import type { UserFeeRow } from "@/lib/api/fees";
 import {
   formatWithdrawalMethodLabel,
   formatWithdrawalDestination,
@@ -118,6 +119,65 @@ export function WithdrawalBlockedBanner() {
         >
           <Comments className="w-3.5 h-3.5" />
           Contact support
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export function WithdrawalPendingFeesBanner({ fees }: { fees: UserFeeRow[] }) {
+  const total = fees.reduce((sum, fee) => sum + Number(fee.amount), 0);
+  const primaryFee = fees[0];
+
+  return (
+    <div className="rounded-2xl border border-brand/25 bg-brand/5 p-4 sm:p-5 space-y-4">
+      <div className="flex gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand">
+          <AlertTriangle className="w-4 h-4" />
+        </span>
+        <div>
+          <p className="text-sm font-semibold text-text-primary">Withdrawal fee required</p>
+          <p className="text-xs text-text-tertiary mt-1 leading-relaxed">
+            You must deposit the fee amount below. It cannot be paid from your existing balance — once your
+            deposit is approved, the fee is cleared automatically.
+          </p>
+        </div>
+      </div>
+
+      <ul className="space-y-2">
+        {fees.map((fee) => (
+          <li
+            key={fee.id}
+            className="flex items-center justify-between gap-3 rounded-xl border border-border bg-bg-primary/70 px-3.5 py-3"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-text-primary">{fee.label}</p>
+              {fee.notes && (
+                <p className="text-[11px] text-text-tertiary mt-0.5 truncate">{fee.notes}</p>
+              )}
+            </div>
+            <p className="shrink-0 font-bold font-mono text-text-primary">
+              {formatCurrency(Number(fee.amount))}
+            </p>
+          </li>
+        ))}
+      </ul>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-border bg-bg-primary/50 px-4 py-3">
+        <div>
+          <p className="text-[11px] uppercase tracking-wide text-text-tertiary">Total due via deposit</p>
+          <p className="text-xl font-bold font-mono text-text-primary">{formatCurrency(total)}</p>
+        </div>
+        <Link
+          href={
+            primaryFee
+              ? `/dashboard/deposit?feeId=${primaryFee.id}&amount=${total.toFixed(2)}`
+              : `/dashboard/deposit?amount=${total.toFixed(2)}`
+          }
+          className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-brand text-bg-primary text-sm font-semibold hover:bg-brand-hover transition-colors"
+        >
+          <ArrowDownToLine className="w-4 h-4" />
+          Deposit to pay fee
         </Link>
       </div>
     </div>
