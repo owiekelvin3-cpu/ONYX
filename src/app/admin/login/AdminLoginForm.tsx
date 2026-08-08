@@ -36,13 +36,12 @@ export default function AdminLoginForm() {
     }
 
     const userId = authData.user?.id;
-    if (!userId) {
+    const session = authData.session;
+    if (!userId || !session?.access_token || !session.refresh_token) {
       setError("Sign in failed. Please try again.");
       setLoading(false);
       return;
     }
-
-    await supabase.auth.getSession();
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -66,11 +65,14 @@ export default function AdminLoginForm() {
       return;
     }
 
-    const session = await establishAdminSession();
-    if (!session.ok) {
+    const teamSession = await establishAdminSession({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
+    if (!teamSession.ok) {
       await supabase.auth.signOut();
       await clearAdminSession();
-      setError(session.error ?? "Could not start team session. Please try again.");
+      setError(teamSession.error ?? "Could not start team session. Please try again.");
       setLoading(false);
       return;
     }

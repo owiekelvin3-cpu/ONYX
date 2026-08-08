@@ -30,11 +30,16 @@ export function hasAdminAuthCookie(): boolean {
   return document.cookie.split("; ").some((part) => part === `${ADMIN_AUTH_COOKIE}=1`);
 }
 
-export async function establishAdminSession(): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function establishAdminSession(tokens?: {
+  access_token: string;
+  refresh_token: string;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
     const res = await fetch("/api/admin/session", {
       method: "POST",
       credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(tokens ?? {}),
     });
 
     if (!res.ok) {
