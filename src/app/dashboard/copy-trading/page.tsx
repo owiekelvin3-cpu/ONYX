@@ -12,9 +12,15 @@ import { COPY_TRADER_SECTIONS, COPY_TRADERS } from "@/lib/copy-traders";
 import { CopyTraderCard } from "@/components/dashboard/copy-trading/CopyTraderCard";
 import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
-import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { ChevronLeft, ChevronRight } from "@/components/icons";
+import { formatCurrency, cn } from "@/lib/utils";
 
 const DEFAULT_ALLOCATION = 1000;
+
+function scrollToPageTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
 export default function CopyTradingPage() {
   const router = useRouter();
@@ -22,6 +28,12 @@ export default function CopyTradingPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingTrader, setLoadingTrader] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [sectionIndex, setSectionIndex] = useState(0);
+
+  const section = COPY_TRADER_SECTIONS[sectionIndex];
+  const sectionCount = COPY_TRADER_SECTIONS.length;
+  const hasPrev = sectionIndex > 0;
+  const hasNext = sectionIndex < sectionCount - 1;
 
   useEffect(() => {
     const supabase = createClient();
@@ -32,6 +44,11 @@ export default function CopyTradingPage() {
       setSubscriptions(rows);
     });
   }, []);
+
+  function goToSection(index: number) {
+    setSectionIndex(index);
+    scrollToPageTop();
+  }
 
   async function handleCopy(traderName: string) {
     setError("");
@@ -110,33 +127,110 @@ export default function CopyTradingPage() {
         </Card>
       )}
 
-      {COPY_TRADER_SECTIONS.map((section, sectionIndex) => (
-        <section key={section.id} className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-text-primary">{section.title}</h2>
-              <p className="mt-0.5 max-w-2xl text-sm text-text-tertiary">{section.subtitle}</p>
-            </div>
-            <p className="text-xs text-text-tertiary shrink-0">
-              {section.traders.length} trader{section.traders.length === 1 ? "" : "s"}
+      <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {COPY_TRADER_SECTIONS.map((s, index) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => goToSection(index)}
+            className={cn(
+              "shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition-colors",
+              index === sectionIndex
+                ? "border-accent bg-accent/15 text-accent"
+                : "border-border bg-bg-secondary text-text-secondary hover:border-accent/40 hover:text-text-primary"
+            )}
+          >
+            {s.title}
+          </button>
+        ))}
+      </div>
+
+      <section className="space-y-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-accent">
+              Section {sectionIndex + 1} of {sectionCount}
+            </p>
+            <h2 className="text-lg font-bold text-text-primary">{section.title}</h2>
+            <p className="mt-0.5 max-w-2xl text-sm text-text-tertiary">{section.subtitle}</p>
+          </div>
+          <p className="shrink-0 text-xs text-text-tertiary">
+            {section.traders.length} trader{section.traders.length === 1 ? "" : "s"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {section.traders.map((trader, index) => (
+            <CopyTraderCard
+              key={trader.name}
+              trader={trader}
+              index={sectionIndex * 6 + index}
+              isActive={activeTraders.has(trader.name)}
+              userId={userId}
+              loading={loadingTrader === trader.name}
+              onCopy={() => handleCopy(trader.name)}
+            />
+          ))}
+        </div>
+
+        <Card className="space-y-4 p-4 sm:p-5">
+          <div>
+            <p className="text-sm font-semibold text-text-primary">Browse other sections</p>
+            <p className="mt-0.5 text-xs text-text-tertiary">
+              Jump to another category or use previous / next below.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {section.traders.map((trader, index) => (
-              <CopyTraderCard
-                key={trader.name}
-                trader={trader}
-                index={sectionIndex * 6 + index}
-                isActive={activeTraders.has(trader.name)}
-                userId={userId}
-                loading={loadingTrader === trader.name}
-                onCopy={() => handleCopy(trader.name)}
-              />
+          <div className="flex flex-wrap gap-2">
+            {COPY_TRADER_SECTIONS.map((s, index) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => goToSection(index)}
+                disabled={index === sectionIndex}
+                className={cn(
+                  "rounded-lg border px-3 py-2 text-left text-xs font-medium transition-colors",
+                  index === sectionIndex
+                    ? "cursor-default border-accent/50 bg-accent/10 text-accent"
+                    : "border-border bg-bg-secondary text-text-secondary hover:border-accent/40 hover:text-text-primary"
+                )}
+              >
+                {s.title}
+              </button>
             ))}
           </div>
-        </section>
-      ))}
+
+          <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={!hasPrev}
+              onClick={() => goToSection(sectionIndex - 1)}
+              className="gap-1.5"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {hasPrev ? COPY_TRADER_SECTIONS[sectionIndex - 1].title : "Previous"}
+            </Button>
+
+            <p className="text-center text-xs text-text-tertiary">
+              {sectionIndex + 1} / {sectionCount}
+            </p>
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={!hasNext}
+              onClick={() => goToSection(sectionIndex + 1)}
+              className="gap-1.5 sm:ml-auto"
+            >
+              {hasNext ? COPY_TRADER_SECTIONS[sectionIndex + 1].title : "Next"}
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      </section>
     </div>
   );
 }
