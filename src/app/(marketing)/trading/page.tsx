@@ -16,23 +16,23 @@ export default function TradingPage() {
       ctaHref="/dashboard/deposit"
       ctaLabel="Fund account"
     >
-      <section className="py-12 sm:py-16 border-b border-border">
-        <div className="container-app">
-          <h2 className="text-[18px] font-bold text-text-primary mb-6">Trade directly on ONYX</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {PRODUCTS.map((product) => (
-              <Link
-                key={product.title}
-                href={product.href}
-                className="rounded-lg border border-border bg-bg-secondary p-5 hover:border-brand/40 transition-colors"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-brand">Featured</p>
-                <h3 className="mt-2 text-[15px] font-semibold text-text-primary">{product.title}</h3>
-                <p className="mt-2 text-[13px] text-text-tertiary leading-relaxed">{product.desc}</p>
-                <span className="inline-block mt-4 text-[13px] font-medium text-brand">{product.cta} →</span>
-              </Link>
-            ))}
-          </div>
+      <section className="fin-page-plain py-8 sm:py-12">
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-text-primary sm:text-xl">Trade directly on Onyx Exchange</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {PRODUCTS.map((product) => (
+            <Link
+              key={product.title}
+              href={product.href}
+              className="rounded-xl border border-border bg-bg-secondary p-5 transition-colors hover:border-brand/40"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-brand">Featured</p>
+              <h3 className="mt-2 text-base font-semibold text-text-primary">{product.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-text-tertiary">{product.desc}</p>
+              <span className="mt-4 inline-block text-sm font-medium text-brand">{product.cta} →</span>
+            </Link>
+          ))}
         </div>
       </section>
       <SecuritySection />

@@ -11,7 +11,7 @@ export function SecuritySection() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="py-16 sm:py-24 landing-section-dark relative overflow-hidden">
+    <section className="fin-page-plain py-16 sm:py-24 landing-section-dark relative overflow-hidden">
       <div className="container-app">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <FadeUp>

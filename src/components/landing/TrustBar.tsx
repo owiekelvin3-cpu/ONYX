@@ -8,7 +8,7 @@ const ICONS = [Shield, Receipt, Layers, Clock] as const;
 
 export function TrustBar() {
   return (
-    <section className="bg-bg-secondary border-y border-border">
+    <section className="fin-page-plain bg-bg-secondary border-y border-border">
       <div className="container-app py-8 sm:py-10">
         <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-x-8 sm:gap-y-6">
           {PLATFORM_HIGHLIGHTS.map((item, i) => {

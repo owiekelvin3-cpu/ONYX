@@ -12,17 +12,19 @@ export function useFinCountUp(
 ) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-  const [value, setValue] = useState(reduce ? target : 0);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [value, setValue] = useState(target);
 
   useEffect(() => {
-    if (!inView) return;
-    if (reduce) {
+    if (reduce || !inView) {
       setValue(target);
       return;
     }
+
     const start = performance.now();
     let frame = 0;
+    setValue(0);
+
     const tick = (now: number) => {
       const p = Math.min((now - start) / (duration * 1000), 1);
       const eased = 1 - Math.pow(1 - p, 3);

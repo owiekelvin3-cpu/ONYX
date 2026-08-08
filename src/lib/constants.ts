@@ -129,7 +129,7 @@ export const TESTIMONIALS = [
   {
     quote: "Our team moved $40M in monthly volume here. Support and compliance are world-class.",
     name: "Elena Rodriguez",
-    role: "Head of Trading, Meridian Fund",
+    role: "Head of Trading, Nova Capital Partners",
   },
 ] as const;
 

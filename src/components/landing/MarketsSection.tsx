@@ -53,7 +53,7 @@ export function MarketsSection({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] 
   const displayed = sorted.slice(0, 10);
 
   return (
-    <section id="markets" className="bg-bg-primary py-12 sm:py-16 lg:py-20">
+    <section id="markets" className="fin-page-plain bg-bg-primary py-12 sm:py-16 lg:py-20">
       <div className="container-app">
         <FadeUp className="flex flex-col xs:flex-row xs:items-end xs:justify-between gap-3 mb-5 sm:mb-6">
           <div>

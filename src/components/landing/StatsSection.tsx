@@ -56,7 +56,7 @@ function AnimatedStat({
 
 export function StatsSection() {
   return (
-    <section className="relative border-y border-border bg-bg-secondary/50 py-12 sm:py-16 overflow-hidden">
+    <section className="fin-page-plain relative border-y border-border bg-bg-secondary/50 py-12 sm:py-16 overflow-hidden">
       <div className="pointer-events-none absolute inset-0 landing-shimmer opacity-50" aria-hidden />
       <div className="container-app relative">
         <FadeUp>

@@ -9,7 +9,7 @@ export function FeaturesSection() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="py-16 sm:py-24 lg:py-28 bg-bg-primary relative overflow-hidden">
+    <section className="fin-page-plain py-16 sm:py-24 lg:py-28 bg-bg-primary relative overflow-hidden">
       <div
         className="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-30"
         style={{

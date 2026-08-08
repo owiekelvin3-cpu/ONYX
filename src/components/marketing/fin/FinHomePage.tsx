@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import type { MarketPair } from "@/lib/market-data";
 import { FIN_CHART_COLORS } from "@/lib/theme";
 import { formatCompact, formatNumber, formatPercent } from "@/lib/utils";
+import { useLiveMarketPairs } from "@/hooks/useLiveMarketPairs";
 import {
   FinBar,
   FinColorBars,
@@ -16,56 +17,18 @@ import {
   FinScrollStagger,
   FinStagger,
   FinStaggerItem,
-  useFinCountUp,
 } from "@/components/marketing/fin/fin-motion";
 import { FinPageActions } from "@/components/marketing/fin/FinMarketingShell";
 import {
-  FinBrokerStats,
   FinCtaBanner,
   FinFeaturesGrid,
   FinHero,
-  FinHowItWorks,
   FinLiveTicker,
   FinProductsGrid,
   FinSecurityBlock,
-  FinTestimonials,
 } from "@/components/marketing/fin/FinBrokerSections";
 
 const MONTHS = ["Sep", "Oct", "Nov", "Dec", "Jan", "Feb"];
-
-function MetricCard({
-  label,
-  value,
-  suffix = "%",
-  delay = 0,
-}: {
-  label: string;
-  value: number;
-  suffix?: string;
-  delay?: number;
-}) {
-  const animated = useFinCountUp(value, { duration: 1.2 + delay * 0.1 });
-  return (
-    <FinStaggerItem variant="scale">
-      <FinHoverLift className="fin-card p-5 sm:p-6">
-        <p className="text-sm text-text-secondary">{label}</p>
-        <p className="mt-3 text-3xl font-bold text-text-primary">
-          <span ref={animated.ref}>{animated.text}</span>
-          {suffix}
-        </p>
-        <motion.span
-          className="fin-badge mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 + delay, type: "spring", stiffness: 400, damping: 20 }}
-        >
-          Live
-        </motion.span>
-      </FinHoverLift>
-    </FinStaggerItem>
-  );
-}
 
 function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
   const [hoverMonth, setHoverMonth] = useState<number | null>(3);
@@ -91,7 +54,7 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
   return (
     <section className="mt-4">
       <FinScrollStagger>
-        <div className="mb-4 flex items-end justify-between gap-4 px-1">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4 px-1">
           <div>
             <FinReveal delay={0}>
               <p className="fin-section-label flex items-center gap-2">
@@ -119,23 +82,20 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
           </FinReveal>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_320px]">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <FinStaggerItem variant="scale">
-            <FinHoverLift className="fin-panel fin-card overflow-hidden p-5 sm:p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-text-primary">Volume overview</h3>
-                <motion.select
-                  whileHover={{ scale: 1.02 }}
-                  className="rounded-xl border border-border bg-bg-secondary px-3 py-1.5 text-sm text-text-primary"
-                >
-                  <option>Month</option>
-                </motion.select>
+            <FinHoverLift className="fin-panel fin-card overflow-hidden p-4 sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-text-primary sm:text-lg">Volume overview</h3>
+                <span className="rounded-xl border border-border bg-bg-secondary px-3 py-1.5 text-xs text-text-secondary">
+                  Last 6 months
+                </span>
               </div>
-              <div className="relative flex h-[260px] items-end gap-2 sm:gap-3">
+              <div className="relative flex h-[200px] items-end gap-1.5 sm:h-[240px] sm:gap-2">
                 {bars.map((bar, i) => (
                   <motion.div
                     key={bar.label}
-                    className="flex h-full flex-1 flex-col items-center justify-end gap-2"
+                    className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"
                     initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -144,13 +104,13 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
                     <FinBar
                       height={Math.min(92, bar.height)}
                       delay={0.06 * i}
-                      className="w-full max-w-[36px] rounded-t-2xl bg-bg-secondary shadow-sm"
+                      className="w-full max-w-[40px] rounded-t-2xl bg-bg-secondary shadow-sm"
                     />
                     <motion.button
                       type="button"
                       onMouseEnter={() => setHoverMonth(i)}
-                      whileHover={{ scale: 1.1, color: "var(--text-primary)" }}
-                      className="text-[11px] text-text-tertiary"
+                      onFocus={() => setHoverMonth(i)}
+                      className="text-[10px] text-text-tertiary sm:text-[11px]"
                     >
                       {bar.label}
                     </motion.button>
@@ -161,56 +121,52 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
                     key={hoverMonth}
                     initial={{ opacity: 0, scale: 0.85, y: 6 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.85 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 26 }}
-                    className="fin-badge absolute left-[42%] top-6 rounded-full px-3 py-1 text-xs font-bold shadow-md"
+                    className="fin-badge absolute left-1/2 top-4 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold shadow-md sm:left-[42%] sm:translate-x-0"
                   >
-                    +{formatCompact((pairs[hoverMonth]?.price ?? 50000) / 100)}k
+                    +{formatCompact((pairs[hoverMonth]?.price ?? 50000) / 100)}k vol
                   </motion.span>
                 )}
               </div>
             </FinHoverLift>
           </FinStaggerItem>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            <MetricCard label="Execution uptime" value={99} delay={0} />
-            <MetricCard label="Fee transparency" value={100} delay={0.05} />
-          </div>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <FinStaggerItem variant="scale">
-            <FinHoverLift className="fin-card p-5 sm:p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-text-primary">Top movers</h3>
-                <Link href="/markets" className="text-sm font-medium text-text-tertiary hover:text-text-primary">
+            <FinHoverLift className="fin-card p-4 sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-text-primary sm:text-lg">Top movers</h3>
+                <Link href="/markets" className="text-xs font-medium text-text-tertiary hover:text-text-primary sm:text-sm">
                   View all
                 </Link>
               </div>
               <FinProgressSegments segments={trafficSegments} />
-              <FinScrollStagger className="mt-5 space-y-3">
+              <FinScrollStagger className="mt-5 space-y-2 sm:space-y-3">
                 {featured.map((pair, i) => (
                   <FinStaggerItem key={pair.symbol} variant="slide">
                     <motion.div
                       whileHover={{ x: 4, scale: 1.01 }}
-                      className="flex items-center justify-between rounded-2xl border border-border bg-bg-primary px-4 py-3"
+                      className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-primary px-3 py-2.5 sm:px-4 sm:py-3"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                         <motion.span
-                          className="h-2.5 w-2.5 rounded-full"
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
                           style={{ backgroundColor: FIN_CHART_COLORS[i % FIN_CHART_COLORS.length] }}
                           animate={{ scale: [1, 1.2, 1] }}
                           transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
                         />
-                        <div>
-                          <p className="font-semibold text-text-primary">{pair.symbol}</p>
-                          <p className="text-xs text-text-tertiary">{pair.name}</p>
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold text-text-primary">{pair.symbol}</p>
+                          <p className="truncate text-[11px] text-text-tertiary">{pair.name}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-mono text-sm font-semibold text-text-primary">
+                      <div className="shrink-0 text-right">
+                        <motion.p
+                          key={pair.price}
+                          initial={{ opacity: 0.6 }}
+                          animate={{ opacity: 1 }}
+                          className="font-mono text-sm font-semibold tabular-nums text-text-primary"
+                        >
                           ${formatNumber(pair.price, pair.price < 10 ? 4 : 2)}
-                        </p>
+                        </motion.p>
                         <p className={pair.change24h >= 0 ? "text-xs text-green" : "text-xs text-red"}>
                           {formatPercent(pair.change24h)}
                         </p>
@@ -221,80 +177,28 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
               </FinScrollStagger>
             </FinHoverLift>
           </FinStaggerItem>
-
-          <FinStaggerItem variant="scale">
-            <FinHoverLift className="fin-card p-5 sm:p-6">
-              <h3 className="text-lg font-bold text-text-primary">Trading activity</h3>
-              <div className="mt-6 flex items-end justify-between gap-2">
-                {MONTHS.map((m, i) => (
-                  <motion.div
-                    key={m}
-                    className="flex flex-col items-center gap-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.05 * i }}
-                  >
-                    <motion.div
-                      className="h-2 w-2 rounded-full bg-border-light"
-                      animate={
-                        hoverMonth === i
-                          ? { scale: 1.8, backgroundColor: "var(--brand-accent)" }
-                          : { scale: 1 }
-                      }
-                      whileHover={{ scale: 1.4, backgroundColor: "var(--brand-accent)" }}
-                      onHoverStart={() => setHoverMonth(i)}
-                    />
-                    <span className="text-[11px] text-text-tertiary">{m}</span>
-                  </motion.div>
-                ))}
-              </div>
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.35, duration: 0.5 }}
-                className="fin-badge mt-6 rounded-2xl px-4 py-3 text-sm font-semibold"
-              >
-                Peak volume season — trade with zero hidden fees on every pair.
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-4 inline-block"
-              >
-                <Link
-                  href="/dashboard/trade"
-                  className="fin-btn-primary inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-semibold"
-                >
-                  Open trade desk
-                </Link>
-              </motion.div>
-            </FinHoverLift>
-          </FinStaggerItem>
         </div>
       </FinScrollStagger>
     </section>
   );
 }
 
-export function FinHomePage({ pairs }: { pairs: MarketPair[] }) {
+export function FinHomePage({ pairs: initialPairs }: { pairs: MarketPair[] }) {
+  const pairs = useLiveMarketPairs(initialPairs);
+
   return (
     <div className="mx-auto max-w-[1200px] pb-8">
       <FinStagger className="space-y-4">
         <FinStaggerItem variant="scale">
-          <FinHero />
+          <FinHero pairs={pairs} />
         </FinStaggerItem>
         <FinLiveTicker pairs={pairs} />
       </FinStagger>
 
       <LiveMarketsDashboard pairs={pairs} />
       <FinProductsGrid />
-      <FinBrokerStats />
-      <FinHowItWorks />
       <FinFeaturesGrid />
       <FinSecurityBlock />
-      <FinTestimonials />
       <FinCtaBanner />
     </div>
   );

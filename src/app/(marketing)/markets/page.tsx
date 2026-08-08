@@ -18,7 +18,9 @@ export default async function MarketsPage() {
       ctaHref="/dashboard/trade"
       ctaLabel="Open markets"
     >
-      <MarketTicker pairs={pairs} />
+      <div className="fin-page-plain -mx-1 overflow-hidden rounded-2xl border border-border sm:mx-0">
+        <MarketTicker pairs={pairs} />
+      </div>
       <MarketsSection pairs={pairs} />
     </MarketingPageShell>
   );

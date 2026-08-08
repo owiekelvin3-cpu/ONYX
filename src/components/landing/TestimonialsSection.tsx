@@ -6,7 +6,7 @@ import { Star } from "@/components/icons";
 
 export function TestimonialsSection() {
   return (
-    <section className="py-16 sm:py-24 bg-bg-primary">
+    <section className="fin-page-plain py-16 sm:py-24 bg-bg-primary">
       <div className="container-app">
         <FadeUp className="text-center max-w-2xl mx-auto mb-12">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-brand mb-3">

@@ -439,6 +439,7 @@ body {
   .landing-hero-grid,
   .landing-terminal-float,
   .landing-chart-scan,
+  .fin-hero-chart-scan,
   .landing-step-line,
   .landing-pulse-ring,
   .marquee-track,
@@ -815,7 +816,7 @@ html.support-chat-open body {
   background: color-mix(in srgb, var(--bg-primary) 92%, transparent);
 }
 
-.fin-page-content > section {
+.fin-page-content > section:not(.fin-page-plain) {
   margin-bottom: 1rem;
   border-radius: 1.75rem;
   border: 1px solid var(--border);
@@ -824,11 +825,24 @@ html.support-chat-open body {
   overflow: hidden;
 }
 
-.fin-page-content > section .container-app,
-.fin-page-content > div > .container-app {
+.fin-page-content > section.fin-page-plain,
+.fin-page-content > div.fin-page-plain {
+  margin-bottom: 1rem;
+}
+
+.fin-page-content > section:not(.fin-page-plain) .container-app,
+.fin-page-content > div:not(.fin-page-plain) > .container-app {
   max-width: none;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .fin-page-content > section:not(.fin-page-plain) .container-app,
+  .fin-page-content > div:not(.fin-page-plain) > .container-app {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .fin-footer {
@@ -856,6 +870,50 @@ html.support-chat-open body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--brand);
+}
+
+.fin-mobile-drawer {
+  background: color-mix(in srgb, var(--bg-secondary) 94%, transparent);
+  border-left: 1px solid var(--border);
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(16px);
+}
+
+.fin-mobile-menu-btn {
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.fin-mobile-menu-btn:active {
+  transform: scale(0.96);
+}
+
+.fin-hero-terminal {
+  transform: translateZ(0);
+}
+
+.fin-hero-chart-scan {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--brand-accent) 8%, transparent) 50%,
+    transparent 100%
+  );
+  animation: fin-chart-scan 4s ease-in-out infinite;
+}
+
+@keyframes fin-chart-scan {
+  0%,
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  40%,
+  60% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(100%);
+  }
 }
 
 /* Trading terminal home showcase */

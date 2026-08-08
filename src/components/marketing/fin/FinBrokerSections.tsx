@@ -5,18 +5,14 @@ import { motion } from "framer-motion";
 import type { MarketPair } from "@/lib/market-data";
 import {
   BRAND,
-  PLATFORM_HIGHLIGHTS,
   PLATFORM_STATS,
   PREMIUM_FEATURES,
   PRODUCTS,
   SECURITY_FEATURES,
-  STEPS,
-  TESTIMONIALS,
 } from "@/lib/constants";
-import { FIN_CHART_COLORS } from "@/lib/theme";
+import { FinHeroTerminal } from "@/components/marketing/fin/FinHeroTerminal";
 import { formatNumber, formatPercent } from "@/lib/utils";
 import {
-  FinColorBars,
   FinGlow,
   FinHoverLift,
   FinPulseDot,
@@ -36,16 +32,41 @@ import {
 } from "@/components/icons";
 
 const PRODUCT_ICONS = [LineChart, TrendingUp, Copy, Bot] as const;
-const STEP_LINKS = ["/register", "/help", "/dashboard/deposit"];
 
-export function FinHero() {
+function HeroStat({
+  value,
+  suffix,
+  label,
+  decimals = 0,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  decimals?: number;
+}) {
+  const animated = useFinCountUp(value, { duration: 1.4, decimals });
   return (
-    <div className="fin-card relative overflow-hidden p-6 sm:p-8 lg:p-10">
+    <div className="rounded-xl border border-border bg-bg-primary/80 px-3 py-3 text-center sm:px-4 sm:py-4">
+      <p className="text-lg font-bold tabular-nums text-text-primary sm:text-xl">
+        <span ref={animated.ref}>{animated.text}</span>
+        {suffix}
+      </p>
+      <p className="mt-1 text-[10px] text-text-tertiary sm:text-[11px]">{label}</p>
+    </div>
+  );
+}
+
+export function FinHero({ pairs }: { pairs: MarketPair[] }) {
+  return (
+    <div className="fin-card relative overflow-hidden p-5 sm:p-8 lg:p-10">
       <FinGlow className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full" />
-      <FinStagger className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+      <FinStagger className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div>
           <FinStaggerItem>
-            <p className="fin-section-label mb-3">Licensed global broker</p>
+            <p className="fin-section-label mb-3 flex items-center gap-2">
+              <FinPulseDot />
+              Onyx Exchange · Live markets
+            </p>
           </FinStaggerItem>
           <FinStaggerItem>
             <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl lg:text-[46px] lg:leading-[1.08]">
@@ -102,17 +123,22 @@ export function FinHero() {
             </div>
           </FinStagger>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          {PLATFORM_HIGHLIGHTS.slice(0, 4).map((item) => (
-            <FinStaggerItem key={item.title} variant="scale">
-              <FinHoverLift className="rounded-2xl border border-border bg-bg-primary p-4">
-                <p className="text-xs font-semibold text-text-primary">{item.title}</p>
-                <p className="mt-1 text-[11px] leading-snug text-text-tertiary">{item.desc}</p>
-              </FinHoverLift>
-            </FinStaggerItem>
-          ))}
-        </div>
+        <FinStaggerItem variant="scale">
+          <FinHeroTerminal pairs={pairs} />
+        </FinStaggerItem>
       </FinStagger>
+
+      <div className="relative mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 lg:mt-8">
+        {PLATFORM_STATS.map((stat) => (
+          <HeroStat
+            key={stat.label}
+            value={stat.value}
+            suffix={stat.suffix}
+            label={stat.label}
+            decimals={stat.value === 99.99 ? 2 : 0}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -167,59 +193,6 @@ export function FinLiveTicker({ pairs }: { pairs: MarketPair[] }) {
   );
 }
 
-function StatCard({
-  value,
-  suffix,
-  label,
-  decimals = 0,
-}: {
-  value: number;
-  suffix: string;
-  label: string;
-  decimals?: number;
-}) {
-  const animated = useFinCountUp(value, { duration: 1.4, decimals });
-  return (
-    <FinStaggerItem variant="scale">
-      <FinHoverLift className="fin-card p-5 text-center sm:p-6">
-        <p className="text-2xl font-bold tabular-nums text-text-primary sm:text-3xl">
-          <span ref={animated.ref}>{animated.text}</span>
-          {suffix}
-        </p>
-        <p className="mt-2 text-xs text-text-tertiary sm:text-sm">{label}</p>
-      </FinHoverLift>
-    </FinStaggerItem>
-  );
-}
-
-export function FinBrokerStats() {
-  return (
-    <section className="mt-4">
-      <FinScrollStagger>
-        <FinStaggerItem>
-          <div className="mb-4 px-1">
-            <p className="fin-section-label">Platform scale</p>
-            <h2 className="mt-2 text-xl font-bold text-text-primary sm:text-2xl">
-              Trusted by millions of traders worldwide
-            </h2>
-          </div>
-        </FinStaggerItem>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {PLATFORM_STATS.map((stat) => (
-            <StatCard
-              key={stat.label}
-              value={stat.value}
-              suffix={stat.suffix}
-              label={stat.label}
-              decimals={stat.value === 99.99 ? 2 : 0}
-            />
-          ))}
-        </div>
-      </FinScrollStagger>
-    </section>
-  );
-}
-
 export function FinProductsGrid() {
   return (
     <section className="mt-4">
@@ -270,41 +243,6 @@ export function FinProductsGrid() {
   );
 }
 
-export function FinHowItWorks() {
-  return (
-    <section className="mt-4">
-      <FinScrollStagger>
-        <FinStaggerItem>
-          <div className="mb-4 px-1">
-            <p className="fin-section-label">Get started</p>
-            <h2 className="mt-2 text-xl font-bold text-text-primary sm:text-2xl">
-              From signup to first trade in minutes
-            </h2>
-          </div>
-        </FinStaggerItem>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <FinStaggerItem key={step.step} variant="scale">
-              <Link href={STEP_LINKS[i]}>
-                <FinHoverLift className="fin-card p-5 sm:p-6">
-                  <motion.span
-                    className="fin-badge inline-flex rounded-full px-3 py-1 text-xs font-bold"
-                    whileHover={{ scale: 1.06 }}
-                  >
-                    {step.step}
-                  </motion.span>
-                  <h3 className="mt-4 text-base font-bold text-text-primary">{step.title}</h3>
-                  <p className="mt-2 text-sm text-text-secondary">{step.desc}</p>
-                </FinHoverLift>
-              </Link>
-            </FinStaggerItem>
-          ))}
-        </div>
-      </FinScrollStagger>
-    </section>
-  );
-}
-
 export function FinFeaturesGrid() {
   return (
     <section className="mt-4">
@@ -317,8 +255,8 @@ export function FinFeaturesGrid() {
             </h2>
           </div>
         </FinStaggerItem>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {PREMIUM_FEATURES.map((feature) => (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {PREMIUM_FEATURES.slice(0, 4).map((feature) => (
             <FinStaggerItem key={feature.title} variant="scale">
               <FinHoverLift className="fin-card h-full p-5 sm:p-6">
                 <motion.span
@@ -391,37 +329,6 @@ export function FinSecurityBlock() {
             </FinScrollStagger>
           </div>
         </FinStaggerItem>
-      </FinScrollStagger>
-    </section>
-  );
-}
-
-export function FinTestimonials() {
-  return (
-    <section className="mt-4">
-      <FinScrollStagger>
-        <FinStaggerItem>
-          <div className="mb-4 px-1">
-            <p className="fin-section-label">Trader stories</p>
-            <h2 className="mt-2 text-xl font-bold text-text-primary sm:text-2xl">
-              Built for professionals, loved by teams
-            </h2>
-          </div>
-        </FinStaggerItem>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {TESTIMONIALS.map((item) => (
-            <FinStaggerItem key={item.name} variant="scale">
-              <FinHoverLift className="fin-card h-full p-5 sm:p-6">
-                <FinColorBars colors={FIN_CHART_COLORS.slice(0, 3)} />
-                <p className="mt-4 text-sm leading-relaxed text-text-secondary">&ldquo;{item.quote}&rdquo;</p>
-                <div className="mt-5 border-t border-border pt-4">
-                  <p className="text-sm font-semibold text-text-primary">{item.name}</p>
-                  <p className="text-xs text-text-tertiary">{item.role}</p>
-                </div>
-              </FinHoverLift>
-            </FinStaggerItem>
-          ))}
-        </div>
       </FinScrollStagger>
     </section>
   );
