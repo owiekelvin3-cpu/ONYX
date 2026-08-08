@@ -20,6 +20,7 @@ import {
   Settings,
   Shield,
   TrendingUp,
+  Users,
   Wallet,
 } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
@@ -31,6 +32,7 @@ const MAIN_MENU = [
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
+  { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
   { label: "Market Analytics", href: "/dashboard/analytics", icon: LineChart },
 ] as const;
 
