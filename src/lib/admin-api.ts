@@ -157,6 +157,48 @@ export async function fetchDepositConfig() {
   return (data?.value as { cryptoWallets?: Record<string, string> } | null) ?? null;
 }
 
+export async function setAdminUserSignalPct(params: {
+  userId: string;
+  pct: number;
+  note?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_set_user_signal_pct", {
+    p_user_id: params.userId,
+    p_pct: params.pct,
+    p_note: params.note?.trim() || null,
+  });
+  if (error) throw new Error(rpcError(error, "Could not update signal allocation."));
+  return data as { signal_pct?: number; previous_pct?: number };
+}
+
+export async function bulkAdjustAdminSignalPct(params: { delta: number; note?: string }) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_bulk_adjust_signal_pct", {
+    p_delta: params.delta,
+    p_note: params.note?.trim() || null,
+  });
+  if (error) throw new Error(rpcError(error, "Could not bulk adjust signal allocation."));
+  return data as { users_updated?: number; delta?: number };
+}
+
+export async function grantAdminUserSignal(params: {
+  userId: string;
+  packageId: string;
+  packageName: string;
+  durationDays?: number;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_grant_user_signal", {
+    p_user_id: params.userId,
+    p_package_id: params.packageId,
+    p_package_name: params.packageName,
+    p_duration_days: params.durationDays ?? 30,
+  });
+  if (error) throw new Error(rpcError(error, "Could not grant signal access."));
+  return data as { package_id?: string; expires_at?: string };
+}
+
 export async function updateDepositWallets(cryptoWallets: Record<string, string>) {
   const supabase = createClient();
   const { data: existing, error: loadError } = await supabase

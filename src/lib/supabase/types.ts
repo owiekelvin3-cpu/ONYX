@@ -126,3 +126,31 @@ export type TransactionItem = {
   destination?: string | null;
   notes?: string | null;
 };
+
+export type SignalPackageRow = {
+  id: string;
+  user_id: string;
+  package_name: string;
+  package_id?: string | null;
+  price: number;
+  status: string;
+  expires_at?: string | null;
+  admin_granted?: boolean;
+  created_at: string;
+};
+
+export type TradingSignalRow = {
+  id: string;
+  symbol: string;
+  direction: "buy" | "sell";
+  entry_price: string;
+  target_price: string;
+  stop_price: string;
+  status: string;
+  min_tier: "basic" | "pro" | "vip";
+  confidence: number;
+  outcome?: string | null;
+  notes?: string | null;
+  published_at: string;
+  closed_at?: string | null;
+};

@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Wallet,
   X,
+  Zap,
 } from "@/components/icons";
 
 const MOBILE_TABS = [
@@ -36,6 +37,7 @@ const MORE_MENU_ITEMS = [
   { href: "/dashboard/notifications", labelKey: "dashboard.notifications", icon: Bell },
   { href: "/dashboard/ai-trading", labelKey: "dashboard.aiTrading", icon: Bot },
   { href: "/dashboard/copy-trading", labelKey: "dashboard.copyTrading", icon: Copy },
+  { href: "/dashboard/signals", labelKey: "dashboard.signals", icon: Zap },
   { href: "/dashboard/support", labelKey: "dashboard.support", icon: Comments },
   { href: "/dashboard/settings", labelKey: "dashboard.settings", icon: Settings },
 ] as const;

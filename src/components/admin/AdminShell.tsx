@@ -23,6 +23,7 @@ import {
   Menu,
   X,
   Bot,
+  Zap,
 } from "@/components/icons";
 
 const ADMIN_LINKS = [
@@ -32,6 +33,7 @@ const ADMIN_LINKS = [
   { href: "/admin/deposits", label: "Deposits", icon: ArrowDownToLine },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
   { href: "/admin/ai-trading", label: "AI Trading", icon: Bot },
+  { href: "/admin/signals", label: "Signals", icon: Zap },
   { href: "/admin/support", label: "Support", icon: Comments },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];

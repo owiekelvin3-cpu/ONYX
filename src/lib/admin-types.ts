@@ -11,6 +11,7 @@ export interface Profile {
   country?: string | null;
   created_at: string;
   admin_notes?: string | null;
+  signal_pct?: number;
 }
 
 export type AdminModerationUiAction = "suspend" | "unsuspend" | "reset_kyc" | "note";
