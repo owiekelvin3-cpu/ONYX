@@ -62,11 +62,21 @@ async function main() {
     .maybeSingle();
 
   if (existing) {
+    const { error: passwordError } = await supabase.auth.admin.updateUserById(existing.id, {
+      password: ADMIN_PASSWORD,
+      email_confirm: true,
+      user_metadata: { full_name: ADMIN_NAME },
+    });
+    if (passwordError) throw passwordError;
+
     if (existing.role !== "admin") {
-      await supabase.from("profiles").update({ role: "admin", full_name: ADMIN_NAME }).eq("id", existing.id);
-      console.log("Existing user promoted to admin.");
+      await supabase
+        .from("profiles")
+        .update({ role: "admin", full_name: ADMIN_NAME, email: ADMIN_EMAIL })
+        .eq("id", existing.id);
+      console.log("Existing user promoted to admin and password reset.");
     } else {
-      console.log("Admin already exists.");
+      console.log("Admin already exists — password reset to configured value.");
     }
   } else {
     const { data: created, error } = await supabase.auth.admin.createUser({
