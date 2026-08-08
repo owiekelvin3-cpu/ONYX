@@ -161,17 +161,6 @@ export function DeckoDashboardOverview({
     return cells;
   }, [today]);
 
-  const schedule = recentTrades.slice(0, 4).map((trade) => ({
-    id: trade.id,
-    time: new Date(trade.created_at).toLocaleTimeString(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    title: `${trade.type === "buy" ? "Buy" : "Sell"} ${trade.asset}`,
-    subtitle: formatCurrency(trade.amount * trade.price, summary.currency),
-    done: trade.status === "completed",
-  }));
-
   return (
     <div className="decko-dashboard mx-auto max-w-[1320px]">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -315,50 +304,6 @@ export function DeckoDashboardOverview({
                     {day}
                   </span>
                 )
-              )}
-            </div>
-          </div>
-
-          <div className="decko-card p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-text-primary">Upcoming Schedule</h2>
-              <Link href="/dashboard/transactions" className="text-xs font-medium text-text-secondary hover:text-text-primary">
-                View all
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {schedule.length > 0 ? (
-                schedule.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: 12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + index * 0.08 }}
-                    className="flex items-start gap-3 rounded-xl border border-border p-3"
-                  >
-                    <input type="checkbox" checked={item.done} readOnly className="mt-1 accent-brand" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-text-tertiary">{item.time}</p>
-                      <p className="font-semibold text-text-primary">{item.title}</p>
-                      <p className="text-sm text-text-secondary">{item.subtitle}</p>
-                    </div>
-                    <div className="flex -space-x-2">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg-secondary bg-[var(--fin-btn-bg)] text-[10px] text-[var(--fin-btn-fg)]">
-                        {initial}
-                      </span>
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg-secondary bg-[var(--decko-accent)] text-[10px] text-text-primary">
-                        OX
-                      </span>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
-                  <p className="text-sm text-text-secondary">No recent activity yet.</p>
-                  <Link href="/dashboard/trade" className="mt-2 inline-block text-sm font-medium text-text-primary underline">
-                    Place your first trade
-                  </Link>
-                </div>
               )}
             </div>
           </div>
