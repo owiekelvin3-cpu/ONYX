@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/Button";
@@ -13,9 +13,10 @@ import {
   setAdminUserSignalPct,
 } from "@/lib/admin-api";
 import { SIGNAL_PLANS, signalTierLabel } from "@/lib/signal-plans";
+import { getSignalStrength } from "@/lib/signal-strength";
 import type { TradingSignalRow } from "@/lib/supabase/types";
 import { cn, formatDate, formatPercent } from "@/lib/utils";
-import { Loader2, Plus, TrendingUp } from "@/components/icons";
+import { Loader2, Plus, RefreshCw, Search, TrendingUp, Zap } from "@/components/icons";
 
 type UserRow = {
   id: string;
@@ -25,9 +26,13 @@ type UserRow = {
   role: string;
 };
 
+type TabId = "allocation" | "desk";
+
 const BULK_STEPS = [-10, -5, -1, 1, 5, 10] as const;
+const QUICK_PCTS = [0, 25, 50, 75, 100] as const;
 
 export default function AdminSignalsPage() {
+  const [tab, setTab] = useState<TabId>("allocation");
   const [users, setUsers] = useState<UserRow[]>([]);
   const [signals, setSignals] = useState<TradingSignalRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +42,7 @@ export default function AdminSignalsPage() {
 
   const [userQuery, setUserQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
-  const [targetPct, setTargetPct] = useState("10");
+  const [targetPct, setTargetPct] = useState("0");
   const [pctNote, setPctNote] = useState("");
   const [bulkNote, setBulkNote] = useState("Platform signal adjustment");
   const [grantDays, setGrantDays] = useState("30");
@@ -62,12 +67,12 @@ export default function AdminSignalsPage() {
         .select("id, email, full_name, signal_pct, role")
         .neq("role", "admin")
         .order("email")
-        .limit(200),
+        .limit(300),
       supabase
         .from("trading_signals")
         .select("*")
         .order("published_at", { ascending: false })
-        .limit(30),
+        .limit(40),
     ]);
     if (usersRes.error) setError(usersRes.error.message);
     else setUsers((usersRes.data as UserRow[]) ?? []);
@@ -80,14 +85,36 @@ export default function AdminSignalsPage() {
     void load();
   }, [load]);
 
-  const filteredUsers = users.filter((u) => {
+  const filteredUsers = useMemo(() => {
     const q = userQuery.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      u.email.toLowerCase().includes(q) ||
-      (u.full_name ?? "").toLowerCase().includes(q)
+    if (!q) return users;
+    return users.filter(
+      (u) =>
+        u.email.toLowerCase().includes(q) ||
+        (u.full_name ?? "").toLowerCase().includes(q)
     );
-  });
+  }, [users, userQuery]);
+
+  const stats = useMemo(() => {
+    const total = users.length;
+    const avg = total ? users.reduce((s, u) => s + (u.signal_pct ?? 0), 0) / total : 0;
+    const atZero = users.filter((u) => (u.signal_pct ?? 0) <= 0).length;
+    const activeDesk = signals.filter((s) => s.status === "active").length;
+    return { total, avg, atZero, activeDesk };
+  }, [users, signals]);
+
+  const previewStrength = getSignalStrength(parseFloat(targetPct) || 0);
+
+  function flash(msg: string) {
+    setSuccess(msg);
+    setError("");
+  }
+
+  function selectUser(u: UserRow) {
+    setSelectedUser(u);
+    setTargetPct(String(u.signal_pct ?? 0));
+    setPctNote("");
+  }
 
   async function runBulk(delta: number) {
     setBusy(true);
@@ -95,7 +122,7 @@ export default function AdminSignalsPage() {
     setSuccess("");
     try {
       const data = await bulkAdjustAdminSignalPct({ delta, note: bulkNote });
-      setSuccess(`Adjusted ${data.users_updated ?? 0} users by ${delta > 0 ? "+" : ""}${delta}%.`);
+      flash(`Adjusted ${data.users_updated ?? 0} users by ${delta > 0 ? "+" : ""}${delta}%.`);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Bulk adjust failed.");
@@ -106,7 +133,7 @@ export default function AdminSignalsPage() {
 
   async function saveUserPct() {
     if (!selectedUser) {
-      setError("Select a user first.");
+      setError("Select a user from the list first.");
       return;
     }
     const pct = parseFloat(targetPct);
@@ -123,10 +150,9 @@ export default function AdminSignalsPage() {
         pct,
         note: pctNote || undefined,
       });
-      setSuccess(`Set ${selectedUser.email} signal allocation to ${pct}%.`);
-      setSelectedUser(null);
-      setUserQuery("");
+      flash(`Set ${selectedUser.email} to ${pct}%.`);
       await load();
+      setSelectedUser((prev) => (prev ? { ...prev, signal_pct: pct } : null));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not update user.");
     } finally {
@@ -136,7 +162,7 @@ export default function AdminSignalsPage() {
 
   async function grantPackage() {
     if (!selectedUser) {
-      setError("Select a user first.");
+      setError("Select a user from the allocation list first.");
       return;
     }
     const plan = SIGNAL_PLANS.find((p) => p.id === grantTier);
@@ -152,8 +178,7 @@ export default function AdminSignalsPage() {
         packageName: plan.name,
         durationDays: Number.isFinite(days) ? days : 30,
       });
-      setSuccess(`Granted ${plan.name} to ${selectedUser.email}.`);
-      await load();
+      flash(`Granted ${plan.name} to ${selectedUser.email}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Grant failed.");
     } finally {
@@ -183,7 +208,7 @@ export default function AdminSignalsPage() {
         status: "active",
       });
       if (insertErr) throw insertErr;
-      setSuccess("Signal published to the desk.");
+      flash("Signal published to the desk.");
       setEntry("");
       setTarget("");
       setStop("");
@@ -206,7 +231,7 @@ export default function AdminSignalsPage() {
         .update({ status: "closed", closed_at: new Date().toISOString() })
         .eq("id", id);
       if (updErr) throw updErr;
-      setSuccess("Signal closed.");
+      flash("Signal closed.");
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not close signal.");
@@ -215,225 +240,408 @@ export default function AdminSignalsPage() {
     }
   }
 
+  const tabs: { id: TabId; label: string; hint: string }[] = [
+    { id: "allocation", label: "User allocation", hint: "Set signal % shown on user dashboard" },
+    { id: "desk", label: "Trading desk", hint: "Publish and manage desk signals" },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl space-y-5">
       <AdminPageHeader
         title="Signals"
-        subtitle="Manage user signal allocation, grant access, and publish desk signals."
+        subtitle="Control the signal strength users see on their overview dashboard."
+        action={
+          <Button variant="outline" size="sm" onClick={load} disabled={loading || busy}>
+            <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+            Refresh
+          </Button>
+        }
       />
 
-      {error && (
-        <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
-          {success}
-        </div>
-      )}
-
-      <Card className="space-y-4 p-4">
-        <h2 className="text-sm font-semibold text-text-primary">Bulk adjust all users</h2>
-        <p className="text-xs text-text-tertiary">
-          Increase or decrease signal allocation % for every non-admin user (clamped 0–100%).
-        </p>
-        <Input
-          label="Note"
-          value={bulkNote}
-          onChange={(e) => setBulkNote(e.target.value)}
-          placeholder="Reason for adjustment"
-        />
-        <div className="flex flex-wrap gap-2">
-          {BULK_STEPS.map((step) => (
-            <Button
-              key={step}
-              variant="secondary"
-              size="sm"
-              disabled={busy}
-              onClick={() => runBulk(step)}
-            >
-              {step > 0 && <Plus className="mr-1 h-3 w-3" />}
-              {step > 0 ? "+" : ""}
-              {step}%
-            </Button>
-          ))}
-        </div>
-      </Card>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="space-y-4 p-4">
-          <h2 className="text-sm font-semibold text-text-primary">Per-user allocation</h2>
-          <Input
-            label="Search user"
-            value={userQuery}
-            onChange={(e) => {
-              setUserQuery(e.target.value);
-              setSelectedUser(null);
-            }}
-            placeholder="Email or name"
-          />
-          <div className="max-h-40 overflow-y-auto rounded-lg border border-border">
-            {loading ? (
-              <div className="flex justify-center p-4">
-                <Loader2 className="h-5 w-5 animate-spin text-text-tertiary" />
-              </div>
-            ) : filteredUsers.length === 0 ? (
-              <p className="p-3 text-xs text-text-tertiary">No users found.</p>
-            ) : (
-              filteredUsers.slice(0, 12).map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedUser(u);
-                    setTargetPct(String(u.signal_pct ?? 0));
-                  }}
-                  className={cn(
-                    "flex w-full items-center justify-between border-b border-border px-3 py-2 text-left text-xs last:border-0 hover:bg-surface-elevated",
-                    selectedUser?.id === u.id && "bg-accent/10"
-                  )}
-                >
-                  <span className="text-text-primary">{u.email}</span>
-                  <span className="text-text-tertiary">{formatPercent(u.signal_pct ?? 0)}</span>
-                </button>
-              ))
-            )}
-          </div>
-          {selectedUser && (
-            <p className="text-xs text-text-secondary">
-              Selected: <strong>{selectedUser.email}</strong>
-            </p>
+      {(error || success) && (
+        <p
+          role={error ? "alert" : "status"}
+          className={cn(
+            "rounded-lg border px-4 py-3 text-sm",
+            error
+              ? "border-red/30 bg-red/10 text-red"
+              : "border-green/30 bg-green/10 text-green"
           )}
-          <Input
-            label="Signal %"
-            type="number"
-            min={0}
-            max={100}
-            step={0.1}
-            value={targetPct}
-            onChange={(e) => setTargetPct(e.target.value)}
-          />
-          <Input
-            label="Note (optional)"
-            value={pctNote}
-            onChange={(e) => setPctNote(e.target.value)}
-          />
-          <Button disabled={busy || !selectedUser} onClick={saveUserPct}>
-            Set allocation
-          </Button>
-        </Card>
+        >
+          {error || success}
+        </p>
+      )}
 
-        <Card className="space-y-4 p-4">
-          <h2 className="text-sm font-semibold text-text-primary">Grant signal package</h2>
-          <p className="text-xs text-text-tertiary">
-            Free access — no balance debit. Select a user from the panel on the left.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="text-xs text-text-tertiary">
-              Tier
-              <select
-                className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-                value={grantTier}
-                onChange={(e) => setGrantTier(e.target.value)}
-              >
-                {SIGNAL_PLANS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Input
-              label="Days"
-              type="number"
-              min={1}
-              value={grantDays}
-              onChange={(e) => setGrantDays(e.target.value)}
-            />
-          </div>
-          <Button disabled={busy || !selectedUser} onClick={grantPackage}>
-            Grant access
-          </Button>
-        </Card>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: "Users", value: stats.total.toLocaleString() },
+          { label: "Avg signal", value: formatPercent(stats.avg) },
+          { label: "At 0%", value: stats.atZero.toLocaleString() },
+          { label: "Active desk", value: stats.activeDesk.toLocaleString() },
+        ].map((item) => (
+          <Card key={item.label} className="p-4">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
+              {item.label}
+            </p>
+            <p className="mt-1 text-xl font-bold text-text-primary">{item.value}</p>
+          </Card>
+        ))}
       </div>
 
-      <Card className="space-y-4 p-4">
-        <h2 className="text-sm font-semibold text-text-primary">Publish desk signal</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Input label="Symbol" value={symbol} onChange={(e) => setSymbol(e.target.value)} />
-          <label className="text-xs text-text-tertiary">
-            Direction
-            <select
-              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-              value={direction}
-              onChange={(e) => setDirection(e.target.value as "buy" | "sell")}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
+              className={cn(
+                "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                tab === t.id
+                  ? "bg-bg-primary text-text-primary shadow-sm"
+                  : "text-text-tertiary hover:text-text-primary"
+              )}
             >
-              <option value="buy">Buy</option>
-              <option value="sell">Sell</option>
-            </select>
-          </label>
-          <Input label="Entry" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="67250" />
-          <Input label="Target" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="68500" />
-          <Input label="Stop" value={stop} onChange={(e) => setStop(e.target.value)} placeholder="66500" />
-          <label className="text-xs text-text-tertiary">
-            Min tier
-            <select
-              className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-              value={minTier}
-              onChange={(e) => setMinTier(e.target.value as "basic" | "pro" | "vip")}
-            >
-              <option value="basic">Basic</option>
-              <option value="pro">Pro</option>
-              <option value="vip">VIP</option>
-            </select>
-          </label>
-          <Input
-            label="Confidence %"
-            type="number"
-            min={0}
-            max={100}
-            value={confidence}
-            onChange={(e) => setConfidence(e.target.value)}
-          />
+              {t.label}
+            </button>
+          ))}
         </div>
-        <Input label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
-        <Button disabled={busy} onClick={publishSignal}>
-          Publish signal
-        </Button>
-      </Card>
+        <p className="text-xs text-text-tertiary">{tabs.find((t) => t.id === tab)?.hint}</p>
+      </div>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-text-primary">Recent signals</h2>
-        {signals.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-text-tertiary">No signals yet.</Card>
-        ) : (
-          <div className="space-y-2">
-            {signals.map((signal) => (
-              <Card key={signal.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-accent" />
-                    <span className="font-semibold text-text-primary">{signal.symbol}</span>
-                    <StatusBadge status={signal.status} />
-                    <span className="text-xs text-text-tertiary">{signalTierLabel(signal.min_tier)}</span>
-                  </div>
-                  <p className="mt-1 text-xs text-text-secondary">
-                    {signal.direction.toUpperCase()} · Entry {signal.entry_price} · TP {signal.target_price} · SL{" "}
-                    {signal.stop_price}
-                  </p>
-                  <p className="text-xs text-text-tertiary">{formatDate(signal.published_at)}</p>
-                </div>
-                {signal.status === "active" && (
-                  <Button variant="secondary" size="sm" disabled={busy} onClick={() => closeSignal(signal.id)}>
-                    Close
+      {tab === "allocation" && (
+        <div className="space-y-4">
+          <Card className="p-4 sm:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <h2 className="text-sm font-semibold text-text-primary">Bulk adjust everyone</h2>
+                <p className="mt-1 text-xs text-text-tertiary">
+                  Shift all non-admin users up or down (clamped 0–100%).
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {BULK_STEPS.map((step) => (
+                  <Button
+                    key={step}
+                    variant="outline"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => runBulk(step)}
+                  >
+                    {step > 0 && <Plus className="mr-1 h-3 w-3" />}
+                    {step > 0 ? "+" : ""}
+                    {step}%
                   </Button>
-                )}
-              </Card>
-            ))}
+                ))}
+              </div>
+            </div>
+            <div className="mt-4 max-w-md">
+              <Input
+                label="Bulk note"
+                value={bulkNote}
+                onChange={(e) => setBulkNote(e.target.value)}
+                placeholder="Reason for team audit"
+              />
+            </div>
+          </Card>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="overflow-hidden p-0">
+              <div className="border-b border-border px-4 py-3">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                  <input
+                    type="search"
+                    value={userQuery}
+                    onChange={(e) => setUserQuery(e.target.value)}
+                    placeholder="Search by email or name…"
+                    className="h-10 w-full rounded-lg border border-border bg-bg-primary pl-9 pr-3 text-sm outline-none focus:border-brand"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-text-tertiary">
+                  {filteredUsers.length} user{filteredUsers.length === 1 ? "" : "s"}
+                </p>
+              </div>
+              {loading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-text-tertiary" />
+                </div>
+              ) : filteredUsers.length === 0 ? (
+                <p className="py-12 text-center text-sm text-text-tertiary">No users match your search.</p>
+              ) : (
+                <ul className="max-h-[28rem] divide-y divide-border overflow-y-auto">
+                  {filteredUsers.map((u) => {
+                    const strength = getSignalStrength(u.signal_pct ?? 0);
+                    return (
+                      <li key={u.id}>
+                        <button
+                          type="button"
+                          onClick={() => selectUser(u)}
+                          className={cn(
+                            "flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-bg-hover",
+                            selectedUser?.id === u.id && "bg-brand/5"
+                          )}
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-text-primary">
+                              {u.full_name || u.email}
+                            </p>
+                            <p className="truncate text-xs text-text-tertiary">{u.email}</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-sm font-bold" style={{ color: strength.color }}>
+                              {formatPercent(u.signal_pct ?? 0)}
+                            </p>
+                            <p className="text-[10px] text-text-tertiary">{strength.label}</p>
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </Card>
+
+            <Card className="p-4 sm:p-5">
+              {!selectedUser ? (
+                <div className="flex min-h-[20rem] flex-col items-center justify-center px-4 text-center">
+                  <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+                    <Zap className="h-5 w-5" />
+                  </span>
+                  <p className="text-sm font-medium text-text-primary">Select a user</p>
+                  <p className="mt-1 max-w-xs text-xs text-text-tertiary">
+                    Choose someone from the list to set their signal percentage for the overview widget.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div>
+                    <h2 className="text-lg font-semibold text-text-primary">
+                      {selectedUser.full_name || selectedUser.email}
+                    </h2>
+                    <p className="text-sm text-text-tertiary">{selectedUser.email}</p>
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      Current: {formatPercent(selectedUser.signal_pct ?? 0)}
+                    </p>
+                  </div>
+
+                  <div
+                    className="rounded-xl border px-4 py-3"
+                    style={{
+                      borderColor: `${previewStrength.color}40`,
+                      background: `${previewStrength.color}10`,
+                    }}
+                  >
+                    <p className="text-[11px] uppercase tracking-wide text-text-tertiary">User preview</p>
+                    <p className="mt-1 text-2xl font-bold" style={{ color: previewStrength.color }}>
+                      {Math.round(parseFloat(targetPct) || 0)}%{" "}
+                      <span className="text-lg">{previewStrength.label}</span>
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="mb-2 flex items-center justify-between">
+                      <label className="text-sm font-medium text-text-primary" htmlFor="signal-slider">
+                        Signal %
+                      </label>
+                      <span className="text-sm font-bold text-text-primary">{targetPct}%</span>
+                    </div>
+                    <input
+                      id="signal-slider"
+                      type="range"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={Math.min(100, Math.max(0, parseFloat(targetPct) || 0))}
+                      onChange={(e) => setTargetPct(e.target.value)}
+                      className="w-full accent-brand"
+                    />
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {QUICK_PCTS.map((pct) => (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => setTargetPct(String(pct))}
+                          className={cn(
+                            "rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors",
+                            String(pct) === targetPct
+                              ? "border-brand bg-brand/10 text-text-primary"
+                              : "border-border text-text-tertiary hover:bg-bg-hover"
+                          )}
+                        >
+                          {pct}%
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Input
+                    label="Note (optional)"
+                    value={pctNote}
+                    onChange={(e) => setPctNote(e.target.value)}
+                    placeholder="Reason for this allocation"
+                  />
+
+                  <Button className="w-full" disabled={busy} onClick={saveUserPct}>
+                    {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save allocation"}
+                  </Button>
+                </div>
+              )}
+            </Card>
           </div>
-        )}
-      </section>
+        </div>
+      )}
+
+      {tab === "desk" && (
+        <div className="space-y-4">
+          <Card className="p-4 sm:p-5">
+            <h2 className="text-sm font-semibold text-text-primary">Publish new signal</h2>
+            <p className="mt-1 text-xs text-text-tertiary">
+              Optional desk feed for subscribed users. Most teams only need user allocation above.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <Input label="Symbol" value={symbol} onChange={(e) => setSymbol(e.target.value)} />
+              <label className="block text-xs text-text-tertiary">
+                Direction
+                <select
+                  className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
+                  value={direction}
+                  onChange={(e) => setDirection(e.target.value as "buy" | "sell")}
+                >
+                  <option value="buy">Buy</option>
+                  <option value="sell">Sell</option>
+                </select>
+              </label>
+              <Input label="Entry" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="67250" />
+              <Input label="Target" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="68500" />
+              <Input label="Stop" value={stop} onChange={(e) => setStop(e.target.value)} placeholder="66500" />
+              <label className="block text-xs text-text-tertiary">
+                Min tier
+                <select
+                  className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
+                  value={minTier}
+                  onChange={(e) => setMinTier(e.target.value as "basic" | "pro" | "vip")}
+                >
+                  <option value="basic">Basic</option>
+                  <option value="pro">Pro</option>
+                  <option value="vip">VIP</option>
+                </select>
+              </label>
+              <Input
+                label="Confidence %"
+                type="number"
+                min={0}
+                max={100}
+                value={confidence}
+                onChange={(e) => setConfidence(e.target.value)}
+              />
+            </div>
+            <div className="mt-3">
+              <Input label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </div>
+            <Button className="mt-4" disabled={busy} onClick={publishSignal}>
+              Publish signal
+            </Button>
+          </Card>
+
+          {selectedUser && (
+            <Card className="p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-text-primary">Grant package access</h2>
+              <p className="mt-1 text-xs text-text-tertiary">
+                Free desk tier for{" "}
+                <strong className="text-text-secondary">{selectedUser.email}</strong> (select user on Allocation tab).
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <label className="block text-xs text-text-tertiary">
+                  Tier
+                  <select
+                    className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
+                    value={grantTier}
+                    onChange={(e) => setGrantTier(e.target.value)}
+                  >
+                    {SIGNAL_PLANS.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <Input
+                  label="Days"
+                  type="number"
+                  min={1}
+                  value={grantDays}
+                  onChange={(e) => setGrantDays(e.target.value)}
+                />
+                <div className="flex items-end">
+                  <Button className="w-full" variant="outline" disabled={busy} onClick={grantPackage}>
+                    Grant access
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Card className="overflow-hidden p-0">
+            <div className="border-b border-border px-4 py-3">
+              <h2 className="text-sm font-semibold text-text-primary">Recent desk signals</h2>
+            </div>
+            {signals.length === 0 ? (
+              <p className="py-10 text-center text-sm text-text-tertiary">No signals published yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-bg-secondary/60 text-[11px] uppercase tracking-wide text-text-tertiary">
+                      <th className="px-4 py-3 font-medium">Pair</th>
+                      <th className="px-4 py-3 font-medium">Setup</th>
+                      <th className="px-4 py-3 font-medium">Tier</th>
+                      <th className="px-4 py-3 font-medium">Status</th>
+                      <th className="px-4 py-3 font-medium">Published</th>
+                      <th className="px-4 py-3 font-medium" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {signals.map((signal) => (
+                      <tr key={signal.id} className="hover:bg-bg-hover/50">
+                        <td className="px-4 py-3 font-semibold text-text-primary">{signal.symbol}</td>
+                        <td className="px-4 py-3 text-xs text-text-secondary">
+                          <span className={signal.direction === "buy" ? "text-green" : "text-red"}>
+                            {signal.direction.toUpperCase()}
+                          </span>
+                          {" · E "}
+                          {signal.entry_price} · TP {signal.target_price} · SL {signal.stop_price}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-text-tertiary">
+                          {signalTierLabel(signal.min_tier)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={signal.status} />
+                        </td>
+                        <td className="px-4 py-3 text-xs text-text-tertiary">
+                          {formatDate(signal.published_at)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {signal.status === "active" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={busy}
+                              onClick={() => closeSignal(signal.id)}
+                            >
+                              Close
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
