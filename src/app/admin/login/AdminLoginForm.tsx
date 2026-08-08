@@ -2,16 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
-import { setAdminAuthCookie } from "@/lib/auth-guards";
+import { clearAdminSession, establishAdminSession } from "@/lib/auth-guards";
+import { AuthShell, AuthCardHeader } from "@/components/auth/AuthLayout";
 import { AuthInput } from "@/components/auth/AuthInput";
-import { Button } from "@/components/ui/Button";
-import { Loader2, Lock, Mail, Shield } from "@/components/icons";
+import { AuthAlert, AuthSubmitButton } from "@/components/auth/auth-motion";
+import { Loader2, Lock, Mail } from "@/components/icons";
 
 export default function AdminLoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,8 +22,10 @@ export default function AdminLoginForm() {
     setLoading(true);
 
     const supabase = createClient();
+    const trimmedEmail = email.trim();
+
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: trimmedEmail,
       password,
     });
 
@@ -41,101 +42,112 @@ export default function AdminLoginForm() {
       return;
     }
 
-    const { data: profile } = await supabase
+    await supabase.auth.getSession();
+
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", userId)
       .maybeSingle();
 
+    if (profileError) {
+      await supabase.auth.signOut();
+      await clearAdminSession();
+      setError("Could not verify team access. Please try again.");
+      setLoading(false);
+      return;
+    }
+
     if (profile?.role !== "admin") {
       await supabase.auth.signOut();
+      await clearAdminSession();
       setError("This account does not have team access.");
       setLoading(false);
       return;
     }
 
-    setAdminAuthCookie();
-    router.push("/admin");
-    router.refresh();
+    const session = await establishAdminSession();
+    if (!session.ok) {
+      await supabase.auth.signOut();
+      await clearAdminSession();
+      setError(session.error ?? "Could not start team session. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    window.location.assign("/admin");
   }
 
   return (
-    <div className="min-h-dvh bg-bg-primary auth-page flex flex-col items-center justify-center px-4 py-8 sm:py-10 safe-area-top safe-area-bottom safe-area-x">
-      <div className="w-full max-w-[420px] auth-form-card">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="w-10 h-10 rounded-lg bg-brand/15 border border-brand/25 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-brand" strokeWidth={1.75} />
-          </span>
-          <div>
-            <p className="text-xs text-text-tertiary uppercase tracking-wider">Team</p>
-            <h1 className="text-xl font-bold text-text-primary">{BRAND.name} Console</h1>
-          </div>
-        </div>
+    <AuthShell
+      panelTitle="Team Console"
+      panelSubtitle="Secure access for authorized operators — manage users, deposits, compliance, and platform settings."
+    >
+      <AuthCardHeader
+        title="Team sign in"
+        subtitle={`Access the ${BRAND.fullName} operator console`}
+        alternate={{
+          prompt: "Trading account?",
+          href: "/login",
+          label: "User login",
+        }}
+      />
 
-        <p className="text-sm text-text-tertiary mb-6">
-          Sign in with your team email and password. Only authorized operators can access this area.
-        </p>
+      <p className="mb-4 text-[13px] leading-relaxed text-text-secondary">
+        Sign in with your operator email and password. Only accounts with team access can enter this area.
+      </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <AuthInput
-            id="team-email"
-            label="Team email"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            icon={<Mail />}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+      <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
+        <AuthInput
+          id="team-email"
+          label="Team email"
+          type="email"
+          placeholder="you@example.com"
+          autoComplete="email"
+          icon={<Mail />}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-          <AuthInput
-            id="team-password"
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            autoComplete="current-password"
-            icon={<Lock />}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <AuthInput
+          id="team-password"
+          label="Password"
+          type="password"
+          placeholder="Enter your password"
+          autoComplete="current-password"
+          icon={<Lock />}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-          {error && (
-            <div
-              role="alert"
-              className="text-[13px] text-red bg-red/[0.08] border border-red/30 rounded-lg px-4 py-3"
-            >
-              {error}
-            </div>
+        <AuthAlert show={!!error} variant="error">
+          {error}
+        </AuthAlert>
+
+        <AuthSubmitButton
+          type="submit"
+          disabled={loading || !email.trim() || !password}
+          loading={loading}
+          className="auth-submit-btn relative mt-1 w-full overflow-hidden rounded-xl bg-[var(--fin-btn-bg)] px-4 py-3.5 text-[15px] font-semibold text-[var(--fin-btn-fg)] transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Signing in...
+            </span>
+          ) : (
+            "Sign in to console"
           )}
+        </AuthSubmitButton>
+      </form>
 
-          <Button
-            type="submit"
-            className="w-full !h-[50px] !text-[15px] !font-semibold !rounded-lg"
-            disabled={loading || !email.trim() || !password}
-          >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Signing in...
-              </span>
-            ) : (
-              "Sign in"
-            )}
-          </Button>
-        </form>
-
-        <p className="text-[12px] text-text-tertiary text-center mt-6">
-          <Link href="/" className="text-brand hover:underline">
-            Back to {BRAND.name}
-          </Link>
-          {" · "}
-          <Link href="/login" className="text-text-tertiary hover:text-text-secondary">
-            User login
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="mt-5 text-center text-[12px] text-text-tertiary">
+        <Link href="/" className="text-brand hover:underline">
+          Back to {BRAND.name}
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

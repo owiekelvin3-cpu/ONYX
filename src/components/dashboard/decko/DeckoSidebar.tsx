@@ -22,7 +22,7 @@ import {
   Wallet,
 } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
-import { clearAdminAuthCookie } from "@/lib/auth-guards";
+import { clearAdminSession } from "@/lib/auth-guards";
 
 const MAIN_MENU = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
@@ -51,7 +51,7 @@ export function DeckoSidebar() {
 
   async function logout() {
     const supabase = createClient();
-    clearAdminAuthCookie();
+    await clearAdminSession();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();

@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/constants";
-import { clearAdminAuthCookie } from "@/lib/auth-guards";
+import { clearAdminSession } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
@@ -152,7 +152,7 @@ export function DashboardSidebar({
 
   async function handleLogout() {
     const supabase = createClient();
-    clearAdminAuthCookie();
+    await clearAdminSession();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
@@ -220,7 +220,7 @@ export function DashboardMobileFrame({
 
   async function handleLogout() {
     const supabase = createClient();
-    clearAdminAuthCookie();
+    await clearAdminSession();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();

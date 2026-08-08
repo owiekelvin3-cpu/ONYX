@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { clearAdminAuthCookie } from "@/lib/auth-guards";
+import { clearAdminSession } from "@/lib/auth-guards";
 import { createClient } from "@/lib/supabase/client";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "@/components/ui/Button";
@@ -51,16 +51,14 @@ export function AdminShell({
   adminEmail?: string;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   useBodyScrollLock(menuOpen);
 
   async function handleLogout() {
     const supabase = createClient();
-    clearAdminAuthCookie();
+    await clearAdminSession();
     await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
+    window.location.assign("/admin/login");
   }
 
   return (

@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { clearAdminAuthCookie } from "@/lib/auth-guards";
+import { clearAdminSession } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { NotificationProvider } from "@/components/notifications/NotificationProvider";
@@ -38,7 +38,7 @@ export function DashboardShell({
 
   async function handleLogout() {
     const supabase = createClient();
-    clearAdminAuthCookie();
+    await clearAdminSession();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
