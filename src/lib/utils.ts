@@ -33,6 +33,12 @@ export function formatPercent(value: number) {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+/** Whole or fixed-decimal stat for marketing KPIs — never animates to zero. */
+export function formatStatValue(value: number, decimals = 0) {
+  if (decimals > 0) return value.toFixed(decimals);
+  return Math.round(value).toLocaleString("en-US");
+}
+
 export function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",

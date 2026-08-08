@@ -16,14 +16,13 @@ export function useFinCountUp(
   const [value, setValue] = useState(target);
 
   useEffect(() => {
-    if (reduce || !inView) {
+    if (!inView || reduce) {
       setValue(target);
       return;
     }
 
     const start = performance.now();
     let frame = 0;
-    setValue(0);
 
     const tick = (now: number) => {
       const p = Math.min((now - start) / (duration * 1000), 1);
@@ -36,7 +35,7 @@ export function useFinCountUp(
   }, [target, duration, reduce, inView]);
 
   if (decimals > 0) return { ref, text: value.toFixed(decimals) };
-  return { ref, text: Math.round(value).toLocaleString() };
+  return { ref, text: Math.round(value).toLocaleString("en-US") };
 }
 
 const container = {

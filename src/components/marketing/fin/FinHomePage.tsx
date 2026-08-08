@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { MarketPair } from "@/lib/market-data";
+import { LIVE_PLATFORM_METRICS } from "@/lib/constants";
 import { FIN_CHART_COLORS } from "@/lib/theme";
-import { formatCompact, formatNumber, formatPercent } from "@/lib/utils";
+import { formatCompact, formatNumber, formatPercent, formatStatValue } from "@/lib/utils";
 import { useLiveMarketPairs } from "@/hooks/useLiveMarketPairs";
 import {
   FinBar,
@@ -80,6 +81,23 @@ function LiveMarketsDashboard({ pairs }: { pairs: MarketPair[] }) {
               <FinPageActions />
             </motion.div>
           </FinReveal>
+        </div>
+
+        <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-2">
+          {LIVE_PLATFORM_METRICS.map((metric) => (
+            <FinStaggerItem key={metric.label} variant="scale">
+              <FinHoverLift className="fin-card p-4 sm:p-5">
+                <p className="text-sm text-text-secondary">{metric.label}</p>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-text-primary sm:text-3xl">
+                  {formatStatValue(metric.value, metric.decimals)}
+                  {metric.suffix}
+                </p>
+                <span className="fin-badge mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold">
+                  Live
+                </span>
+              </FinHoverLift>
+            </FinStaggerItem>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">

@@ -11,7 +11,7 @@ import {
   SECURITY_FEATURES,
 } from "@/lib/constants";
 import { FinHeroTerminal } from "@/components/marketing/fin/FinHeroTerminal";
-import { formatNumber, formatPercent } from "@/lib/utils";
+import { formatNumber, formatPercent, formatStatValue } from "@/lib/utils";
 import {
   FinGlow,
   FinHoverLift,
@@ -19,7 +19,6 @@ import {
   FinScrollStagger,
   FinStagger,
   FinStaggerItem,
-  useFinCountUp,
 } from "@/components/marketing/fin/fin-motion";
 import {
   ArrowRight,
@@ -44,11 +43,10 @@ function HeroStat({
   label: string;
   decimals?: number;
 }) {
-  const animated = useFinCountUp(value, { duration: 1.4, decimals });
   return (
     <div className="rounded-xl border border-border bg-bg-primary/80 px-3 py-3 text-center sm:px-4 sm:py-4">
       <p className="text-lg font-bold tabular-nums text-text-primary sm:text-xl">
-        <span ref={animated.ref}>{animated.text}</span>
+        {formatStatValue(value, decimals)}
         {suffix}
       </p>
       <p className="mt-1 text-[10px] text-text-tertiary sm:text-[11px]">{label}</p>

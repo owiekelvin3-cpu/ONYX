@@ -82,6 +82,11 @@ export const PLATFORM_STATS = [
   { value: 99.99, suffix: "%", label: "Platform uptime" },
 ] as const;
 
+export const LIVE_PLATFORM_METRICS = [
+  { value: 99.99, suffix: "%", label: "Execution uptime", decimals: 2 },
+  { value: 100, suffix: "%", label: "Fee transparency", decimals: 0 },
+] as const;
+
 export const PREMIUM_FEATURES = [
   {
     title: "Lightning execution",
