@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, signal_pct")
         .eq("id", user.id)
         .maybeSingle()
     : { data: null };
@@ -62,6 +62,7 @@ export default async function DashboardPage() {
       chartData={chartData}
       recentTrades={recentTrades}
       marketPairs={marketPairs}
+      signalPct={Number(profile?.signal_pct ?? 0)}
     />
   );
 }

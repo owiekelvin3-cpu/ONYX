@@ -20,7 +20,6 @@ import {
   Shield,
   TrendingUp,
   Wallet,
-  Zap,
 } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import { clearAdminSession } from "@/lib/auth-guards";
@@ -31,7 +30,6 @@ const MAIN_MENU = [
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
-  { label: "Signals", href: "/dashboard/signals", icon: Zap },
   { label: "Market Analytics", href: "/dashboard/analytics", icon: LineChart },
 ] as const;
 

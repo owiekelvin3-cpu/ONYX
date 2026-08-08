@@ -15,6 +15,7 @@ import {
   DeckoStaggerItem,
   useCountUp,
 } from "@/components/dashboard/decko/decko-motion";
+import { SignalStrengthCard } from "@/components/dashboard/decko/SignalStrengthCard";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import {
@@ -37,6 +38,7 @@ type Props = {
   chartData: ChartPoint[];
   recentTrades: TradeRow[];
   marketPairs: MarketPair[];
+  signalPct?: number;
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -129,6 +131,7 @@ export function DeckoDashboardOverview({
   chartData: _chartData,
   recentTrades,
   marketPairs: _marketPairs,
+  signalPct = 0,
 }: Props) {
   const [hoverBar, setHoverBar] = useState<number | null>(null);
   const firstName = displayName.split(" ")[0] || displayName || "Trader";
@@ -284,6 +287,8 @@ export function DeckoDashboardOverview({
         </DeckoStaggerItem>
 
         <DeckoStaggerItem className="space-y-4">
+          <SignalStrengthCard signalPct={signalPct} />
+
           <div className="decko-card p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-text-primary">
