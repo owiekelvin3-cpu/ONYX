@@ -202,7 +202,7 @@ export function DeckoDashboardOverview({
         </div>
       </div>
 
-      <DeckoStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <DeckoStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <KpiCard
           label="Total Portfolio"
           numeric={summary.totalValue}
@@ -229,16 +229,6 @@ export function DeckoDashboardOverview({
           trendLabel="realized P&L"
           icon={TrendingUp}
           delay={0.1}
-        />
-        <KpiCard
-          label="Expense Total"
-          numeric={summary.totalWithdrawals}
-          decimals={2}
-          prefix="$"
-          trend={-2.1}
-          trendLabel="withdrawals"
-          icon={ArrowUpFromLine}
-          delay={0.15}
         />
       </DeckoStagger>
 
