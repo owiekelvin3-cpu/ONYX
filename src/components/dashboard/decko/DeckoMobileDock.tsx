@@ -12,6 +12,7 @@ import {
   Bot,
   Comments,
   Copy,
+  FileCheck,
   LayoutDashboard,
   LogOut,
   MoreHorizontal,
@@ -36,6 +37,7 @@ const MORE_MENU_ITEMS = [
   { href: "/dashboard/notifications", labelKey: "dashboard.notifications", icon: Bell },
   { href: "/dashboard/ai-trading", labelKey: "dashboard.aiTrading", icon: Bot },
   { href: "/dashboard/copy-trading", labelKey: "dashboard.copyTrading", icon: Copy },
+  { href: "/dashboard/kyc", labelKey: "dashboard.kyc", icon: FileCheck },
   { href: "/dashboard/support", labelKey: "dashboard.support", icon: Comments },
   { href: "/dashboard/settings", labelKey: "dashboard.settings", icon: Settings },
 ] as const;

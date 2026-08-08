@@ -138,7 +138,7 @@ export function SettingsProfileSection({ hideHeader = false }: { hideHeader?: bo
               <p className="text-sm font-medium text-text-primary">{t("settingsPage.identityTitle")}</p>
               <p className="text-xs text-text-tertiary mt-0.5">{t("settingsPage.identityDesc")}</p>
             </div>
-            <Link href="/dashboard/support">
+            <Link href="/dashboard/kyc">
               <Button variant="outline" size="sm">
                 <FileCheck className="h-4 w-4" />
                 {t("settingsPage.completeKyc")}

@@ -71,16 +71,27 @@ export default function AdminUsersPage() {
     setDetailLoading(false);
   }
 
-  async function handleModerate(action: "suspend" | "unsuspend") {
+  async function handleModerate(action: "suspend" | "unsuspend" | "reset_kyc") {
     if (!selectedId) return;
     setActing(true);
     try {
       await moderateAdminUser({
         userId: selectedId,
         action,
-        reason: action === "suspend" ? "Suspended by team" : undefined,
+        reason:
+          action === "suspend"
+            ? "Suspended by team"
+            : action === "reset_kyc"
+              ? "KYC reset by admin"
+              : undefined,
       });
-      setMessage(action === "suspend" ? "User suspended" : "User unsuspended");
+      setMessage(
+        action === "suspend"
+          ? "User suspended"
+          : action === "reset_kyc"
+            ? "KYC reset — user must verify again"
+            : "User unsuspended"
+      );
       await openUser(selectedId);
       await load();
     } catch (e) {
@@ -294,6 +305,9 @@ export default function AdminUsersPage() {
                     Suspend
                   </Button>
                 )}
+                <Button size="sm" variant="outline" disabled={acting} onClick={() => handleModerate("reset_kyc")}>
+                  Reset KYC
+                </Button>
               </div>
 
               <div className="border-t border-border pt-4 space-y-2">

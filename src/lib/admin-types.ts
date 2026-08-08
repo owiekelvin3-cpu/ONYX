@@ -91,6 +91,8 @@ export interface KycRow {
   user_id: string;
   document_type: string;
   document_url: string | null;
+  selfie_url?: string | null;
+  face_captured_at?: string | null;
   status: string;
   notes: string | null;
   created_at: string;

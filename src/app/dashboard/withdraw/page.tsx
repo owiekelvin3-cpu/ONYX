@@ -40,6 +40,7 @@ import {
   WithdrawalHistoryList,
   Input,
 } from "@/components/dashboard/WithdrawalUi";
+import { KycRequiredGate } from "@/components/dashboard/KycRequiredGate";
 
 const EMPTY_BANK = {
   accountHolder: "",
@@ -243,6 +244,7 @@ export default function WithdrawPage() {
   const formDisabled = loading || submitting || !userId || !canWithdraw || (balance ?? 0) <= 0;
 
   return (
+    <KycRequiredGate>
     <div className="space-y-5 max-w-3xl pb-2">
       <WithdrawalPageHeader />
 
@@ -532,5 +534,6 @@ export default function WithdrawPage() {
         </Link>
       </p>
     </div>
+    </KycRequiredGate>
   );
 }

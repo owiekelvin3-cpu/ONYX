@@ -10,6 +10,7 @@ import { clearAdminSession } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
+  FileCheck,
   LayoutDashboard,
   TrendingUp,
   Wallet,
@@ -57,6 +58,7 @@ const NAV_GROUPS = [
     id: "account",
     labelKey: "dashboard.navGroupAccount",
     items: [
+      { labelKey: "dashboard.kyc", href: "/dashboard/kyc", icon: FileCheck },
       { labelKey: "dashboard.support", href: "/dashboard/support", icon: Comments },
       { labelKey: "dashboard.settings", href: "/dashboard/settings", icon: Settings },
     ],
@@ -72,6 +74,7 @@ const MOBILE_TABS = [
 ] as const;
 
 const MORE_MENU_PATHS = [
+  "/dashboard/kyc",
   "/dashboard/withdraw",
   "/dashboard/ai-trading",
   "/dashboard/copy-trading",

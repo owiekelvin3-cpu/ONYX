@@ -58,6 +58,11 @@ import {
   faMoon,
   faSun,
   faPlay,
+  faCamera,
+  faCreditCard,
+  faUpload,
+  faWandMagicSparkles,
+  faArrowUpRightFromSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -133,7 +138,14 @@ export const FaceSmile = icon(faFaceSmile);
 export const FileLines = icon(faFileLines);
 export const Image = icon(faImage);
 export const CircleCheck = icon(faCircleCheck);
+export const CheckCircle = CircleCheck;
 export const AlertTriangle = icon(faTriangleExclamation);
 export const Sun = icon(faSun);
 export const Moon = icon(faMoon);
 export const Play = icon(faPlay);
+export const Camera = icon(faCamera);
+export const CreditCard = icon(faCreditCard);
+export const Upload = icon(faUpload);
+export const Sparkles = icon(faWandMagicSparkles);
+export const ExternalLink = icon(faArrowUpRightFromSquare);
+export const ImageIcon = Image;

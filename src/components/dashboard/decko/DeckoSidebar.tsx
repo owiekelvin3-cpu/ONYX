@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   ArrowRight,
   Bot,
+  FileCheck,
   HelpCircle,
   LayoutDashboard,
   LineChart,
@@ -34,6 +35,7 @@ const MAIN_MENU = [
 ] as const;
 
 const SETTINGS_MENU = [
+  { label: "KYC Verification", href: "/dashboard/kyc", icon: FileCheck },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
   { label: "Security & Privacy", href: "/dashboard/settings/account", icon: Shield },
   { label: "Help Center", href: "/dashboard/support", icon: HelpCircle },
