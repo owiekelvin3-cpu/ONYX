@@ -207,7 +207,7 @@ export default function RegisterForm() {
         <AuthSlidePanel panelKey={step}>
         {step === 1 && (
           <>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <AuthInput
                 id="firstName"
                 label="First name"

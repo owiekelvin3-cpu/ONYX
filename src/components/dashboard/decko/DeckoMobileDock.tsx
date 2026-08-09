@@ -73,7 +73,7 @@ export function DeckoMobileDock({
 
   return (
     <>
-      <div className="decko-mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.5rem,var(--safe-bottom))] lg:hidden">
+      <div className="decko-mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.5rem,var(--safe-bottom))] safe-area-x lg:hidden">
         <nav
           className="pointer-events-auto mx-auto max-w-[420px] overflow-visible rounded-[24px] border border-[var(--decko-dock-border)] bg-[var(--decko-dock-bg)] p-1 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
           aria-label={t("dashboard.navLabel")}
@@ -111,7 +111,7 @@ export function DeckoMobileDock({
                   </span>
                   <span
                     className={cn(
-                      "relative mt-1 max-w-[72px] truncate text-[10px] font-medium leading-none",
+                      "relative mt-1 max-w-[72px] truncate text-[11px] font-medium leading-none",
                       active || featured ? "text-white" : "text-[#737373]"
                     )}
                   >
@@ -214,7 +214,7 @@ export function DeckoMobileDock({
                           </span>
                           <span
                             className={cn(
-                              "line-clamp-1 w-full text-[9px] font-medium leading-none",
+                              "line-clamp-2 min-h-[2rem] w-full text-[10px] font-medium leading-tight",
                               active ? "text-text-primary" : "text-text-secondary"
                             )}
                           >

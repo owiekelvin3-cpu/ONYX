@@ -36,7 +36,7 @@ export function AuthShell({
   const reduce = useReducedMotion();
 
   return (
-    <div className="auth-page relative flex h-dvh max-h-dvh flex-col overflow-hidden lg:flex-row">
+    <div className="auth-page relative flex min-h-dvh flex-col overflow-x-hidden lg:h-dvh lg:max-h-dvh lg:flex-row lg:overflow-hidden">
       <AuthBackground />
 
       {/* Brand panel — desktop */}
@@ -145,8 +145,8 @@ export function AuthShell({
       </aside>
 
       {/* Form panel */}
-      <div className="relative z-10 flex h-dvh max-h-dvh min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="safe-area-top shrink-0 border-b border-border/60 lg:hidden">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col lg:h-dvh lg:max-h-dvh lg:overflow-hidden">
+        <header className="safe-area-top shrink-0 border-b border-border/60 safe-area-x lg:hidden">
           <div className="flex h-12 items-center justify-between px-4">
             <Link href="/" className="flex items-center gap-2">
               <AuthLogoPulse>
@@ -165,7 +165,7 @@ export function AuthShell({
           </div>
         </header>
 
-        <main className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 py-2 sm:px-4 sm:py-3 lg:px-6">
+        <main className="flex min-h-0 flex-1 items-start justify-center overflow-y-auto px-3 py-4 safe-area-x sm:items-center sm:px-4 sm:py-3 lg:overflow-hidden lg:px-6">
           <AuthStagger
             className={
               wide

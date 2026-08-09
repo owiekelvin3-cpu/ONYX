@@ -145,7 +145,7 @@ export function AdminShell({
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto min-w-0">{children}</main>
+        <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto p-3 safe-area-x sm:p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

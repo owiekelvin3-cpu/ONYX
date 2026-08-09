@@ -617,15 +617,22 @@ body {
 /* Auth pages */
 .auth-page {
   background-color: var(--bg-primary);
-  height: 100dvh;
-  max-height: 100dvh;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: hidden;
 }
 
-html:has(.auth-page),
-html:has(.auth-page) body {
-  overflow: hidden;
-  height: 100%;
+@media (min-width: 1024px) {
+  .auth-page {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  html:has(.auth-page),
+  html:has(.auth-page) body {
+    overflow: hidden;
+    height: 100%;
+  }
 }
 
 .auth-mesh {
@@ -769,6 +776,15 @@ html:has(.auth-page) body {
   font-size: 16px;
 }
 
+/* Prevent iOS/Android zoom on form focus (needs >=16px) */
+@media (max-width: 1023px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
 html.support-chat-open body {
   overflow: hidden;
 }
@@ -833,15 +849,15 @@ html.support-chat-open body {
 .fin-page-content > section:not(.fin-page-plain) .container-app,
 .fin-page-content > div:not(.fin-page-plain) > .container-app {
   max-width: none;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
 }
 
 @media (min-width: 640px) {
   .fin-page-content > section:not(.fin-page-plain) .container-app,
   .fin-page-content > div:not(.fin-page-plain) > .container-app {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
   }
 }
 

@@ -82,6 +82,29 @@ export function FinLegalPage({ page }: Props) {
           </div>
         </header>
 
+        <div className="mb-6 lg:hidden">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            Jump to section
+          </p>
+          <div className="scroll-tabs flex gap-2 overflow-x-auto pb-1">
+            {page.sections.map((section) => (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => scrollToSection(section.id)}
+                className={cn(
+                  "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  activeId === section.id
+                    ? "border-brand bg-brand/10 text-text-primary"
+                    : "border-border bg-bg-secondary text-text-secondary"
+                )}
+              >
+                {section.title}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
           <aside className="hidden lg:block">
             <div className="sticky top-24">

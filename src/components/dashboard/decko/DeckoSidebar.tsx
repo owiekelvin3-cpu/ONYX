@@ -171,7 +171,7 @@ export function DeckoMobileTopBar({
   const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
 
   return (
-    <div className="decko-mobile-bar flex items-center justify-between border-b px-4 py-3 lg:hidden safe-area-top">
+    <div className="decko-mobile-bar flex items-center justify-between border-b px-4 py-3 safe-area-top safe-area-x lg:hidden">
       <Link href="/dashboard" className="flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--decko-accent)]">
           <OnyxLogo size={18} />

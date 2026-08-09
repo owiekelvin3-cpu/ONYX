@@ -99,7 +99,7 @@ export function FinMarketingMobileBar() {
 
   return (
     <>
-      <header className="fin-mobile-bar sticky top-0 z-50 flex items-center justify-between border-b px-4 py-3 backdrop-blur-md lg:hidden safe-area-top">
+      <header className="fin-mobile-bar sticky top-0 z-50 flex items-center justify-between border-b px-4 py-3 backdrop-blur-md safe-area-top safe-area-x lg:hidden">
         <Link href="/" className="flex min-w-0 items-center gap-2">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-bg-secondary shadow-sm">
             <OnyxLogo size={20} />

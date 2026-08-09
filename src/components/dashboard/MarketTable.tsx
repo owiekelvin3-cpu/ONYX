@@ -20,8 +20,8 @@ export function MarketTable({
   const rows = limit ? pairs.slice(0, limit) : pairs;
 
   return (
-    <div className="overflow-x-auto -mx-1 px-1">
-      <table className="w-full">
+    <div className="table-scroll -mx-1 px-1">
+      <table className="w-full min-w-[320px]">
         <thead>
           <tr className="text-left text-[11px] text-text-tertiary border-b border-border/80">
             <th className="py-2.5 pl-1 font-medium">Pair</th>

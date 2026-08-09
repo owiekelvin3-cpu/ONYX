@@ -273,22 +273,24 @@ export default function AdminSignalsPage() {
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={cn(
-                "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                tab === t.id
-                  ? "bg-bg-primary text-text-primary shadow-sm"
-                  : "text-text-tertiary hover:text-text-primary"
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="scroll-tabs max-w-full overflow-x-auto pb-1">
+          <div className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                  tab === t.id
+                    ? "bg-bg-primary text-text-primary shadow-sm"
+                    : "text-text-tertiary hover:text-text-primary"
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
         <p className="text-xs text-text-tertiary">{tabs.find((t) => t.id === tab)?.hint}</p>
       </div>
@@ -347,7 +349,78 @@ export default function AdminSignalsPage() {
             ) : users.length === 0 ? (
               <p className="py-16 text-center text-sm text-text-tertiary">No users found.</p>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+                <div className="divide-y divide-border md:hidden">
+                  {users.map((u) => {
+                    const strength = getSignalStrength(u.signal_pct ?? 0);
+                    const draft = draftPct[u.id] ?? String(u.signal_pct ?? 0);
+                    const draftStrength = getSignalStrength(parseFloat(draft) || 0);
+                    const isDirty = draft !== String(u.signal_pct ?? 0);
+                    const saving = savingUserId === u.id;
+
+                    return (
+                      <div key={u.id} className="space-y-3 p-4">
+                        <div>
+                          <p className="font-medium text-text-primary">{u.full_name || u.email}</p>
+                          <p className="text-xs text-text-tertiary">{u.email}</p>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-[11px] uppercase tracking-wide text-text-tertiary">Current</p>
+                            <p className="font-bold" style={{ color: strength.color }}>
+                              {formatPercent(u.signal_pct ?? 0)}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[11px] uppercase tracking-wide text-text-tertiary">Draft</p>
+                            <p className="text-sm font-medium" style={{ color: draftStrength.color }}>
+                              {draftStrength.label}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={draft}
+                            onChange={(e) => setDraftForUser(u.id, e.target.value)}
+                            className="h-10 w-24 rounded-lg border border-border bg-bg-primary px-2 font-mono outline-none focus:border-brand"
+                          />
+                          <div className="flex flex-1 flex-wrap gap-1">
+                            {QUICK_PCTS.map((pct) => (
+                              <button
+                                key={pct}
+                                type="button"
+                                onClick={() => setDraftForUser(u.id, String(pct))}
+                                className={cn(
+                                  "rounded border px-2 py-1 text-[11px] font-medium transition-colors",
+                                  draft === String(pct)
+                                    ? "border-brand bg-brand/10 text-text-primary"
+                                    : "border-border text-text-tertiary"
+                                )}
+                              >
+                                {pct}%
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button
+                          className="w-full"
+                          size="sm"
+                          variant={isDirty ? "brand" : "outline"}
+                          disabled={saving || busy}
+                          onClick={() => void saveUserPct(u)}
+                        >
+                          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[720px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-bg-secondary/60 text-[11px] uppercase tracking-wide text-text-tertiary">
@@ -433,7 +506,8 @@ export default function AdminSignalsPage() {
                     })}
                   </tbody>
                 </table>
-              </div>
+                </div>
+              </>
             )}
           </Card>
         </div>
@@ -546,7 +620,43 @@ export default function AdminSignalsPage() {
             {signals.length === 0 ? (
               <p className="py-10 text-center text-sm text-text-tertiary">No signals published yet.</p>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+                <div className="divide-y divide-border md:hidden">
+                  {signals.map((signal) => (
+                    <div key={signal.id} className="space-y-3 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-text-primary">{signal.symbol}</p>
+                          <p className="mt-1 text-xs text-text-secondary">
+                            <span className={signal.direction === "buy" ? "text-green" : "text-red"}>
+                              {signal.direction.toUpperCase()}
+                            </span>
+                            {" · E "}
+                            {signal.entry_price} · TP {signal.target_price} · SL {signal.stop_price}
+                          </p>
+                        </div>
+                        <StatusBadge status={signal.status} />
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-text-tertiary">
+                        <span>{signalTierLabel(signal.min_tier)}</span>
+                        <span>{formatDate(signal.published_at)}</span>
+                      </div>
+                      {signal.status === "active" && (
+                        <Button
+                          className="w-full"
+                          variant="outline"
+                          size="sm"
+                          disabled={busy}
+                          onClick={() => closeSignal(signal.id)}
+                        >
+                          Close
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[640px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-bg-secondary/60 text-[11px] uppercase tracking-wide text-text-tertiary">
@@ -594,7 +704,8 @@ export default function AdminSignalsPage() {
                     ))}
                   </tbody>
                 </table>
-              </div>
+                </div>
+              </>
             )}
           </Card>
         </div>
