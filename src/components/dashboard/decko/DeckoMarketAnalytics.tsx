@@ -230,19 +230,19 @@ export function DeckoMarketAnalytics({ marketPairs, updatedAt }: Props) {
 
   return (
     <div className="decko-dashboard mx-auto max-w-[1320px]">
-      <div className="mb-5 flex flex-col gap-4 lg:mb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="hidden text-xl font-bold text-text-primary lg:block sm:text-2xl lg:text-3xl">Market Analytics</h1>
-          <p className="text-sm text-text-secondary lg:mt-1">
+          <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Market Analytics</h1>
+          <p className="mt-1 text-sm text-text-secondary">
             Live prices, sector breakdown, and market breadth across crypto, stocks, and forex.
           </p>
           <p className="mt-1 text-xs text-text-tertiary">Updated {updatedAt}</p>
         </div>
         <div className="flex items-center gap-2">
-          <ThemeToggle className="hidden rounded-xl border border-border bg-bg-secondary lg:inline-flex" />
+          <ThemeToggle className="rounded-xl border border-border bg-bg-secondary" />
           <Link
             href="/dashboard/trade"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)] transition-transform hover:scale-[1.02] sm:w-auto"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)] transition-transform hover:scale-[1.02]"
           >
             <TrendingUp className="h-4 w-4" />
             Trade now

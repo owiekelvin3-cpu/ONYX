@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { NotificationProvider } from "@/components/notifications/NotificationProvider";
 import {
-  DeckoMobileNavDrawer,
   DeckoMobileTopBar,
   DeckoSidebar,
 } from "@/components/dashboard/decko/DeckoSidebar";
@@ -33,10 +32,9 @@ export function DashboardShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const hideBottomNav = shouldHideMobileBottomNav(pathname);
-  useBodyScrollLock(drawerOpen || menuOpen);
+  useBodyScrollLock(menuOpen);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -56,21 +54,14 @@ export function DashboardShell({
             userName={userName}
             userEmail={userEmail}
             avatarUrl={avatarUrl}
-            onOpenDrawer={() => setDrawerOpen(true)}
-          />
-
-          <DeckoMobileNavDrawer
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            onLogout={() => void handleLogout()}
           />
 
           <main
             className={cn(
-              "decko-main relative z-[1] flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 lg:px-8",
+              "decko-main relative z-[1] flex-1 overflow-y-auto px-3 py-4 sm:px-5 sm:py-6 lg:px-8",
               hideBottomNav
                 ? "pb-[max(0.75rem,var(--safe-bottom))]"
-                : "pb-[calc(4.5rem+var(--safe-bottom))] lg:pb-8"
+                : "pb-[calc(5.75rem+var(--safe-bottom))] lg:pb-8"
             )}
           >
             {children}

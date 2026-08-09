@@ -600,18 +600,6 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
-
-  .decko-card {
-    border-radius: 1rem;
-  }
-
-  .decko-dashboard {
-    --decko-section-gap: 1rem;
-  }
-
-  .decko-main {
-    -webkit-overflow-scrolling: touch;
-  }
 }
 
 .nav-dropdown {

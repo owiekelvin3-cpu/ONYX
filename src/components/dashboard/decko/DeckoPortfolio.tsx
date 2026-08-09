@@ -129,25 +129,25 @@ export function DeckoPortfolio({
 
   return (
     <div className="decko-dashboard mx-auto max-w-[1320px]">
-      <div className="mb-5 flex flex-col gap-4 lg:mb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="hidden text-xl font-bold text-text-primary lg:block sm:text-2xl lg:text-3xl">Portfolio</h1>
-          <p className="text-sm text-text-secondary lg:mt-1">
+          <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Portfolio</h1>
+          <p className="mt-1 text-sm text-text-secondary">
             Track your balance, holdings, and performance in one place.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-          <ThemeToggle className="hidden rounded-xl border border-border bg-bg-secondary lg:inline-flex" />
+        <div className="flex flex-wrap items-center gap-2">
+          <ThemeToggle className="rounded-xl border border-border bg-bg-secondary" />
           <Link
             href="/dashboard/deposit"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-bg-secondary px-3 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-hover sm:px-4"
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-bg-secondary px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-hover"
           >
             <ArrowDownToLine className="h-4 w-4" />
             Deposit
           </Link>
           <Link
             href="/dashboard/trade"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-3 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)] transition-transform hover:scale-[1.02] sm:px-4"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)] transition-transform hover:scale-[1.02]"
           >
             <TrendingUp className="h-4 w-4" />
             Trade

@@ -97,7 +97,7 @@ function KpiCard({
   return (
     <DeckoStaggerItem>
       <motion.div
-        className="decko-card h-full p-4 sm:p-5"
+        className="decko-card h-full p-5"
         whileHover={{ y: -4, transition: { duration: 0.2 } }}
       >
         <div className="flex items-start justify-between gap-3">
@@ -163,16 +163,16 @@ export function DeckoDashboardOverview({
 
   return (
     <div className="decko-dashboard mx-auto max-w-[1320px]">
-      <div className="mb-5 flex flex-col gap-4 lg:mb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-text-primary sm:text-2xl lg:text-3xl">
+          <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">
             Hello, {firstName}!
           </h1>
           <p className="mt-1 text-sm text-text-secondary">
             Here&apos;s your overview of your trading business!
           </p>
         </div>
-        <div className="hidden items-center gap-2 sm:gap-3 lg:flex">
+        <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle className="rounded-xl border border-border bg-bg-secondary" />
           <NotificationBell />
           <div className="flex items-center gap-2 rounded-2xl border border-border bg-bg-secondary py-1.5 pl-1.5 pr-3">
@@ -223,19 +223,19 @@ export function DeckoDashboardOverview({
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_340px]">
         <DeckoStaggerItem className="min-w-0">
-          <div className="decko-card p-4 sm:p-6">
-            <div className="mb-4 flex items-center justify-between gap-3 sm:mb-6">
+          <div className="decko-card p-5 sm:p-6">
+            <div className="mb-6 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-bold text-text-primary sm:text-lg">Portfolio Overview</h2>
+                <h2 className="text-lg font-bold text-text-primary">Portfolio Overview</h2>
                 <p className="text-sm text-text-secondary">Monthly profit performance</p>
               </div>
-              <select className="rounded-xl border border-border bg-bg-secondary px-2.5 py-1.5 text-xs text-text-primary outline-none sm:px-3 sm:py-2 sm:text-sm">
+              <select className="rounded-xl border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary outline-none">
                 <option>Month</option>
                 <option>Quarter</option>
               </select>
             </div>
 
-            <div className="relative flex h-[180px] items-end gap-1.5 sm:h-[240px] sm:gap-3">
+            <div className="relative flex h-[240px] items-end gap-2 sm:gap-3">
               {monthly.map((bar, index) => (
                 <div key={bar.label} className="flex h-full flex-1 flex-col items-center gap-2">
                   <DeckoAnimatedBar
@@ -268,7 +268,7 @@ export function DeckoDashboardOverview({
         <DeckoStaggerItem className="space-y-4">
           <SignalStrengthCard signalPct={signalPct} />
 
-          <div className="decko-card hidden p-4 sm:block sm:p-5">
+          <div className="decko-card p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-text-primary">
                 {today.toLocaleString(undefined, { month: "long", year: "numeric" })}

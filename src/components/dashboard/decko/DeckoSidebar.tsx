@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import {
   ArrowRight,
   Bot,
@@ -17,7 +15,6 @@ import {
   LayoutDashboard,
   LineChart,
   LogOut,
-  Menu,
   Receipt,
   Search,
   Settings,
@@ -25,7 +22,6 @@ import {
   TrendingUp,
   Users,
   Wallet,
-  X,
 } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import { clearAdminSession } from "@/lib/auth-guards";
@@ -47,33 +43,9 @@ const SETTINGS_MENU = [
   { label: "Help Center", href: "/dashboard/support", icon: HelpCircle },
 ] as const;
 
-const MOBILE_PAGE_TITLES: Array<{ prefix: string; title: string; exact?: boolean }> = [
-  { prefix: "/dashboard/trade", title: "Spot Trading" },
-  { prefix: "/dashboard/portfolio", title: "Portfolio" },
-  { prefix: "/dashboard/transactions", title: "Transactions" },
-  { prefix: "/dashboard/analytics", title: "Market Analytics" },
-  { prefix: "/dashboard/copy-trading", title: "Copy Trading" },
-  { prefix: "/dashboard/ai-trading", title: "AI Trading" },
-  { prefix: "/dashboard/deposit", title: "Deposit" },
-  { prefix: "/dashboard/withdraw", title: "Withdraw" },
-  { prefix: "/dashboard/notifications", title: "Notifications" },
-  { prefix: "/dashboard/kyc", title: "KYC Verification" },
-  { prefix: "/dashboard/support", title: "Help Center" },
-  { prefix: "/dashboard/settings", title: "Settings" },
-  { prefix: "/dashboard/signals", title: "Signals" },
-  { prefix: "/dashboard", title: "Overview", exact: true },
-];
-
 function navActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-function getMobilePageTitle(pathname: string) {
-  const match = MOBILE_PAGE_TITLES.find((item) =>
-    item.exact ? pathname === item.prefix : pathname === item.prefix || pathname.startsWith(`${item.prefix}/`)
-  );
-  return match?.title ?? "Dashboard";
 }
 
 export function DeckoSidebar() {
@@ -187,193 +159,35 @@ export function DeckoSidebar() {
   );
 }
 
-export function DeckoMobileNavDrawer({
-  open,
-  onClose,
-  onLogout,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onLogout: () => void;
-}) {
-  const pathname = usePathname();
-  const { t } = useTranslation();
-
-  return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true">
-          <motion.button
-            type="button"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/50 backdrop-blur-[1px]"
-            onClick={onClose}
-            aria-label={t("common.close")}
-          />
-
-          <motion.aside
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 380, damping: 36 }}
-            className="decko-sidebar absolute left-0 top-0 flex h-full w-[min(300px,88vw)] flex-col px-4 py-5 safe-area-top safe-area-bottom safe-area-x"
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <Link href="/dashboard" onClick={onClose} className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--decko-accent)]">
-                  <OnyxLogo size={20} />
-                </span>
-                <span className="text-base font-bold text-[var(--decko-sidebar-text)]">{BRAND.name}</span>
-              </Link>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--decko-sidebar-hover)] text-[var(--decko-sidebar-text)]"
-                aria-label={t("common.close")}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto">
-              <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--decko-sidebar-muted)]">
-                Main Menu
-              </p>
-              <nav className="space-y-1">
-                {MAIN_MENU.map((item) => {
-                  const Icon = item.icon;
-                  const active = navActive(pathname, item.href, "exact" in item ? item.exact : false);
-                  return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={onClose}
-                      className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
-                        active
-                          ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)]"
-                          : "text-[var(--decko-sidebar-muted)] hover:bg-[var(--decko-sidebar-hover)] hover:text-[var(--decko-sidebar-text)]"
-                      )}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-
-              <p className="mb-2 mt-5 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--decko-sidebar-muted)]">
-                Settings
-              </p>
-              <nav className="space-y-1">
-                {SETTINGS_MENU.map((item) => {
-                  const Icon = item.icon;
-                  const active = navActive(pathname, item.href);
-                  return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={onClose}
-                      className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
-                        active
-                          ? "bg-[var(--decko-sidebar-hover)] text-[var(--decko-sidebar-text)]"
-                          : "text-[var(--decko-sidebar-muted)] hover:bg-[var(--decko-sidebar-hover)] hover:text-[var(--decko-sidebar-text)]"
-                      )}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-
-            <div className="mt-4 space-y-3 border-t border-[var(--decko-sidebar-border)] pt-4">
-              <Link
-                href="/dashboard/deposit"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-2xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-surface)] px-4 py-3"
-              >
-                <div>
-                  <p className="text-[11px] uppercase tracking-wide text-[var(--decko-sidebar-muted)]">Fund account</p>
-                  <p className="text-sm font-semibold text-[var(--decko-sidebar-text)]">Deposit now</p>
-                </div>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--decko-accent)] text-[var(--decko-accent-text)]">
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </span>
-              </Link>
-
-              <ThemeToggle className="w-full justify-start rounded-xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-surface)] px-3 text-[var(--decko-sidebar-text)]" showLabel />
-
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onLogout();
-                }}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red transition-colors hover:bg-[var(--decko-sidebar-hover)]"
-              >
-                <LogOut className="h-4 w-4" />
-                {t("common.signOut")}
-              </button>
-            </div>
-          </motion.aside>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-}
-
 export function DeckoMobileTopBar({
   userName,
   userEmail,
   avatarUrl,
-  onOpenDrawer,
 }: {
   userName?: string;
   userEmail?: string;
   avatarUrl?: string;
-  onOpenDrawer: () => void;
 }) {
-  const pathname = usePathname();
-  const { t } = useTranslation();
   const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
-  const pageTitle = getMobilePageTitle(pathname);
 
   return (
-    <header className="decko-mobile-bar sticky top-0 z-40 flex items-center gap-2 border-b px-4 py-2.5 lg:hidden safe-area-top safe-area-x">
-      <button
-        type="button"
-        onClick={onOpenDrawer}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-bg-tertiary text-text-primary transition-colors active:bg-bg-hover"
-        aria-label={t("dashboard.openSidebar")}
-      >
-        <Menu className="h-4 w-4" />
-      </button>
-
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-medium uppercase tracking-wide text-text-tertiary">{BRAND.name}</p>
-        <p className="truncate text-sm font-semibold text-text-primary">{pageTitle}</p>
+    <div className="decko-mobile-bar flex items-center justify-between border-b px-4 py-3 lg:hidden safe-area-top">
+      <Link href="/dashboard" className="flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--decko-accent)]">
+          <OnyxLogo size={18} />
+        </span>
+        <span className="font-bold text-text-primary">{BRAND.name}</span>
+      </Link>
+      <div className="flex items-center gap-2">
+        <ThemeToggle className="rounded-lg border border-border bg-bg-tertiary" />
+        {avatarUrl ? (
+          <img src={avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+        ) : (
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fin-btn-bg)] text-xs font-bold text-[var(--fin-btn-fg)]">
+            {initial}
+          </span>
+        )}
       </div>
-
-      <div className="flex shrink-0 items-center gap-1.5">
-        <NotificationBell className="h-10 w-10 rounded-xl border border-border bg-bg-tertiary" />
-        <Link
-          href="/dashboard/settings"
-          className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-border bg-bg-tertiary"
-          aria-label={t("dashboard.settings")}
-        >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-xs font-bold text-text-primary">{initial}</span>
-          )}
-        </Link>
-      </div>
-    </header>
+    </div>
   );
 }
