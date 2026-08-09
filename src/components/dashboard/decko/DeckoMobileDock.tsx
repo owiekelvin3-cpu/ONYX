@@ -14,6 +14,7 @@ import {
   Copy,
   FileCheck,
   LayoutDashboard,
+  LineChart,
   LogOut,
   MoreHorizontal,
   Receipt,
@@ -25,15 +26,16 @@ import {
 
 const MOBILE_TABS = [
   { labelKey: "dashboard.dock.home", href: "/dashboard", icon: LayoutDashboard },
-  { labelKey: "dashboard.dock.trade", href: "/dashboard/trade", icon: TrendingUp, featured: true },
-  { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
+  { labelKey: "dashboard.dock.trade", href: "/dashboard/trade", icon: TrendingUp },
+  { labelKey: "dashboard.navPortfolio", href: "/dashboard/portfolio", icon: Wallet },
+  { labelKey: "dashboard.transactions", href: "/dashboard/transactions", icon: Receipt },
   { labelKey: "nav.more", href: null, icon: MoreHorizontal },
 ] as const;
 
 const MORE_MENU_ITEMS = [
   { href: "/dashboard/deposit", labelKey: "dashboard.navDeposit", icon: ArrowDownToLine },
   { href: "/dashboard/withdraw", labelKey: "dashboard.navWithdraw", icon: ArrowUpFromLine },
-  { href: "/dashboard/transactions", labelKey: "dashboard.transactions", icon: Receipt },
+  { href: "/dashboard/analytics", labelKey: "dashboard.marketAnalytics", icon: LineChart },
   { href: "/dashboard/notifications", labelKey: "dashboard.notifications", icon: Bell },
   { href: "/dashboard/ai-trading", labelKey: "dashboard.aiTrading", icon: Bot },
   { href: "/dashboard/copy-trading", labelKey: "dashboard.copyTrading", icon: Copy },
@@ -73,55 +75,35 @@ export function DeckoMobileDock({
 
   return (
     <>
-      <div className="decko-mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.5rem,var(--safe-bottom))] lg:hidden">
+      <div className="decko-mobile-dock fixed inset-x-0 bottom-0 z-50 lg:hidden">
         <nav
-          className="pointer-events-auto mx-auto max-w-[420px] overflow-visible rounded-[24px] border border-[var(--decko-dock-border)] bg-[var(--decko-dock-bg)] p-1 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+          className="border-t border-[var(--decko-dock-border)] bg-[var(--decko-dock-bg)] pb-[max(0.25rem,var(--safe-bottom))] backdrop-blur-xl safe-area-x"
           aria-label={t("dashboard.navLabel")}
         >
-          <div className="grid grid-cols-4 items-center gap-0.5">
+          <div className="grid grid-cols-5">
             {MOBILE_TABS.map((item) => {
               const Icon = item.icon;
               const isMore = item.href === null;
               const active = isMore
                 ? menuOpen || isMoreMenuActive(pathname)
                 : isActive(pathname, item.href!);
-              const featured = "featured" in item && item.featured;
+
+              const tabClass = cn(
+                "relative flex min-h-[56px] flex-col items-center justify-center gap-1 px-1 py-2 touch-target transition-colors",
+                active ? "text-[var(--decko-accent)]" : "text-text-tertiary"
+              );
 
               const inner = (
                 <>
-                  {!featured && active && (
-                    <motion.span
-                      layoutId="decko-dock-active"
-                      className="absolute inset-0 rounded-[18px] bg-[var(--decko-accent)]/18"
-                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                    />
+                  {active && !isMore && (
+                    <span className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-[var(--decko-accent)]" />
                   )}
-                  <span
-                    className={cn(
-                      "relative flex items-center justify-center rounded-2xl transition-all duration-200",
-                      featured
-                        ? "h-11 w-11 rounded-full bg-[var(--decko-accent)] text-[#111111] shadow-[0_6px_18px_rgba(226,255,76,0.4)]"
-                        : cn(
-                            "h-9 w-9",
-                            active ? "text-[var(--decko-accent)]" : "text-[#9CA3AF]"
-                          )
-                    )}
-                  >
-                    <Icon className={cn("shrink-0", featured ? "h-5 w-5" : "h-[18px] w-[18px]")} />
-                  </span>
-                  <span
-                    className={cn(
-                      "relative mt-1 max-w-[72px] truncate text-[10px] font-medium leading-none",
-                      active || featured ? "text-white" : "text-[#737373]"
-                    )}
-                  >
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
+                  <span className="max-w-[68px] truncate text-[11px] font-medium leading-none">
                     {t(item.labelKey)}
                   </span>
                 </>
               );
-
-              const tabClass =
-                "relative flex min-h-[62px] flex-col items-center justify-center px-1 py-1.5 touch-target";
 
               if (isMore) {
                 return (
@@ -167,26 +149,26 @@ export function DeckoMobileDock({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
-              className="absolute bottom-0 left-0 right-0 overflow-hidden rounded-t-[24px] border-t border-border bg-bg-secondary pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-16px_48px_rgba(0,0,0,0.16)]"
+              className="decko-sheet absolute bottom-0 left-0 right-0 overflow-hidden rounded-t-[20px] border-t pb-[max(0.75rem,var(--safe-bottom))] shadow-[0_-12px_40px_rgba(0,0,0,0.18)]"
             >
               <div className="flex justify-center pt-2.5">
                 <span className="h-1 w-9 rounded-full bg-border" aria-hidden />
               </div>
 
-              <div className="flex items-center justify-between px-4 pb-2 pt-1.5">
+              <div className="flex items-center justify-between px-4 pb-3 pt-1.5">
                 <p className="text-sm font-bold text-text-primary">{t("nav.more")}</p>
                 <button
                   type="button"
                   onClick={onMenuClose}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-bg-tertiary text-text-secondary transition-colors active:bg-bg-hover"
                   aria-label={t("common.close")}
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="px-3 pb-2">
-                <div className="grid grid-cols-4 gap-1.5">
+              <div className="px-4 pb-3">
+                <div className="grid grid-cols-3 gap-2">
                   {MORE_MENU_ITEMS.map((item, i) => {
                     const Icon = item.icon;
                     const active = isActive(pathname, item.href);
@@ -200,21 +182,21 @@ export function DeckoMobileDock({
                         <Link
                           href={item.href}
                           onClick={onMenuClose}
-                          className="group flex flex-col items-center gap-1 rounded-xl p-1 text-center"
+                          className="group flex flex-col items-center gap-1.5 rounded-xl border border-transparent p-2 text-center active:bg-bg-tertiary"
                         >
                           <span
                             className={cn(
-                              "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 group-active:scale-95",
+                              "flex h-11 w-11 items-center justify-center rounded-xl transition-colors",
                               active
-                                ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)] shadow-[0_6px_16px_rgba(226,255,76,0.3)]"
-                                : "bg-bg-tertiary text-text-primary group-hover:bg-bg-hover"
+                                ? "bg-[var(--decko-accent)] text-[var(--decko-accent-text)]"
+                                : "bg-bg-tertiary text-text-primary"
                             )}
                           >
                             <Icon className="h-4 w-4" />
                           </span>
                           <span
                             className={cn(
-                              "line-clamp-1 w-full text-[9px] font-medium leading-none",
+                              "line-clamp-2 min-h-[2rem] w-full text-[10px] font-medium leading-tight",
                               active ? "text-text-primary" : "text-text-secondary"
                             )}
                           >
@@ -227,16 +209,16 @@ export function DeckoMobileDock({
                 </div>
               </div>
 
-              <div className="border-t border-border px-3 py-2.5">
+              <div className="border-t border-border px-4 py-3">
                 <button
                   type="button"
                   onClick={() => {
                     onMenuClose();
                     onLogout();
                   }}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-red/20 bg-red/8 px-3 py-2.5 text-xs font-semibold text-red transition-colors active:bg-red/12"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-red/20 bg-red/8 px-3 py-3 text-sm font-semibold text-red transition-colors active:bg-red/12"
                 >
-                  <LogOut className="h-3.5 w-3.5" />
+                  <LogOut className="h-4 w-4" />
                   {t("common.signOut")}
                 </button>
               </div>

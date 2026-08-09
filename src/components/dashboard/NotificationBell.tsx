@@ -53,7 +53,7 @@ export function NotificationBell({ className }: { className?: string }) {
     <Link
       href="/dashboard/notifications"
       className={cn(
-        "relative hidden rounded-xl p-2.5 transition-colors sm:inline-flex",
+        "relative inline-flex items-center justify-center rounded-xl p-2.5 transition-colors",
         active
           ? "bg-brand/10 text-brand"
           : "text-text-tertiary hover:bg-bg-hover hover:text-text-primary",

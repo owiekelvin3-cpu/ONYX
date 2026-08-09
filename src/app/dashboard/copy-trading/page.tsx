@@ -79,7 +79,7 @@ export default function CopyTradingPage() {
   );
 
   return (
-    <div className="decko-dashboard mx-auto max-w-[1320px] space-y-8 pb-8">
+    <div className="decko-dashboard mx-auto max-w-[1320px] space-y-6 pb-6 lg:space-y-8 lg:pb-8">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Copy Trading</h1>
         <p className="mt-1 max-w-2xl text-sm text-text-secondary">
