@@ -371,7 +371,7 @@ export function FinCtaBanner() {
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
                   <Link
-                    href="/pricing"
+                    href="/fees"
                     className="inline-flex h-11 items-center rounded-full border border-border px-6 text-sm font-semibold text-text-primary hover:bg-bg-hover"
                   >
                     View fees

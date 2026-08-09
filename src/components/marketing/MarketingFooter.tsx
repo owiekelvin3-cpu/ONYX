@@ -16,7 +16,6 @@ const QUICK_LINKS = [
   { label: "Markets", href: "/markets" },
   { label: "Trading", href: "/trading" },
   { label: "Products", href: "/products" },
-  { label: "Pricing", href: "/pricing" },
   { label: "Help", href: "/help" },
   { label: "About", href: "/about" },
 ] as const;

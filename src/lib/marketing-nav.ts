@@ -8,7 +8,6 @@ export const MARKETING_NAV = [
 
 export const MARKETING_MORE_LINKS = [
   { label: "Features", href: "/features" },
-  { label: "Pricing", href: "/pricing" },
   { label: "Help Center", href: "/help" },
   { label: "About", href: "/about" },
 ] as const;
@@ -21,5 +20,4 @@ export const MARKETING_PAGES = [
   { slug: "markets", title: "Markets", href: "/markets" },
   { slug: "trading", title: "Trading", href: "/trading" },
   { slug: "features", title: "Features", href: "/features" },
-  { slug: "pricing", title: "Pricing", href: "/pricing" },
 ] as const;

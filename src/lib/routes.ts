@@ -27,7 +27,7 @@ export const SITE_ROUTES: Record<string, string> = {
   Affiliate: "/register",
   Referral: "/register",
   Features: "/features",
-  Pricing: "/pricing",
+  Pricing: "/fees",
 
   // Footer — About
   "About Us": "/about",

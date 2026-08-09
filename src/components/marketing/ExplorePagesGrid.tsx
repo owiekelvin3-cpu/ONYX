@@ -8,7 +8,6 @@ const PAGE_DESCRIPTIONS: Record<string, string> = {
   markets: "Live prices across crypto, stocks, forex, and commodities.",
   trading: "Connect, fund, and execute trades with transparent fees.",
   features: "Charts, analytics, alerts, and institutional-grade tools.",
-  pricing: "Simple 0.10% spot fees. No hidden spreads.",
 };
 
 export function ExplorePagesGrid() {

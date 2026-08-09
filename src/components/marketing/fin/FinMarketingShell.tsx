@@ -16,7 +16,6 @@ import {
   Bot,
   Globe,
   LayoutDashboard,
-  LineChart,
   Menu,
   Star,
   TrendingUp,
@@ -34,7 +33,6 @@ const SIDEBAR = [
   { href: "/markets", icon: Globe, label: "Markets" },
   { href: "/trading", icon: TrendingUp, label: "Trading" },
   { href: "/features", icon: Star, label: "Features" },
-  { href: "/pricing", icon: LineChart, label: "Pricing" },
   { href: "/dashboard/ai-trading", icon: Bot, label: "AI" },
 ] as const;
 
