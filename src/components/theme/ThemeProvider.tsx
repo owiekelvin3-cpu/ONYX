@@ -28,10 +28,7 @@ function readStoredTheme(): ColorTheme | null {
   return stored === "light" || stored === "dark" ? stored : null;
 }
 
-function getSystemTheme(): ColorTheme {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
+const DEFAULT_THEME: ColorTheme = "dark";
 
 function applyTheme(theme: ColorTheme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
@@ -44,25 +41,14 @@ function applyTheme(theme: ColorTheme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ColorTheme>(() => readStoredTheme() ?? "light");
+  const [theme, setThemeState] = useState<ColorTheme>(() => readStoredTheme() ?? DEFAULT_THEME);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const initial = readStoredTheme() ?? getSystemTheme();
+    const initial = readStoredTheme() ?? DEFAULT_THEME;
     setThemeState(initial);
     applyTheme(initial);
     setMounted(true);
-
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    function onSystemChange(event: MediaQueryListEvent) {
-      if (readStoredTheme()) return;
-      const next = event.matches ? "dark" : "light";
-      setThemeState(next);
-      applyTheme(next);
-    }
-
-    media.addEventListener("change", onSystemChange);
-    return () => media.removeEventListener("change", onSystemChange);
   }, []);
 
   const setTheme = useCallback((next: ColorTheme) => {
