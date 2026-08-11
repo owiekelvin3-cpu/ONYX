@@ -20,8 +20,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import {
   ArrowDownToLine,
-  ArrowUpFromLine,
-  Bell,
+  Bot,
   TrendingUp,
   Users,
   Zap,
@@ -45,11 +44,10 @@ type Props = {
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const QUICK_ACTIONS = [
-  { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
   { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
-  { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
-  { label: "Signals", href: "/dashboard/signals", icon: Zap },
-  { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
+  { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
+  { label: "Trading Signals", href: "/dashboard/signals", icon: Zap },
+  { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
 ] as const;
 
 function buildMonthlyBars(summary: PortfolioSummary, trades: TradeRow[]) {
@@ -210,8 +208,6 @@ function MobilePortfolioHero({
 }
 
 function QuickActionsGrid({ openOrders, tradesCount, mobile = false }: { openOrders: number; tradesCount: number; mobile?: boolean }) {
-  const actions = mobile ? QUICK_ACTIONS : QUICK_ACTIONS.slice(0, 4);
-
   return (
     <div className={cn("decko-card", mobile ? "p-4" : "p-5 sm:p-6")}>
       <div className="mb-3 flex items-center justify-between gap-2 lg:mb-4">
@@ -222,8 +218,13 @@ function QuickActionsGrid({ openOrders, tradesCount, mobile = false }: { openOrd
           {openOrders} open · {tradesCount} trades
         </span>
       </div>
-      <div className={cn("grid gap-2", mobile ? "grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-2.5" : "grid-cols-2 gap-3")}>
-        {actions.map((action) => {
+      <div
+        className={cn(
+          "grid gap-2 sm:gap-2.5",
+          mobile ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2 lg:grid-cols-4"
+        )}
+      >
+        {QUICK_ACTIONS.map((action) => {
           const Icon = action.icon;
           return (
             <Link
@@ -231,7 +232,7 @@ function QuickActionsGrid({ openOrders, tradesCount, mobile = false }: { openOrd
               href={action.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary text-center transition-colors active:border-[var(--decko-accent)] active:bg-bg-secondary",
-                mobile ? "p-3" : "items-start gap-3 rounded-2xl p-4 hover:border-[var(--decko-accent)]"
+                mobile ? "p-2.5 sm:p-3" : "items-start gap-3 rounded-2xl p-4 hover:border-[var(--decko-accent)]"
               )}
             >
               <span
@@ -242,7 +243,12 @@ function QuickActionsGrid({ openOrders, tradesCount, mobile = false }: { openOrd
               >
                 <Icon className="h-4 w-4" />
               </span>
-              <span className={cn("font-semibold text-text-primary", mobile ? "text-[11px]" : "")}>
+              <span
+                className={cn(
+                  "font-semibold leading-tight text-text-primary",
+                  mobile ? "text-[10px] sm:text-[11px]" : "text-sm"
+                )}
+              >
                 {action.label}
               </span>
             </Link>
