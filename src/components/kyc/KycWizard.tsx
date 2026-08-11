@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import { type KycStatus } from "@/lib/kyc";
@@ -11,6 +11,7 @@ import {
   isJwtExpiredError,
 } from "@/lib/auth-session";
 import { FaceVerificationCapture } from "@/components/kyc/FaceVerificationCapture";
+import { KycVerifyingOverlay } from "@/components/kyc/KycVerifyingOverlay";
 import { Card, Button } from "@/components/ui";
 import {
   ArrowDownToLine,
@@ -41,7 +42,13 @@ const DOC_TYPES = [
 ] as const;
 
 const MAX_BYTES = 10 * 1024 * 1024;
+const VERIFY_MIN_MS = 8000;
+const VERIFY_MAX_MS = 10000;
 type WizardStep = 1 | 2 | 3 | 4;
+
+function randomVerifyDurationMs() {
+  return VERIFY_MIN_MS + Math.floor(Math.random() * (VERIFY_MAX_MS - VERIFY_MIN_MS + 1));
+}
 
 function statusMeta(status: KycStatus) {
   if (status === "approved") {
@@ -85,6 +92,8 @@ export function KycWizard({ userId, kycStatus, onComplete }: KycWizardProps) {
   const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
   const [step, setStep] = useState<WizardStep>(1);
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyDurationMs, setVerifyDurationMs] = useState(VERIFY_MIN_MS);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState("");
 
@@ -282,30 +291,29 @@ export function KycWizard({ userId, kycStatus, onComplete }: KycWizardProps) {
       return;
     }
 
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ kyc_status: "pending" })
-      .eq("id", userId);
-
-    if (profileError) {
-      setError(formatAuthError(profileError, t("auth.sessionExpired")));
-      setLoading(false);
-      return;
-    }
-
     setFile(null);
     setSelfie(null);
-    setStep(1);
     if (fileInputRef.current) fileInputRef.current.value = "";
     setLoading(false);
-    onComplete();
+    setVerifyDurationMs(randomVerifyDurationMs());
+    setVerifying(true);
   };
+
+  const finishVerification = useCallback(() => {
+    setVerifying(false);
+    setStep(1);
+    onComplete();
+  }, [onComplete]);
 
   const selectedDoc = DOC_TYPES.find((d) => d.id === docType)!;
   const progressPct = (step / wizardSteps.length) * 100;
 
   return (
     <div className="space-y-5">
+      {verifying ? (
+        <KycVerifyingOverlay durationMs={verifyDurationMs} onComplete={finishVerification} />
+      ) : (
+        <>
       <Card
         className={cn(
           "relative overflow-hidden !p-5 sm:!p-6",
@@ -765,6 +773,8 @@ export function KycWizard({ userId, kycStatus, onComplete }: KycWizardProps) {
           </div>
         </form>
       ) : null}
+        </>
+      )}
     </div>
   );
 }
