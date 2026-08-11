@@ -26,7 +26,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
       "The rules, rights, and responsibilities that govern your use of Onyx Exchange.",
     lastUpdated: "August 8, 2026",
     effectiveDate: "August 8, 2026",
-    contactEmail: "legal@onyx.exchange",
+    contactEmail: "legal@onyxmarkets.site",
     quickFacts: [
       { label: "Minimum age", value: "18+" },
       { label: "Jurisdiction", value: "Global access" },
@@ -151,7 +151,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         summary: "How legal disputes are handled.",
         paragraphs: [
           "These Terms are governed by the laws specified in your account jurisdiction notice, without regard to conflict-of-law principles.",
-          "Before initiating formal proceedings, you agree to contact legal@onyx.exchange to attempt good-faith resolution. Where permitted, disputes may be resolved through binding arbitration rather than class action litigation.",
+          "Before initiating formal proceedings, you agree to contact legal@onyxmarkets.site to attempt good-faith resolution. Where permitted, disputes may be resolved through binding arbitration rather than class action litigation.",
         ],
       },
       {
@@ -168,7 +168,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         title: "12. Contact",
         summary: "Reach our legal team.",
         paragraphs: [
-          "Questions about these Terms may be directed to legal@onyx.exchange or ONYX Legal, Onyx Exchange, via the Help Center.",
+          "Questions about these Terms may be directed to legal@onyxmarkets.site or ONYX Legal, Onyx Exchange, via the Help Center.",
         ],
       },
     ],
@@ -180,7 +180,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
       "How Onyx Exchange collects, uses, shares, and protects your personal information.",
     lastUpdated: "August 8, 2026",
     effectiveDate: "August 8, 2026",
-    contactEmail: "privacy@onyx.exchange",
+    contactEmail: "privacy@onyxmarkets.site",
     quickFacts: [
       { label: "Encryption", value: "TLS 1.3 + AES-256" },
       { label: "Data sales", value: "Never" },
@@ -290,7 +290,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
           "Employee training and vendor security reviews.",
         ],
         highlight:
-          "No method of transmission or storage is 100% secure. Report suspected incidents to security@onyx.exchange immediately.",
+          "No method of transmission or storage is 100% secure. Report suspected incidents to security@onyxmarkets.site immediately.",
       },
       {
         id: "rights",
@@ -298,7 +298,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         summary: "Choices and requests you can make.",
         paragraphs: [
           "Depending on your location, you may have rights to access, correct, delete, restrict, or port your personal data, and to object to certain processing or withdraw consent.",
-          "Submit requests to privacy@onyx.exchange. We may verify your identity before fulfilling a request. You may also lodge a complaint with your local data protection authority.",
+          "Submit requests to privacy@onyxmarkets.site. We may verify your identity before fulfilling a request. You may also lodge a complaint with your local data protection authority.",
         ],
         bullets: [
           "Access & portability: receive a copy of data we hold about you.",
@@ -326,7 +326,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         title: "11. Children's Privacy",
         summary: "Our services are not directed to minors.",
         paragraphs: [
-          "The Platform is not intended for individuals under 18. We do not knowingly collect personal information from children. If you believe a minor has provided us data, contact privacy@onyx.exchange and we will take steps to delete it.",
+          "The Platform is not intended for individuals under 18. We do not knowingly collect personal information from children. If you believe a minor has provided us data, contact privacy@onyxmarkets.site and we will take steps to delete it.",
         ],
       },
       {
@@ -342,7 +342,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         title: "13. Contact Us",
         summary: "Privacy inquiries and data requests.",
         paragraphs: [
-          "For privacy questions, data subject requests, or concerns about this policy, contact privacy@onyx.exchange or write to ONYX Privacy, Onyx Exchange, via the Help Center.",
+          "For privacy questions, data subject requests, or concerns about this policy, contact privacy@onyxmarkets.site or write to ONYX Privacy, Onyx Exchange, via the Help Center.",
         ],
       },
     ],

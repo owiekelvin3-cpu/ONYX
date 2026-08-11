@@ -4,7 +4,7 @@ export const BRAND = {
   tagline: "Institutional-grade trading. Built for everyone.",
   description:
     "Trade crypto, stocks, and forex on a platform engineered for speed, security, and clarity — trusted by traders worldwide.",
-  domain: "onyx.exchange",
+  domain: "onyxmarkets.site",
 } as const;
 
 export const NAV = {

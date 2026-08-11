@@ -52,8 +52,8 @@ In **Authentication → URL Configuration**:
 
 | Setting | Value |
 |---------|--------|
-| Site URL | `https://meridian-markets-kohl.vercel.app` |
-| Redirect URLs | `http://localhost:3000/**`, `https://meridian-markets-kohl.vercel.app/**` |
+| Site URL | `https://onyxmarkets.site` |
+| Redirect URLs | `http://localhost:3000/**`, `https://onyxmarkets.site/**`, `https://www.onyxmarkets.site/**` |
 
 ### 5. Deposit wallets (optional)
 

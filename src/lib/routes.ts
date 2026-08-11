@@ -87,12 +87,12 @@ export const SITE_PAGES: Record<
     description: "Get support and find answers to common questions.",
     content: [
       "Welcome to the ONYX Help Center. Find answers to the most common questions below.",
-      "Account & Registration: Create a free account at onyx.exchange/register. Verification (KYC) is required for withdrawals over $10,000.",
+      "Account & Registration: Create a free account at onyxmarkets.site/register. Verification (KYC) is required for withdrawals over $10,000.",
       "Deposits: Navigate to Dashboard → Deposit. Select your asset and send crypto to the displayed wallet address. Deposits typically confirm within 10–30 minutes after team approval.",
       "Trading: Go to Dashboard → Trade to access spot markets. Select a pair, enter amount, and click Buy or Sell.",
       "Withdrawals: Dashboard → Withdraw. Choose crypto wallet, bank transfer, international wire, or PayPal/e-wallet. Enter payout details and amount — our team processes requests within 1–5 business days depending on method.",
       "Security: Enable 2FA in Settings. Never share your password or API keys. ONYX will never ask for your credentials via email.",
-      "Need more help? Open Dashboard → Support for live chat with our team, or email support@onyx.exchange — available 24/7.",
+      "Need more help? Open Dashboard → Support for live chat with our team, or email support@onyxmarkets.site — available 24/7.",
     ],
   },
   terms: {

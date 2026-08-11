@@ -35,7 +35,7 @@ loadEnvLocal();
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@onyx.exchange";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@onyxmarkets.site";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Onyx@Admin2026!";
 const ADMIN_NAME = process.env.ADMIN_NAME || "ONYX Admin";
 

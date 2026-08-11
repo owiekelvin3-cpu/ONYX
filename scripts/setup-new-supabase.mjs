@@ -125,7 +125,7 @@ async function main() {
 NEXT_PUBLIC_SUPABASE_URL=https://${projectRef}.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=${anon}
 NEXT_PUBLIC_APP_NAME=ONYX
-NEXT_PUBLIC_APP_URL=https://meridian-markets-kohl.vercel.app
+NEXT_PUBLIC_APP_URL=https://onyxmarkets.site
 `;
 
   const envPath = resolve(root, ".env.local");
@@ -138,8 +138,8 @@ Done! Migrations applied.
 
 Next:
   1. In Supabase → Authentication → URL Configuration, add:
-     Site URL: https://meridian-markets-kohl.vercel.app
-     Redirect URLs: http://localhost:3000/**, https://meridian-markets-kohl.vercel.app/**
+     Site URL: https://onyxmarkets.site
+     Redirect URLs: http://localhost:3000/**, https://onyxmarkets.site/**, https://www.onyxmarkets.site/**
   2. Update the same env vars on Vercel (Production)
   3. npm run dev — test register/login
   4. git push + vercel deploy --prod
