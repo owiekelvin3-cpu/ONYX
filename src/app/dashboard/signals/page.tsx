@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { SignalsClient } from "@/components/dashboard/signals/SignalsClient";
 
-export default function SignalsRedirectPage() {
-  redirect("/dashboard");
+export default function SignalsPage() {
+  return <SignalsClient />;
 }

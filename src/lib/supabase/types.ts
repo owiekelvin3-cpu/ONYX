@@ -147,7 +147,7 @@ export type TradingSignalRow = {
   target_price: string;
   stop_price: string;
   status: string;
-  min_tier: "basic" | "pro" | "vip";
+  min_tier: string;
   confidence: number;
   outcome?: string | null;
   notes?: string | null;

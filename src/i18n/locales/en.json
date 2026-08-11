@@ -889,7 +889,7 @@
   },
   "signals": {
     "title": "Trading Signals",
-    "subtitle": "Institutional-style signal desk with entry, target, and stop levels. Subscribe to unlock tier-gated setups — research only, not financial advice.",
+    "subtitle": "Purchase a signal plan to unlock the live trading desk. Plans start at $500 — research only, not financial advice.",
     "eyebrow": "Desk alerts",
     "balance": "Available balance",
     "currentPlan": "Current plan",
@@ -941,12 +941,10 @@
     "openNotifications": "Open notifications",
     "openTradingRoom": "Trading room",
     "packages": {
-      "basic": "Basic desk",
-      "pro": "Pro desk",
-      "vip": "VIP desk",
-      "basicVolume": "Up to 5 ideas / day",
-      "proVolume": "Up to 15 ideas / day",
-      "vipVolume": "Priority desk coverage"
+      "starter": "Starter desk",
+      "professional": "Professional desk",
+      "elite": "Elite desk",
+      "institutional": "Institutional desk"
     },
     "includes": {
       "desk": "Curated desk outlooks",
