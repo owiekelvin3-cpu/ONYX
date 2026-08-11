@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.onyxmarkets.site" }],
+        destination: "https://onyxmarkets.site/:path*",
+        permanent: true,
+      },
+      {
         source: "/pricing",
         destination: "/fees",
         permanent: true,

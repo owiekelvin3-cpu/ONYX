@@ -1,0 +1,6 @@
+Contact: mailto:support@onyxmarkets.site
+Contact: https://onyxmarkets.site/help
+Preferred-Languages: en
+Canonical: https://onyxmarkets.site/.well-known/security.txt
+Policy: https://onyxmarkets.site/terms
+Acknowledgments: https://onyxmarkets.site/help
