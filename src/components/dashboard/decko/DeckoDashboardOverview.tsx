@@ -25,7 +25,9 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  Zap,
 } from "@/components/icons";
+import { Button } from "@/components/ui/Button";
 
 type Props = {
   displayName: string;
@@ -42,6 +44,14 @@ type Props = {
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const QUICK_ACTIONS = [
+  { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
+  { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
+  { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
+  { label: "Signals", href: "/dashboard/signals", icon: Zap },
+  { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
+] as const;
 
 function buildMonthlyBars(summary: PortfolioSummary, trades: TradeRow[]) {
   const now = new Date();
@@ -78,6 +88,7 @@ function KpiCard({
   trendLabel,
   icon: Icon,
   delay = 0,
+  compact = false,
 }: {
   label: string;
   value?: string;
@@ -89,6 +100,7 @@ function KpiCard({
   trendLabel?: string;
   icon: typeof Users;
   delay?: number;
+  compact?: boolean;
 }) {
   const animated = useCountUp(numeric ?? 0, { decimals, duration: 1.2 + delay * 0.1 });
   const display = value ?? `${prefix}${animated}${suffix}`;
@@ -97,26 +109,82 @@ function KpiCard({
   return (
     <DeckoStaggerItem>
       <motion.div
-        className="decko-card h-full p-5"
-        whileHover={{ y: -4, transition: { duration: 0.2 } }}
+        className={cn("decko-card h-full", compact ? "p-3.5" : "p-4 lg:p-5")}
+        whileHover={{ y: compact ? 0 : -4, transition: { duration: 0.2 } }}
       >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm text-text-secondary">{label}</p>
-            <p className="mt-2 text-2xl font-bold tracking-tight text-text-primary">{display}</p>
-            {trend !== undefined && (
-              <p className={cn("mt-2 text-xs font-medium", up ? "text-green" : "text-red")}>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className={cn("text-text-secondary", compact ? "text-xs" : "text-sm")}>{label}</p>
+            <p
+              className={cn(
+                "mt-1 font-bold tracking-tight text-text-primary",
+                compact ? "text-lg" : "mt-2 text-xl lg:text-2xl"
+              )}
+            >
+              {display}
+            </p>
+            {trend !== undefined && !compact && (
+              <p className={cn("mt-1.5 text-xs font-medium lg:mt-2", up ? "text-green" : "text-red")}>
                 {up ? "+" : ""}
                 {trend.toFixed(1)}% {trendLabel}
               </p>
             )}
           </div>
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-tertiary text-text-primary">
-            <Icon className="h-4 w-4" />
+          <span
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-xl bg-bg-tertiary text-text-primary",
+              compact ? "h-8 w-8" : "h-10 w-10"
+            )}
+          >
+            <Icon className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
           </span>
         </div>
       </motion.div>
     </DeckoStaggerItem>
+  );
+}
+
+function QuickActionsGrid({ openOrders, tradesCount, mobile = false }: { openOrders: number; tradesCount: number; mobile?: boolean }) {
+  const actions = mobile ? QUICK_ACTIONS : QUICK_ACTIONS.slice(0, 4);
+
+  return (
+    <div className={cn("decko-card", mobile ? "p-4" : "p-5 sm:p-6")}>
+      <div className="mb-3 flex items-center justify-between gap-2 lg:mb-4">
+        <h2 className={cn("font-bold text-text-primary", mobile ? "text-base" : "text-lg")}>
+          Quick Actions
+        </h2>
+        <span className="rounded-full bg-bg-tertiary px-2 py-0.5 text-[10px] text-text-secondary lg:px-2.5 lg:py-1 lg:text-xs">
+          {openOrders} open · {tradesCount} trades
+        </span>
+      </div>
+      <div className={cn("grid gap-2.5", mobile ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-2 gap-3")}>
+        {actions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <Link
+              key={action.href}
+              href={action.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary text-center transition-colors active:border-[var(--decko-accent)] active:bg-bg-secondary",
+                mobile ? "p-3" : "items-start gap-3 rounded-2xl p-4 hover:border-[var(--decko-accent)]"
+              )}
+            >
+              <span
+                className={cn(
+                  "flex items-center justify-center rounded-xl bg-bg-secondary text-text-primary",
+                  mobile ? "h-9 w-9" : "h-10 w-10 shadow-sm"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className={cn("font-semibold text-text-primary", mobile ? "text-[11px]" : "")}>
+                {action.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -137,6 +205,7 @@ export function DeckoDashboardOverview({
   const firstName = displayName.split(" ")[0] || displayName || "Trader";
   const initial = (displayName || userEmail || "U").charAt(0).toUpperCase();
   const monthly = useMemo(() => buildMonthlyBars(summary, recentTrades), [summary, recentTrades]);
+  const chartMonths = useMemo(() => monthly.slice(-6), [monthly]);
 
   const cashPct =
     summary.totalValue > 0 ? (summary.cashBalance / summary.totalValue) * 100 : 50;
@@ -162,17 +231,16 @@ export function DeckoDashboardOverview({
   }, [today]);
 
   return (
-    <div className="decko-dashboard mx-auto max-w-[1320px]">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="decko-dashboard mx-auto max-w-[1320px] space-y-4 pb-2 lg:space-y-6 lg:pb-0">
+      {/* Header */}
+      <div className="flex flex-col gap-3 lg:mb-2 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">
-            Hello, {firstName}!
-          </h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            Here&apos;s your overview of your trading business!
+          <h1 className="text-xl font-bold text-text-primary lg:text-3xl">Hello, {firstName}!</h1>
+          <p className="mt-0.5 text-sm text-text-secondary lg:mt-1">
+            Here&apos;s your trading overview
           </p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="hidden items-center gap-2 sm:gap-3 lg:flex">
           <ThemeToggle className="rounded-xl border border-border bg-bg-secondary" />
           <NotificationBell />
           <div className="flex items-center gap-2 rounded-2xl border border-border bg-bg-secondary py-1.5 pl-1.5 pr-3">
@@ -183,7 +251,7 @@ export function DeckoDashboardOverview({
                 {initial}
               </span>
             )}
-            <div className="hidden sm:block min-w-0">
+            <div className="hidden min-w-0 sm:block">
               <p className="truncate text-sm font-semibold text-text-primary">{displayName || "Trader"}</p>
               <p className="truncate text-xs text-text-secondary">{userEmail}</p>
             </div>
@@ -191,7 +259,58 @@ export function DeckoDashboardOverview({
         </div>
       </div>
 
-      <DeckoStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {/* Mobile hero balance */}
+      <div className="decko-card overflow-hidden p-4 lg:hidden">
+        <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">Total portfolio</p>
+        <p className="mt-1 text-3xl font-bold tracking-tight text-text-primary">
+          {formatCurrency(summary.totalValue, summary.currency)}
+        </p>
+        <p className={cn("mt-1 text-xs font-medium", profitTotal >= 0 ? "text-green" : "text-red")}>
+          {profitTotal >= 0 ? "+" : ""}
+          {formatCurrency(profitTotal, summary.currency)} realized P&amp;L
+        </p>
+        <div className="mt-4 flex gap-2">
+          <Link href="/dashboard/trade" className="flex-1">
+            <Button className="w-full gap-1.5" size="sm">
+              <TrendingUp className="h-3.5 w-3.5" />
+              Trade
+            </Button>
+          </Link>
+          <Link href="/dashboard/deposit" className="flex-1">
+            <Button variant="secondary" className="w-full gap-1.5" size="sm">
+              <ArrowDownToLine className="h-3.5 w-3.5" />
+              Deposit
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Mobile quick actions — high on the page */}
+      <div className="lg:hidden">
+        <QuickActionsGrid openOrders={openOrders} tradesCount={tradesCount} mobile />
+      </div>
+
+      {/* Mobile compact KPIs */}
+      <DeckoStagger className="grid grid-cols-2 gap-3 lg:hidden">
+        <KpiCard
+          label="Cash"
+          numeric={summary.cashBalance}
+          decimals={2}
+          prefix="$"
+          icon={Wallet}
+          compact
+        />
+        <KpiCard
+          label="Profit"
+          value={formatCurrency(profitTotal, summary.currency)}
+          icon={TrendingUp}
+          delay={0.05}
+          compact
+        />
+      </DeckoStagger>
+
+      {/* Desktop KPIs */}
+      <DeckoStagger className="hidden gap-4 lg:grid lg:grid-cols-3">
         <KpiCard
           label="Total Portfolio"
           numeric={summary.totalValue}
@@ -221,21 +340,52 @@ export function DeckoDashboardOverview({
         />
       </DeckoStagger>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_340px]">
+      {/* Signal — mobile, compact placement */}
+      <div className="lg:hidden">
+        <SignalStrengthCard signalPct={signalPct} compact />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_340px]">
         <DeckoStaggerItem className="min-w-0">
-          <div className="decko-card p-5 sm:p-6">
-            <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="decko-card p-4 lg:p-6">
+            <div className="mb-4 flex items-center justify-between gap-3 lg:mb-6">
               <div>
-                <h2 className="text-lg font-bold text-text-primary">Portfolio Overview</h2>
-                <p className="text-sm text-text-secondary">Monthly profit performance</p>
+                <h2 className="text-base font-bold text-text-primary lg:text-lg">Portfolio Overview</h2>
+                <p className="text-xs text-text-secondary lg:text-sm">Monthly profit performance</p>
               </div>
-              <select className="rounded-xl border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary outline-none">
+              <select className="rounded-lg border border-border bg-bg-secondary px-2 py-1.5 text-xs text-text-primary outline-none lg:rounded-xl lg:px-3 lg:py-2 lg:text-sm">
                 <option>Month</option>
                 <option>Quarter</option>
               </select>
             </div>
 
-            <div className="relative flex h-[240px] items-end gap-2 sm:gap-3">
+            {/* Mobile: last 6 months */}
+            <div className="relative flex h-[160px] items-end gap-2 lg:hidden">
+              {chartMonths.map((bar, index) => (
+                <div key={bar.label} className="flex h-full flex-1 flex-col items-center gap-1.5">
+                  <DeckoAnimatedBar
+                    height={bar.height}
+                    delay={0.06 * index}
+                    active={hoverBar === index}
+                    onHover={() => setHoverBar(index)}
+                    onLeave={() => setHoverBar(null)}
+                  />
+                  <span className="text-[10px] text-text-tertiary">{bar.label}</span>
+                </div>
+              ))}
+              {hoverBar !== null && chartMonths[hoverBar] && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="pointer-events-none absolute left-1/2 top-1 z-10 -translate-x-1/2 rounded-lg bg-[var(--fin-btn-bg)] px-2.5 py-1.5 text-[10px] text-[var(--fin-btn-fg)] shadow-xl"
+                >
+                  <p>Profit: {formatNumber(chartMonths[hoverBar].profit / 1000, 1)}K</p>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Desktop: full year */}
+            <div className="relative hidden h-[240px] items-end gap-3 lg:flex">
               {monthly.map((bar, index) => (
                 <div key={bar.label} className="flex h-full flex-1 flex-col items-center gap-2">
                   <DeckoAnimatedBar
@@ -248,7 +398,6 @@ export function DeckoDashboardOverview({
                   <span className="text-[11px] text-text-tertiary">{bar.label}</span>
                 </div>
               ))}
-
               {hoverBar !== null && (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
@@ -265,7 +414,7 @@ export function DeckoDashboardOverview({
           </div>
         </DeckoStaggerItem>
 
-        <DeckoStaggerItem className="space-y-4">
+        <DeckoStaggerItem className="hidden space-y-4 xl:block">
           <SignalStrengthCard signalPct={signalPct} />
 
           <div className="decko-card p-5">
@@ -310,69 +459,31 @@ export function DeckoDashboardOverview({
         </DeckoStaggerItem>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <DeckoStaggerItem>
-          <div className="decko-card p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-text-primary">Portfolio Allocation</h2>
-            <div className="mt-6 space-y-5">
+          <div className="decko-card p-4 lg:p-6">
+            <h2 className="text-base font-bold text-text-primary lg:text-lg">Portfolio Allocation</h2>
+            <div className="mt-4 space-y-4 lg:mt-6 lg:space-y-5">
               <div>
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="text-text-secondary">Cash Balance</span>
-                  <span className="font-semibold text-text-primary">{cashPct.toFixed(2)}%</span>
+                  <span className="font-semibold text-text-primary">{cashPct.toFixed(1)}%</span>
                 </div>
                 <DeckoProgressBar value={cashPct} delay={0.2} />
-                <p className="mt-1 text-xs text-green">+{Math.max(1, cashPct * 0.08).toFixed(1)}%</p>
               </div>
               <div>
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="text-text-secondary">Holdings Value</span>
-                  <span className="font-semibold text-text-primary">{holdingsPct.toFixed(2)}%</span>
+                  <span className="font-semibold text-text-primary">{holdingsPct.toFixed(1)}%</span>
                 </div>
                 <DeckoProgressBar value={holdingsPct} delay={0.35} />
-                <p className="mt-1 text-xs text-green">+{Math.max(1, holdingsPct * 0.05).toFixed(1)}%</p>
               </div>
             </div>
           </div>
         </DeckoStaggerItem>
 
-        <DeckoStaggerItem>
-          <div className="decko-card p-5 sm:p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-text-primary">Quick Actions</h2>
-              <span className="rounded-full bg-bg-tertiary px-2.5 py-1 text-xs text-text-secondary">
-                {openOrders} open · {tradesCount} trades
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Trade", href: "/dashboard/trade", icon: TrendingUp },
-                { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
-                { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
-                { label: "Alerts", href: "/dashboard/notifications", icon: Bell },
-              ].map((action, index) => {
-                const Icon = action.icon;
-                return (
-                  <motion.div
-                    key={action.href}
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.45 + index * 0.06 }}
-                    whileHover={{ scale: 1.03 }}
-                  >
-                    <Link
-                      href={action.href}
-                      className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-bg-primary p-4 transition-colors hover:border-[var(--decko-accent)]"
-                    >
-                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-secondary text-text-primary shadow-sm">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span className="font-semibold text-text-primary">{action.label}</span>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
+        <DeckoStaggerItem className="hidden lg:block">
+          <QuickActionsGrid openOrders={openOrders} tradesCount={tradesCount} />
         </DeckoStaggerItem>
       </div>
     </div>

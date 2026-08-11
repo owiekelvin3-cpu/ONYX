@@ -3,22 +3,31 @@
 import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { getSignalStrength } from "@/lib/signal-strength";
+import { cn } from "@/lib/utils";
 import { useCountUp } from "@/components/dashboard/decko/decko-motion";
 
-const RING_SIZE = 112;
+const RING_SIZE_DEFAULT = 112;
+const RING_SIZE_COMPACT = 80;
 const STROKE = 7;
-const RADIUS = (RING_SIZE - STROKE) / 2;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export function SignalStrengthCard({ signalPct }: { signalPct: number }) {
+export function SignalStrengthCard({
+  signalPct,
+  compact = false,
+}: {
+  signalPct: number;
+  compact?: boolean;
+}) {
   const reduce = useReducedMotion();
   const clamped = Math.max(0, Math.min(100, signalPct));
   const strength = useMemo(() => getSignalStrength(clamped), [clamped]);
   const animatedPct = useCountUp(clamped, { duration: 1.6, decimals: 0 });
-  const dashOffset = CIRCUMFERENCE - (clamped / 100) * CIRCUMFERENCE;
+  const ringSize = compact ? RING_SIZE_COMPACT : RING_SIZE_DEFAULT;
+  const radius = (ringSize - STROKE) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (clamped / 100) * circumference;
 
   return (
-    <div className="decko-card signal-strength-card relative overflow-hidden p-5">
+    <div className={cn("decko-card signal-strength-card relative overflow-hidden", compact ? "p-4" : "p-5")}>
       {!reduce && (
         <>
           <motion.span
@@ -40,27 +49,27 @@ export function SignalStrengthCard({ signalPct }: { signalPct: number }) {
 
       <p className="text-sm font-medium text-text-secondary">Signal</p>
 
-      <div className="mt-4 flex items-center gap-4">
-        <div className="relative shrink-0" style={{ width: RING_SIZE, height: RING_SIZE }}>
-          <svg width={RING_SIZE} height={RING_SIZE} className="-rotate-90" aria-hidden>
+      <div className={cn("mt-4 flex items-center gap-4", compact && "mt-3 gap-3")}>
+        <div className="relative shrink-0" style={{ width: ringSize, height: ringSize }}>
+          <svg width={ringSize} height={ringSize} className="-rotate-90" aria-hidden>
             <circle
-              cx={RING_SIZE / 2}
-              cy={RING_SIZE / 2}
-              r={RADIUS}
+              cx={ringSize / 2}
+              cy={ringSize / 2}
+              r={radius}
               fill="none"
               stroke={strength.track}
               strokeWidth={STROKE}
             />
             <motion.circle
-              cx={RING_SIZE / 2}
-              cy={RING_SIZE / 2}
-              r={RADIUS}
+              cx={ringSize / 2}
+              cy={ringSize / 2}
+              r={radius}
               fill="none"
               stroke={strength.color}
               strokeWidth={STROKE}
               strokeLinecap="round"
-              strokeDasharray={CIRCUMFERENCE}
-              initial={reduce ? false : { strokeDashoffset: CIRCUMFERENCE }}
+              strokeDasharray={circumference}
+              initial={reduce ? false : { strokeDashoffset: circumference }}
               animate={{ strokeDashoffset: dashOffset }}
               transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
               style={{
@@ -83,7 +92,10 @@ export function SignalStrengthCard({ signalPct }: { signalPct: number }) {
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <motion.span
               key={animatedPct}
-              className="text-4xl font-bold tabular-nums tracking-tight"
+              className={cn(
+                "font-bold tabular-nums tracking-tight",
+                compact ? "text-2xl" : "text-4xl"
+              )}
               style={{ color: strength.color }}
               initial={reduce ? false : { opacity: 0, y: 8, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -93,7 +105,7 @@ export function SignalStrengthCard({ signalPct }: { signalPct: number }) {
             </motion.span>
             <motion.span
               key={strength.label}
-              className="text-lg font-semibold"
+              className={cn("font-semibold", compact ? "text-base" : "text-lg")}
               style={{ color: strength.color }}
               initial={reduce ? false : { opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
@@ -108,7 +120,7 @@ export function SignalStrengthCard({ signalPct }: { signalPct: number }) {
         </div>
       </div>
 
-      <div className="mt-5 border-t border-border/70 pt-4">
+      <div className={cn("border-t border-border/70 pt-4", compact ? "mt-4" : "mt-5")}>
         <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-wide text-text-tertiary">
           <span>Strength meter</span>
           <span>{clamped.toFixed(0)} / 100</span>
