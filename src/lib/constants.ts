@@ -38,7 +38,7 @@ export const PRODUCTS = [
   },
   {
     title: "Copy Trading",
-    desc: "Mirror top performers with one click. Set allocation limits and pause anytime.",
+    desc: "Follow top performers for free — one click, no subscription fee.",
     cta: "Browse traders",
     href: "/dashboard/copy-trading",
   },

@@ -14,9 +14,9 @@ import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "@/components/icons";
-import { formatCurrency, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
-const DEFAULT_ALLOCATION = 1000;
+const COPY_ALLOCATION = 0;
 
 function scrollToPageTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -64,7 +64,7 @@ export default function CopyTradingPage() {
       const row = await subscribeToTrader(supabase, {
         userId,
         traderName,
-        allocation: DEFAULT_ALLOCATION,
+        allocation: COPY_ALLOCATION,
       });
       setSubscriptions((prev) => [row, ...prev]);
     } catch (err) {
@@ -83,7 +83,7 @@ export default function CopyTradingPage() {
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Copy Trading</h1>
         <p className="mt-1 max-w-2xl text-sm text-text-secondary">
-          Follow top performers like a social feed — each trader has their own style, stats, and profile.
+          Follow top performers like a social feed — free to follow, no subscription fee.
           Past performance is not indicative of future results.
         </p>
       </div>
@@ -116,7 +116,7 @@ export default function CopyTradingPage() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-text-primary">{sub.trader_name}</p>
                       <p className="text-xs capitalize text-text-tertiary">
-                        {sub.status} · {formatCurrency(sub.allocation)}
+                        {sub.status} · Free
                       </p>
                     </div>
                   </div>
