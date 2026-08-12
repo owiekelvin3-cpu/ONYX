@@ -13,6 +13,7 @@ import {
 } from "@/lib/admin-api";
 import type { AdminUserFee, Profile } from "@/lib/admin-types";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminMobilePanel } from "@/components/admin/AdminMobilePanel";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -233,135 +234,72 @@ export default function AdminUsersPage() {
     setActing(false);
   }
 
-  return (
-    <div className="space-y-5 max-w-6xl">
-      <AdminPageHeader
-        title="Users"
-        subtitle="View accounts, balances, and moderation actions."
-        action={
-          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
-            Refresh
-          </Button>
-        }
-      />
+  function closeUser() {
+    setSelectedId(null);
+    setDetails(null);
+    setMessage("");
+  }
 
-      {message && (
-        <p className="text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
-          {message}
-        </p>
-      )}
+  const showDetail = !!selectedId;
+  const detailTitle =
+    details?.profile.full_name || details?.profile.email || t("admin.userDetail.title");
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-0 overflow-hidden">
-          <div className="border-b border-border p-4">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("admin.userDetail.searchPlaceholder")}
-                className="h-10 w-full rounded-lg border border-border bg-bg-primary pl-9 pr-3 text-sm text-text-primary outline-none focus:border-brand/40"
-              />
-            </div>
-            <p className="mt-2 text-xs text-text-tertiary">
-              {t("admin.allUsers")} ({filteredUsers.length})
-            </p>
-          </div>
+  function renderUserList(searchHeader: React.ReactNode) {
+    return (
+      <>
+        {searchHeader}
+        {loading ? (
+          <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
+        ) : filteredUsers.length === 0 ? (
+          <p className="p-8 text-center text-sm text-text-tertiary">{t("admin.noUsers")}</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {filteredUsers.map((u) => (
+              <li key={u.id}>
+                <button
+                  type="button"
+                  onClick={() => openUser(u.id)}
+                  className={cn(
+                    "w-full text-left p-4 hover:bg-bg-hover transition-colors active:bg-bg-hover",
+                    selectedId === u.id && "bg-brand/5"
+                  )}
+                >
+                  <p className="font-medium text-text-primary truncate">{u.full_name || u.email}</p>
+                  <p className="text-xs text-text-tertiary truncate">{u.email}</p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-text-secondary">
+                    <MapPin className="h-3 w-3 shrink-0 text-text-tertiary" />
+                    <span className="truncate">{formatProfileLocation(u)}</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <StatusBadge status={u.kyc_status} />
+                    {u.role === "admin" && <StatusBadge status="team" />}
+                    {u.is_suspended && <StatusBadge status="suspended" />}
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    );
+  }
 
-          {loading ? (
-            <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
-          ) : filteredUsers.length === 0 ? (
-            <p className="p-8 text-center text-sm text-text-tertiary">{t("admin.noUsers")}</p>
-          ) : (
-            <>
-              <ul className="divide-y divide-border max-h-[32rem] overflow-y-auto md:hidden">
-                {filteredUsers.map((u) => (
-                  <li key={u.id}>
-                    <button
-                      type="button"
-                      onClick={() => openUser(u.id)}
-                      className={cn(
-                        "w-full text-left p-4 hover:bg-bg-hover transition-colors",
-                        selectedId === u.id && "bg-brand/5"
-                      )}
-                    >
-                      <p className="font-medium text-text-primary truncate">{u.full_name || u.email}</p>
-                      <p className="text-xs text-text-tertiary truncate">{u.email}</p>
-                      <p className="mt-1 flex items-center gap-1 text-xs text-text-secondary">
-                        <MapPin className="h-3 w-3 shrink-0 text-text-tertiary" />
-                        <span className="truncate">{formatProfileLocation(u)}</span>
-                      </p>
-                      <div className="flex gap-2 mt-2">
-                        <StatusBadge status={u.kyc_status} />
-                        {u.role === "admin" && <StatusBadge status="team" />}
-                        {u.is_suspended && <StatusBadge status="suspended" />}
-                      </div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+  function renderUserDetails(options?: { hideHeader?: boolean }) {
+    if (!selectedId) return null;
+    if (detailLoading) {
+      return <p className="text-sm text-text-tertiary py-8 text-center">Loading user…</p>;
+    }
+    if (!details) return null;
 
-              <div className="hidden max-h-[32rem] overflow-auto md:block">
-                <table className="w-full min-w-[720px] text-left text-sm">
-                  <thead className="sticky top-0 bg-bg-secondary text-[11px] uppercase tracking-wide text-text-tertiary">
-                    <tr className="border-b border-border">
-                      <th className="px-4 py-3 font-semibold">{t("admin.name")}</th>
-                      <th className="px-4 py-3 font-semibold">{t("admin.email")}</th>
-                      <th className="px-4 py-3 font-semibold">{t("admin.userDetail.locationShort")}</th>
-                      <th className="px-4 py-3 font-semibold">{t("admin.kyc")}</th>
-                      <th className="px-4 py-3 font-semibold">{t("common.status")}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredUsers.map((u) => (
-                      <tr
-                        key={u.id}
-                        onClick={() => openUser(u.id)}
-                        className={cn(
-                          "cursor-pointer transition-colors hover:bg-bg-hover",
-                          selectedId === u.id && "bg-brand/5"
-                        )}
-                      >
-                        <td className="max-w-[140px] truncate px-4 py-3 font-medium text-text-primary">
-                          {u.full_name || "—"}
-                        </td>
-                        <td className="max-w-[180px] truncate px-4 py-3 text-text-tertiary">{u.email}</td>
-                        <td className="max-w-[160px] truncate px-4 py-3 text-text-secondary">
-                          {formatProfileLocation(u)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <StatusBadge status={u.kyc_status} />
-                        </td>
-                        <td className="px-4 py-3">
-                          {u.is_suspended ? (
-                            <StatusBadge status="suspended" />
-                          ) : (
-                            <span className="text-xs text-text-tertiary">Active</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-        </Card>
-
-        <Card>
-          {!selectedId ? (
-            <p className="text-sm text-text-tertiary py-8 text-center">Select a user to view details.</p>
-          ) : detailLoading ? (
-            <p className="text-sm text-text-tertiary py-8 text-center">Loading user…</p>
-          ) : details ? (
-            <div className="space-y-4">
+    return (
+      <div className="space-y-4">
+              {!options?.hideHeader && (
               <div>
                 <h2 className="text-lg font-semibold text-text-primary">{details.profile.full_name || details.profile.email}</h2>
                 <p className="text-sm text-text-tertiary">{details.profile.email}</p>
                 <p className="text-xs text-text-tertiary mt-1">Joined {formatDate(details.profile.created_at)}</p>
               </div>
+              )}
 
               <div className="rounded-lg border border-border bg-bg-secondary/40 p-4">
                 <div className="mb-3 flex items-center justify-between gap-2">
@@ -647,15 +585,152 @@ export default function AdminUsersPage() {
                   onChange={(e) => setBalanceReason(e.target.value)}
                   className="w-full h-10 px-3 bg-bg-primary border border-border rounded text-sm"
                 />
-                <div className="flex gap-2">
-                  <Button size="sm" disabled={acting} onClick={() => handleBalance("credit")}>Credit</Button>
-                  <Button size="sm" variant="outline" disabled={acting} onClick={() => handleBalance("debit")}>Debit</Button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button size="sm" disabled={acting} onClick={() => handleBalance("credit")} className="sm:flex-1">
+                    Credit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={acting}
+                    onClick={() => handleBalance("debit")}
+                    className="sm:flex-1"
+                  >
+                    Debit
+                  </Button>
                 </div>
               </div>
+      </div>
+    );
+  }
+
+  const searchHeader = (
+    <div className="border-b border-border p-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t("admin.userDetail.searchPlaceholder")}
+          className="h-10 w-full rounded-lg border border-border bg-bg-primary pl-9 pr-3 text-base text-text-primary outline-none focus:border-brand/40 sm:text-sm"
+        />
+      </div>
+      <p className="mt-2 text-xs text-text-tertiary">
+        {t("admin.allUsers")} ({filteredUsers.length})
+      </p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-5 max-w-6xl">
+      <div className={cn("space-y-5", showDetail && "hidden lg:block")}>
+        <AdminPageHeader
+          title="Users"
+          subtitle="View accounts, balances, and moderation actions."
+          action={
+            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+              <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+              Refresh
+            </Button>
+          }
+        />
+
+        {message && !showDetail && (
+          <p className="text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
+            {message}
+          </p>
+        )}
+      </div>
+
+      {/* Mobile user list */}
+      <Card className={cn("overflow-hidden p-0 lg:hidden", showDetail && "hidden")}>
+        {renderUserList(searchHeader)}
+      </Card>
+
+      {/* Desktop split view */}
+      <div className="hidden lg:grid lg:grid-cols-2 gap-4">
+        <Card className="overflow-hidden p-0">
+          {searchHeader}
+          {loading ? (
+            <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
+          ) : filteredUsers.length === 0 ? (
+            <p className="p-8 text-center text-sm text-text-tertiary">{t("admin.noUsers")}</p>
+          ) : (
+            <div className="max-h-[calc(100dvh-14rem)] overflow-auto">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <thead className="sticky top-0 bg-bg-secondary text-[11px] uppercase tracking-wide text-text-tertiary">
+                  <tr className="border-b border-border">
+                    <th className="px-4 py-3 font-semibold">{t("admin.name")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("admin.email")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("admin.userDetail.locationShort")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("admin.kyc")}</th>
+                    <th className="px-4 py-3 font-semibold">{t("common.status")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredUsers.map((u) => (
+                    <tr
+                      key={u.id}
+                      onClick={() => openUser(u.id)}
+                      className={cn(
+                        "cursor-pointer transition-colors hover:bg-bg-hover",
+                        selectedId === u.id && "bg-brand/5"
+                      )}
+                    >
+                      <td className="max-w-[140px] truncate px-4 py-3 font-medium text-text-primary">
+                        {u.full_name || "—"}
+                      </td>
+                      <td className="max-w-[180px] truncate px-4 py-3 text-text-tertiary">{u.email}</td>
+                      <td className="max-w-[160px] truncate px-4 py-3 text-text-secondary">
+                        {formatProfileLocation(u)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={u.kyc_status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        {u.is_suspended ? (
+                          <StatusBadge status="suspended" />
+                        ) : (
+                          <span className="text-xs text-text-tertiary">Active</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ) : null}
+          )}
+        </Card>
+
+        <Card className="max-h-[calc(100dvh-14rem)] overflow-y-auto">
+          {!selectedId ? (
+            <p className="text-sm text-text-tertiary py-8 text-center">Select a user to view details.</p>
+          ) : (
+            renderUserDetails()
+          )}
         </Card>
       </div>
+
+      {message && showDetail && (
+        <p className="hidden text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary lg:block">
+          {message}
+        </p>
+      )}
+
+      <AdminMobilePanel
+        open={showDetail}
+        title={detailTitle}
+        subtitle={details?.profile.email}
+        onClose={closeUser}
+      >
+        {message && (
+          <p className="mb-4 text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
+            {message}
+          </p>
+        )}
+        {renderUserDetails({ hideHeader: true })}
+      </AdminMobilePanel>
     </div>
   );
 }
