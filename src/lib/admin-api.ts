@@ -37,6 +37,20 @@ export async function moderateAdminUser(params: {
   if (error) throw new Error(rpcError(error, "Could not complete that action."));
 }
 
+export async function deleteAdminUser(params: { userId: string; reason: string }) {
+  const supabase = createClient();
+  const reason = params.reason.trim();
+  if (reason.length < 3) {
+    throw new Error("A reason of at least 3 characters is required.");
+  }
+
+  const { error } = await supabase.rpc("admin_delete_user", {
+    p_user_id: params.userId,
+    p_reason: reason,
+  });
+  if (error) throw new Error(rpcError(error, "Could not delete user."));
+}
+
 export async function adjustAdminUserBalance(params: {
   userId: string;
   direction: AdminBalanceDirection;

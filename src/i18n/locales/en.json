@@ -449,6 +449,13 @@
     "navGroupAccount": "Account",
     "navGroupOverview": "Overview",
     "navGroupTools": "Tools",
+    "suspended": {
+      "title": "Account suspended",
+      "description": "You can still sign in and view your account, but withdrawals are disabled. Contact our team to resolve this.",
+      "reason": "Reason",
+      "contactAdmin": "Contact admin",
+      "withdrawBlocked": "Withdrawals are disabled while your account is suspended. Please contact admin through support."
+    },
     "navDashboard": "Dashboard",
     "navTrade": "Trade",
     "navPortfolio": "Portfolio",

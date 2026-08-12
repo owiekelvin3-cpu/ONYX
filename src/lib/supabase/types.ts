@@ -83,6 +83,8 @@ export type WithdrawalEligibility = {
   portfolio: Record<string, unknown>;
   pending_fees_count: number;
   can_withdraw: boolean;
+  is_suspended?: boolean;
+  suspension_reason?: string | null;
 };
 
 export type ProfileRow = {

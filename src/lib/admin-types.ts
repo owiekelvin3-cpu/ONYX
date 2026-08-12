@@ -7,6 +7,8 @@ export interface Profile {
   role: "user" | "admin";
   kyc_status: string;
   is_suspended?: boolean;
+  suspended_at?: string | null;
+  suspension_reason?: string | null;
   phone?: string | null;
   country?: string | null;
   city?: string | null;

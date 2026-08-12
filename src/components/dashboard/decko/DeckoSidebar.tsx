@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { SuspendedAvatarBadge } from "@/components/dashboard/AccountSuspendedBanner";
 import {
   ArrowRight,
   Bot,
@@ -165,10 +166,12 @@ export function DeckoMobileTopBar({
   userName,
   userEmail,
   avatarUrl,
+  isSuspended,
 }: {
   userName?: string;
   userEmail?: string;
   avatarUrl?: string;
+  isSuspended?: boolean;
 }) {
   const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
 
@@ -182,13 +185,18 @@ export function DeckoMobileTopBar({
       </Link>
       <div className="flex items-center gap-2">
         <ThemeToggle className="rounded-lg border border-border bg-bg-tertiary" />
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
-        ) : (
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fin-btn-bg)] text-xs font-bold text-[var(--fin-btn-fg)]">
-            {initial}
-          </span>
-        )}
+        <div className="relative">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fin-btn-bg)] text-xs font-bold text-[var(--fin-btn-fg)]">
+              {initial}
+            </span>
+          )}
+          {isSuspended && (
+            <SuspendedAvatarBadge className="absolute -right-0.5 -top-0.5" />
+          )}
+        </div>
       </div>
     </div>
   );

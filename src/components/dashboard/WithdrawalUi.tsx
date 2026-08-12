@@ -125,6 +125,34 @@ export function WithdrawalBlockedBanner() {
   );
 }
 
+export function WithdrawalSuspendedBanner({ reason }: { reason?: string | null }) {
+  return (
+    <div className="rounded-2xl border border-red/30 bg-red/5 p-4 flex gap-3">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red/10 text-red">
+        <AlertTriangle className="w-4 h-4" />
+      </span>
+      <div>
+        <p className="text-sm font-semibold text-text-primary">Account suspended</p>
+        <p className="text-xs text-text-tertiary mt-1 leading-relaxed">
+          Withdrawals are disabled while your account is suspended. Contact admin through support to resolve this.
+        </p>
+        {reason?.trim() && (
+          <p className="text-xs text-text-tertiary mt-2">
+            <span className="font-medium text-text-secondary">Reason:</span> {reason.trim()}
+          </p>
+        )}
+        <Link
+          href="/dashboard/support"
+          className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-brand hover:text-brand-hover"
+        >
+          <Comments className="w-3.5 h-3.5" />
+          Contact admin
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export function WithdrawalPendingFeesBanner({ fees }: { fees: UserFeeRow[] }) {
   const total = fees.reduce((sum, fee) => sum + Number(fee.amount), 0);
   const primaryFee = fees[0];

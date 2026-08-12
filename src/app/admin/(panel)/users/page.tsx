@@ -10,6 +10,7 @@ import {
   adjustAdminUserProfit,
   assignAdminUserFee,
   updateAdminUserFeeStatus,
+  deleteAdminUser,
 } from "@/lib/admin-api";
 import type { AdminUserFee, Profile } from "@/lib/admin-types";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -19,7 +20,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { formatProfileLocation } from "@/lib/user-location";
-import { Globe, MapPin, RefreshCw, Search } from "@/components/icons";
+import { Globe, MapPin, RefreshCw, Search, X } from "@/components/icons";
 
 const FEE_TYPES = [
   { id: "withdrawal_processing", label: "Withdrawal processing fee" },
@@ -56,6 +57,9 @@ export default function AdminUsersPage() {
   const [feeLabel, setFeeLabel] = useState<string>(FEE_TYPES[0].label);
   const [feeAmount, setFeeAmount] = useState("");
   const [feeNotes, setFeeNotes] = useState("");
+  const [moderationReason, setModerationReason] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -95,6 +99,8 @@ export default function AdminUsersPage() {
     setSelectedId(id);
     setDetailLoading(true);
     setMessage("");
+    setDeleteConfirm(false);
+    setDeleteReason("");
     try {
       const d = await fetchAdminUserDetails(id);
       setDetails(d);
@@ -107,6 +113,11 @@ export default function AdminUsersPage() {
 
   async function handleModerate(action: "suspend" | "unsuspend" | "reset_kyc") {
     if (!selectedId) return;
+    const reason = moderationReason.trim();
+    if (action !== "unsuspend" && reason.length < 3) {
+      setMessage(t("admin.userDetail.reasonRequired"));
+      return;
+    }
     setActing(true);
     try {
       await moderateAdminUser({
@@ -114,10 +125,10 @@ export default function AdminUsersPage() {
         action,
         reason:
           action === "suspend"
-            ? "Suspended by team"
+            ? reason
             : action === "reset_kyc"
-              ? "KYC reset by admin"
-              : undefined,
+              ? reason
+              : reason || "Suspension lifted by team",
       });
       setMessage(
         action === "suspend"
@@ -126,6 +137,7 @@ export default function AdminUsersPage() {
             ? "KYC reset — user must verify again"
             : "User unsuspended"
       );
+      setModerationReason("");
       await openUser(selectedId);
       await load();
     } catch (e) {
@@ -232,6 +244,26 @@ export default function AdminUsersPage() {
       setMessage(e instanceof Error ? e.message : "Could not update fee");
     }
     setActing(false);
+  }
+
+  async function handleDeleteUser() {
+    if (!selectedId || !details) return;
+    const reason = deleteReason.trim() || moderationReason.trim();
+    if (reason.length < 3) {
+      setMessage(t("admin.userDetail.reasonRequired"));
+      return;
+    }
+    setActing(true);
+    try {
+      await deleteAdminUser({ userId: selectedId, reason });
+      setMessage(`Deleted ${details.profile.email}`);
+      closeUser();
+      await load();
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : t("admin.userDetail.deleteFailed"));
+    }
+    setActing(false);
+    setDeleteConfirm(false);
   }
 
   function closeUser() {
@@ -401,6 +433,43 @@ export default function AdminUsersPage() {
                     </p>
                   </div>
                 )}
+              </div>
+
+              {details.profile.is_suspended && (
+                <div className="rounded-lg border border-red/25 bg-red/5 p-3">
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status="suspended" />
+                    {details.profile.suspended_at && (
+                      <span className="text-xs text-text-tertiary">
+                        {t("admin.userDetail.suspendedSince", {
+                          date: formatDate(details.profile.suspended_at),
+                        })}
+                      </span>
+                    )}
+                  </div>
+                  {details.profile.suspension_reason && (
+                    <p className="mt-2 text-sm text-text-secondary">
+                      <span className="font-medium text-text-primary">
+                        {t("admin.userDetail.suspensionReason")}:
+                      </span>{" "}
+                      {details.profile.suspension_reason}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-2 rounded-lg border border-border bg-bg-secondary/40 p-3">
+                <p className="text-sm font-medium text-text-primary">
+                  {t("admin.userDetail.accountActions")}
+                </p>
+                <p className="text-xs text-text-tertiary">{t("admin.userDetail.accountActionsDesc")}</p>
+                <input
+                  type="text"
+                  placeholder={t("admin.userDetail.reasonPlaceholder")}
+                  value={moderationReason}
+                  onChange={(e) => setModerationReason(e.target.value)}
+                  className="w-full h-10 px-3 bg-bg-primary border border-border rounded text-sm"
+                />
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -600,6 +669,62 @@ export default function AdminUsersPage() {
                   </Button>
                 </div>
               </div>
+
+              {details.profile.role !== "admin" && (
+                <div className="border-t border-border pt-4 space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold text-red">{t("admin.userDetail.deleteUserTitle")}</p>
+                    <p className="mt-1 text-xs text-text-tertiary">{t("admin.userDetail.deleteUserDesc")}</p>
+                  </div>
+                  {!deleteConfirm ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={acting}
+                      className="border-red/30 text-red hover:bg-red/5"
+                      onClick={() => setDeleteConfirm(true)}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      {t("admin.userDetail.deleteUser")}
+                    </Button>
+                  ) : (
+                    <div className="space-y-3 rounded-lg border border-red/25 bg-red/5 p-3">
+                      <p className="text-sm text-text-primary">
+                        {t("admin.userDetail.deleteConfirmBody", {
+                          name: details.profile.full_name || details.profile.email,
+                          email: details.profile.email,
+                        })}
+                      </p>
+                      <p className="text-xs text-text-tertiary">{t("admin.userDetail.deleteConfirmHint")}</p>
+                      <input
+                        type="text"
+                        placeholder={t("admin.userDetail.reasonPlaceholder")}
+                        value={deleteReason}
+                        onChange={(e) => setDeleteReason(e.target.value)}
+                        className="w-full h-10 px-3 bg-bg-primary border border-border rounded text-sm"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          disabled={acting}
+                          className="bg-red hover:bg-red/90"
+                          onClick={() => void handleDeleteUser()}
+                        >
+                          {acting ? t("admin.userDetail.deleting") : t("admin.userDetail.deleteConfirmSubmit")}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={acting}
+                          onClick={() => setDeleteConfirm(false)}
+                        >
+                          {t("common.cancel")}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
       </div>
     );
   }

@@ -21,7 +21,7 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, avatar_url")
+    .select("full_name, avatar_url, is_suspended, suspension_reason")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -31,6 +31,8 @@ export default async function DashboardLayout({
       userName={profile?.full_name ?? undefined}
       userEmail={user.email}
       avatarUrl={profile?.avatar_url ?? undefined}
+      isSuspended={profile?.is_suspended ?? false}
+      suspensionReason={profile?.suspension_reason}
     >
       {children}
     </DashboardShell>

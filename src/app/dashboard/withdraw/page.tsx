@@ -30,6 +30,7 @@ import {
   WithdrawalPageHeader,
   WithdrawalBalanceBanner,
   WithdrawalBlockedBanner,
+  WithdrawalSuspendedBanner,
   WithdrawalPendingFeesBanner,
   WithdrawalMethodPicker,
   WithdrawalAmountField,
@@ -57,6 +58,8 @@ export default function WithdrawPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [canWithdraw, setCanWithdraw] = useState(true);
+  const [isSuspended, setIsSuspended] = useState(false);
+  const [suspensionReason, setSuspensionReason] = useState<string | null>(null);
   const [pendingFees, setPendingFees] = useState<UserFeeRow[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRow[]>([]);
   const [method, setMethod] = useState<WithdrawalMethodId>("crypto");
@@ -91,6 +94,8 @@ export default function WithdrawPage() {
         try {
           const eligibility = await getWithdrawalEligibility(supabase);
           setCanWithdraw(eligibility.can_withdraw);
+          setIsSuspended(Boolean(eligibility.is_suspended));
+          setSuspensionReason(eligibility.suspension_reason ?? null);
         } catch {
           setCanWithdraw(true);
         }
@@ -250,10 +255,15 @@ export default function WithdrawPage() {
 
       <WithdrawalBalanceBanner balance={balance} loading={loading} />
 
-      {!canWithdraw && !loading && pendingFees.length > 0 && (
+      {!canWithdraw && !loading && isSuspended && (
+        <WithdrawalSuspendedBanner reason={suspensionReason} />
+      )}
+      {!canWithdraw && !loading && !isSuspended && pendingFees.length > 0 && (
         <WithdrawalPendingFeesBanner fees={pendingFees} />
       )}
-      {!canWithdraw && !loading && pendingFees.length === 0 && <WithdrawalBlockedBanner />}
+      {!canWithdraw && !loading && !isSuspended && pendingFees.length === 0 && (
+        <WithdrawalBlockedBanner />
+      )}
 
       {canWithdraw && (balance ?? 0) > 0 && (
         <>

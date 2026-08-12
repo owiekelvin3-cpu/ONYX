@@ -13,6 +13,7 @@ import {
 } from "@/components/dashboard/decko/DeckoSidebar";
 import { DeckoMobileDock } from "@/components/dashboard/decko/DeckoMobileDock";
 import { UserLocationSync } from "@/components/dashboard/UserLocationSync";
+import { AccountSuspendedBanner } from "@/components/dashboard/AccountSuspendedBanner";
 
 export function shouldHideMobileBottomNav(pathname: string) {
   return pathname.startsWith("/dashboard/support");
@@ -24,12 +25,16 @@ export function DashboardShell({
   userName,
   userEmail,
   avatarUrl,
+  isSuspended,
+  suspensionReason,
 }: {
   children: React.ReactNode;
   userId?: string;
   userName?: string;
   userEmail?: string;
   avatarUrl?: string;
+  isSuspended?: boolean;
+  suspensionReason?: string | null;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -56,6 +61,7 @@ export function DashboardShell({
             userName={userName}
             userEmail={userEmail}
             avatarUrl={avatarUrl}
+            isSuspended={isSuspended}
           />
 
           <main
@@ -66,6 +72,7 @@ export function DashboardShell({
                 : "pb-[calc(5.75rem+var(--safe-bottom))] lg:pb-8"
             )}
           >
+            {isSuspended && <AccountSuspendedBanner reason={suspensionReason} />}
             {children}
           </main>
 
