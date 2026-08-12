@@ -9,6 +9,12 @@ export interface Profile {
   is_suspended?: boolean;
   phone?: string | null;
   country?: string | null;
+  city?: string | null;
+  region?: string | null;
+  timezone?: string | null;
+  last_known_ip?: string | null;
+  last_known_location?: string | null;
+  location_updated_at?: string | null;
   created_at: string;
   admin_notes?: string | null;
   signal_pct?: number;
@@ -36,6 +42,13 @@ export interface AdminUserDetails {
   balance: number;
   profit_total?: number;
   outstanding_fees_total: number;
+  auth?: {
+    created_at?: string | null;
+    last_sign_in_at?: string | null;
+    email_confirmed_at?: string | null;
+    has_password?: boolean;
+    providers?: string[];
+  };
   fees?: AdminUserFee[];
   stats: {
     deposits_count: number;

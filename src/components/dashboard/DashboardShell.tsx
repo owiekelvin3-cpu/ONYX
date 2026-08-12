@@ -12,6 +12,7 @@ import {
   DeckoSidebar,
 } from "@/components/dashboard/decko/DeckoSidebar";
 import { DeckoMobileDock } from "@/components/dashboard/decko/DeckoMobileDock";
+import { UserLocationSync } from "@/components/dashboard/UserLocationSync";
 
 export function shouldHideMobileBottomNav(pathname: string) {
   return pathname.startsWith("/dashboard/support");
@@ -46,6 +47,7 @@ export function DashboardShell({
 
   return (
     <NotificationProvider userId={userId}>
+      <UserLocationSync userId={userId} />
       <div className="decko-shell flex min-h-dvh">
         <DeckoSidebar />
 

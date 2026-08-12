@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import {
   fetchAdminUserDetails,
@@ -16,7 +17,8 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
-import { RefreshCw } from "@/components/icons";
+import { formatProfileLocation } from "@/lib/user-location";
+import { Globe, MapPin, RefreshCw, Search } from "@/components/icons";
 
 const FEE_TYPES = [
   { id: "withdrawal_processing", label: "Withdrawal processing fee" },
@@ -25,8 +27,20 @@ const FEE_TYPES = [
   { id: "custom", label: "Custom fee" },
 ] as const;
 
+function hasLocationData(profile: Profile): boolean {
+  return Boolean(
+    profile.last_known_location ||
+      profile.last_known_ip ||
+      profile.country ||
+      profile.city ||
+      profile.timezone
+  );
+}
+
 export default function AdminUsersPage() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<Profile[]>([]);
+  const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [details, setDetails] = useState<Awaited<ReturnType<typeof fetchAdminUserDetails>> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,6 +70,25 @@ export default function AdminUsersPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const filteredUsers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter((u) => {
+      const location = formatProfileLocation(u).toLowerCase();
+      return (
+        u.email.toLowerCase().includes(q) ||
+        (u.full_name?.toLowerCase().includes(q) ?? false) ||
+        u.role.includes(q) ||
+        u.kyc_status.includes(q) ||
+        (u.is_suspended && "suspended".includes(q)) ||
+        (u.country?.toLowerCase().includes(q) ?? false) ||
+        (u.city?.toLowerCase().includes(q) ?? false) ||
+        (u.last_known_ip?.toLowerCase().includes(q) ?? false) ||
+        (location !== "—" && location.includes(q))
+      );
+    });
+  }, [users, search]);
 
   async function openUser(id: string) {
     setSelectedId(id);
@@ -221,31 +254,99 @@ export default function AdminUsersPage() {
 
       <div className="grid lg:grid-cols-2 gap-4">
         <Card className="p-0 overflow-hidden">
+          <div className="border-b border-border p-4">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("admin.userDetail.searchPlaceholder")}
+                className="h-10 w-full rounded-lg border border-border bg-bg-primary pl-9 pr-3 text-sm text-text-primary outline-none focus:border-brand/40"
+              />
+            </div>
+            <p className="mt-2 text-xs text-text-tertiary">
+              {t("admin.allUsers")} ({filteredUsers.length})
+            </p>
+          </div>
+
           {loading ? (
             <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
+          ) : filteredUsers.length === 0 ? (
+            <p className="p-8 text-center text-sm text-text-tertiary">{t("admin.noUsers")}</p>
           ) : (
-            <ul className="divide-y divide-border max-h-[32rem] overflow-y-auto">
-              {users.map((u) => (
-                <li key={u.id}>
-                  <button
-                    type="button"
-                    onClick={() => openUser(u.id)}
-                    className={cn(
-                      "w-full text-left p-4 hover:bg-bg-hover transition-colors",
-                      selectedId === u.id && "bg-brand/5"
-                    )}
-                  >
-                    <p className="font-medium text-text-primary truncate">{u.full_name || u.email}</p>
-                    <p className="text-xs text-text-tertiary truncate">{u.email}</p>
-                    <div className="flex gap-2 mt-2">
-                      <StatusBadge status={u.kyc_status} />
-                      {u.role === "admin" && <StatusBadge status="team" />}
-                      {u.is_suspended && <StatusBadge status="suspended" />}
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul className="divide-y divide-border max-h-[32rem] overflow-y-auto md:hidden">
+                {filteredUsers.map((u) => (
+                  <li key={u.id}>
+                    <button
+                      type="button"
+                      onClick={() => openUser(u.id)}
+                      className={cn(
+                        "w-full text-left p-4 hover:bg-bg-hover transition-colors",
+                        selectedId === u.id && "bg-brand/5"
+                      )}
+                    >
+                      <p className="font-medium text-text-primary truncate">{u.full_name || u.email}</p>
+                      <p className="text-xs text-text-tertiary truncate">{u.email}</p>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-text-secondary">
+                        <MapPin className="h-3 w-3 shrink-0 text-text-tertiary" />
+                        <span className="truncate">{formatProfileLocation(u)}</span>
+                      </p>
+                      <div className="flex gap-2 mt-2">
+                        <StatusBadge status={u.kyc_status} />
+                        {u.role === "admin" && <StatusBadge status="team" />}
+                        {u.is_suspended && <StatusBadge status="suspended" />}
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="hidden max-h-[32rem] overflow-auto md:block">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead className="sticky top-0 bg-bg-secondary text-[11px] uppercase tracking-wide text-text-tertiary">
+                    <tr className="border-b border-border">
+                      <th className="px-4 py-3 font-semibold">{t("admin.name")}</th>
+                      <th className="px-4 py-3 font-semibold">{t("admin.email")}</th>
+                      <th className="px-4 py-3 font-semibold">{t("admin.userDetail.locationShort")}</th>
+                      <th className="px-4 py-3 font-semibold">{t("admin.kyc")}</th>
+                      <th className="px-4 py-3 font-semibold">{t("common.status")}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredUsers.map((u) => (
+                      <tr
+                        key={u.id}
+                        onClick={() => openUser(u.id)}
+                        className={cn(
+                          "cursor-pointer transition-colors hover:bg-bg-hover",
+                          selectedId === u.id && "bg-brand/5"
+                        )}
+                      >
+                        <td className="max-w-[140px] truncate px-4 py-3 font-medium text-text-primary">
+                          {u.full_name || "—"}
+                        </td>
+                        <td className="max-w-[180px] truncate px-4 py-3 text-text-tertiary">{u.email}</td>
+                        <td className="max-w-[160px] truncate px-4 py-3 text-text-secondary">
+                          {formatProfileLocation(u)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={u.kyc_status} />
+                        </td>
+                        <td className="px-4 py-3">
+                          {u.is_suspended ? (
+                            <StatusBadge status="suspended" />
+                          ) : (
+                            <span className="text-xs text-text-tertiary">Active</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </Card>
 
@@ -260,6 +361,75 @@ export default function AdminUsersPage() {
                 <h2 className="text-lg font-semibold text-text-primary">{details.profile.full_name || details.profile.email}</h2>
                 <p className="text-sm text-text-tertiary">{details.profile.email}</p>
                 <p className="text-xs text-text-tertiary mt-1">Joined {formatDate(details.profile.created_at)}</p>
+              </div>
+
+              <div className="rounded-lg border border-border bg-bg-secondary/40 p-4">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+                    <Globe className="h-4 w-4 text-green" />
+                    {t("admin.userDetail.location")}
+                  </h3>
+                  {hasLocationData(details.profile) && (
+                    <span className="rounded-full border border-green/30 bg-green/10 px-2 py-0.5 text-[10px] font-semibold text-green">
+                      {t("admin.userDetail.locationLive")}
+                    </span>
+                  )}
+                </div>
+
+                {hasLocationData(details.profile) ? (
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-green/20 bg-green/[0.06] px-3 py-2.5">
+                      <p className="text-sm font-medium text-text-primary">
+                        {formatProfileLocation(details.profile)}
+                      </p>
+                      {details.profile.location_updated_at && (
+                        <p className="mt-1 text-xs text-text-tertiary">
+                          {t("admin.userDetail.locationDetectedAt", {
+                            time: formatDate(details.profile.location_updated_at),
+                          })}
+                        </p>
+                      )}
+                    </div>
+                    <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                      <div>
+                        <dt className="text-[11px] uppercase tracking-wide text-text-tertiary">
+                          {t("admin.userDetail.country")}
+                        </dt>
+                        <dd className="mt-0.5 text-text-primary">{details.profile.country || "—"}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-[11px] uppercase tracking-wide text-text-tertiary">
+                          {t("admin.userDetail.city")}
+                        </dt>
+                        <dd className="mt-0.5 text-text-primary">{details.profile.city || "—"}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-[11px] uppercase tracking-wide text-text-tertiary">
+                          {t("admin.userDetail.region")}
+                        </dt>
+                        <dd className="mt-0.5 text-text-primary">{details.profile.region || "—"}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-[11px] uppercase tracking-wide text-text-tertiary">
+                          {t("admin.userDetail.timezone")}
+                        </dt>
+                        <dd className="mt-0.5 text-text-primary">{details.profile.timezone || "—"}</dd>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <dt className="text-[11px] uppercase tracking-wide text-text-tertiary">
+                          {t("admin.userDetail.lastKnownIp")}
+                        </dt>
+                        <dd className="mt-0.5 font-mono text-xs text-text-primary break-all">
+                          {details.profile.last_known_ip || "—"}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                ) : (
+                  <p className="rounded-lg border border-brand/20 bg-brand/5 px-3 py-2.5 text-sm text-text-secondary">
+                    {t("admin.userDetail.locationPending")}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
