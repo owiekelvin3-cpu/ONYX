@@ -16,14 +16,17 @@ const inter = Inter({
 });
 
 const appUrl = getAppUrl();
+const shareTitle = `${BRAND.name} — ${BRAND.tagline}`;
+const shareDescription = BRAND.description;
+const ogImageAlt = `${BRAND.fullName} — ${BRAND.tagline}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: `${BRAND.fullName} | Track All Markets`,
+    default: shareTitle,
     template: `%s | ${BRAND.name}`,
   },
-  description: BRAND.description,
+  description: shareDescription,
   applicationName: BRAND.fullName,
   keywords: [
     "crypto exchange",
@@ -31,30 +34,68 @@ export const metadata: Metadata = {
     "spot trading",
     "copy trading",
     "AI trading",
+    "forex trading",
     BRAND.name,
+    BRAND.domain,
   ],
-  authors: [{ name: BRAND.fullName }],
+  authors: [{ name: BRAND.fullName, url: appUrl }],
   creator: BRAND.fullName,
+  publisher: BRAND.fullName,
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: appUrl,
     siteName: BRAND.fullName,
-    title: `${BRAND.fullName} | Track All Markets`,
-    description: BRAND.description,
+    title: shareTitle,
+    description: shareDescription,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: ogImageAlt,
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${BRAND.fullName} | Track All Markets`,
-    description: BRAND.description,
+    title: shareTitle,
+    description: shareDescription,
+    images: [
+      {
+        url: "/twitter-image",
+        width: 1200,
+        height: 630,
+        alt: ogImageAlt,
+      },
+    ],
   },
+  icons: {
+    icon: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
+    apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
+  },
+  manifest: "/manifest.webmanifest",
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   alternates: {
     canonical: appUrl,
   },
+  category: "finance",
 };
 
 export const viewport: Viewport = {
