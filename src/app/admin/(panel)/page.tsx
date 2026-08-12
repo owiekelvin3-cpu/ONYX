@@ -47,13 +47,17 @@ export default function AdminOverviewPage() {
           {loading ? "—" : attention}
         </p>
         <p className="text-sm text-text-tertiary mt-1">Pending KYC, deposits, and withdrawals</p>
-        <div className="flex flex-wrap gap-2 mt-4">
-          <Link href="/admin/deposits"><Button size="sm">Review deposits</Button></Link>
-          <Link href="/admin/withdrawals"><Button size="sm" variant="outline">Review withdrawals</Button></Link>
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+          <Link href="/admin/deposits" className="w-full sm:w-auto">
+            <Button size="sm" className="w-full sm:w-auto">Review deposits</Button>
+          </Link>
+          <Link href="/admin/withdrawals" className="w-full sm:w-auto">
+            <Button size="sm" variant="outline" className="w-full sm:w-auto">Review withdrawals</Button>
+          </Link>
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {[
           { label: "Total users", value: stats.totalUsers },
           { label: "Pending deposits", value: stats.pendingDeposits },

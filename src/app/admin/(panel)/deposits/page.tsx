@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { approveDeposit, rejectDeposit } from "@/lib/admin-api";
 import type { DepositRow } from "@/lib/admin-types";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminFilterBar, AdminListActions } from "@/components/admin/AdminFilterBar";
 import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -94,25 +95,9 @@ export default function AdminDepositsPage() {
         </p>
       )}
 
-      <div className="flex gap-1 overflow-x-auto">
-        {filters.map((f) => (
-          <button
-            key={f.key}
-            type="button"
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded border transition-colors",
-              filter === f.key
-                ? "bg-brand/10 text-brand border-brand/30"
-                : "border-border text-text-tertiary hover:text-text-primary"
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+      <AdminFilterBar value={filter} onChange={setFilter} options={filters.map((f) => ({ key: f.key, label: f.label }))} />
 
-      <Card className="p-0 overflow-hidden">
+      <Card className="overflow-hidden p-0">
         {loading ? (
           <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
         ) : filtered.length === 0 ? (
@@ -135,14 +120,14 @@ export default function AdminDepositsPage() {
                     {d.notes && <p className="text-xs text-text-tertiary mt-1 truncate">{d.notes}</p>}
                   </div>
                   {pending && (
-                    <div className="flex gap-2 shrink-0">
+                    <AdminListActions>
                       <Button size="sm" disabled={acting === d.id} onClick={() => handleApprove(d)}>
                         Approve
                       </Button>
                       <Button size="sm" variant="outline" disabled={acting === d.id} onClick={() => handleReject(d.id)}>
                         Reject
                       </Button>
-                    </div>
+                    </AdminListActions>
                   )}
                 </li>
               );

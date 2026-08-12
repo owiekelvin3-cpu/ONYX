@@ -122,7 +122,7 @@ export default function AdminAiTradingPage() {
         </p>
       )}
 
-      <div className="flex flex-wrap gap-1.5 rounded-xl border border-border bg-bg-secondary/30 p-1">
+      <div className="grid grid-cols-3 gap-1.5 sm:flex sm:flex-wrap sm:rounded-xl sm:border sm:border-border sm:bg-bg-secondary/30 sm:p-1">
         {(
           [
             ["active", t("admin.aiFilterActive")],
@@ -135,7 +135,7 @@ export default function AdminAiTradingPage() {
             type="button"
             onClick={() => setFilter(id)}
             className={cn(
-              "rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+              "min-h-10 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors sm:py-2",
               filter === id
                 ? "bg-bg-primary text-text-primary shadow-sm"
                 : "text-text-tertiary hover:text-text-primary"
@@ -144,7 +144,7 @@ export default function AdminAiTradingPage() {
             {label}
           </button>
         ))}
-      </div>
+        </div>
 
       <div className="rounded-xl border border-border bg-bg-secondary/40 overflow-hidden">
         <div className="border-b border-border px-4 py-3">
@@ -219,7 +219,7 @@ export default function AdminAiTradingPage() {
                             onChange={(e) => setNote(e.target.value)}
                             placeholder={t("admin.aiPnLNotePlaceholder")}
                           />
-                          <div className="flex items-end gap-2">
+                          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-end">
                             <Button
                               disabled={busy}
                               onClick={() => submitSigned(row.id, "profit")}

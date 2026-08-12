@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { completeWithdrawal, rejectWithdrawal } from "@/lib/admin-api";
 import type { WithdrawalRow } from "@/lib/admin-types";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminFilterBar, AdminListActions } from "@/components/admin/AdminFilterBar";
 import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -65,6 +66,13 @@ export default function AdminWithdrawalsPage() {
     setActing(null);
   }
 
+  const filters: { key: Filter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "pending", label: "Pending" },
+    { key: "completed", label: "Completed" },
+    { key: "rejected", label: "Rejected" },
+  ];
+
   const filtered = rows.filter((w) => {
     if (filter === "pending") return w.status === "pending";
     if (filter === "completed") return w.status === "completed";
@@ -91,7 +99,9 @@ export default function AdminWithdrawalsPage() {
         </p>
       )}
 
-      <Card className="p-0 overflow-hidden">
+      <AdminFilterBar value={filter} onChange={setFilter} options={filters.map((f) => ({ key: f.key, label: f.label }))} />
+
+      <Card className="overflow-hidden p-0">
         {loading ? (
           <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
         ) : filtered.length === 0 ? (
@@ -118,14 +128,14 @@ export default function AdminWithdrawalsPage() {
                     ))}
                   </div>
                   {pending && (
-                    <div className="flex gap-2 shrink-0">
+                    <AdminListActions>
                       <Button size="sm" disabled={acting === w.id} onClick={() => handleComplete(w.id)}>
                         Complete
                       </Button>
                       <Button size="sm" variant="outline" disabled={acting === w.id} onClick={() => handleReject(w.id)}>
                         Reject
                       </Button>
-                    </div>
+                    </AdminListActions>
                   )}
                 </li>
               );

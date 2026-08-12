@@ -107,8 +107,8 @@ export function DepositWalletSettings() {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2 pt-2">
-          <Button onClick={handleSave} disabled={loading || saving}>
+        <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap">
+          <Button onClick={handleSave} disabled={loading || saving} className="w-full sm:w-auto">
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -118,7 +118,7 @@ export function DepositWalletSettings() {
               "Save wallet addresses"
             )}
           </Button>
-          <Button variant="outline" onClick={load} disabled={loading || saving}>
+          <Button variant="outline" onClick={load} disabled={loading || saving} className="w-full sm:w-auto">
             Reset
           </Button>
         </div>

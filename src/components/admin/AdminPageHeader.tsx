@@ -11,12 +11,16 @@ export function AdminPageHeader({
 }) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <div>
+      <div className="min-w-0 flex-1">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-brand">Team</p>
-        <h1 className="text-xl sm:text-2xl font-bold text-text-primary mt-1">{title}</h1>
-        {subtitle && <p className="text-sm text-text-tertiary mt-1">{subtitle}</p>}
+        <h1 className="mt-1 text-xl font-bold text-text-primary sm:text-2xl">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm leading-relaxed text-text-tertiary">{subtitle}</p>}
       </div>
-      {action}
+      {action ? (
+        <div className="w-full shrink-0 sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
+          {action}
+        </div>
+      ) : null}
     </div>
   );
 }

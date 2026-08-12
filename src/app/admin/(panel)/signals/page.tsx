@@ -350,7 +350,7 @@ export default function AdminSignalsPage() {
               <p className="py-16 text-center text-sm text-text-tertiary">No users found.</p>
             ) : (
               <>
-                <div className="divide-y divide-border md:hidden">
+                <div className="divide-y divide-border lg:hidden">
                   {users.map((u) => {
                     const strength = getSignalStrength(u.signal_pct ?? 0);
                     const draft = draftPct[u.id] ?? String(u.signal_pct ?? 0);
@@ -420,7 +420,7 @@ export default function AdminSignalsPage() {
                   })}
                 </div>
 
-                <div className="hidden overflow-x-auto md:block">
+                <div className="hidden overflow-x-auto lg:block">
                 <table className="w-full min-w-[720px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-bg-secondary/60 text-[11px] uppercase tracking-wide text-text-tertiary">
@@ -621,7 +621,7 @@ export default function AdminSignalsPage() {
               <p className="py-10 text-center text-sm text-text-tertiary">No signals published yet.</p>
             ) : (
               <>
-                <div className="divide-y divide-border md:hidden">
+                <div className="divide-y divide-border lg:hidden">
                   {signals.map((signal) => (
                     <div key={signal.id} className="space-y-3 p-4">
                       <div className="flex items-start justify-between gap-3">
@@ -656,7 +656,7 @@ export default function AdminSignalsPage() {
                   ))}
                 </div>
 
-                <div className="hidden overflow-x-auto md:block">
+                <div className="hidden overflow-x-auto lg:block">
                 <table className="w-full min-w-[640px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-bg-secondary/60 text-[11px] uppercase tracking-wide text-text-tertiary">

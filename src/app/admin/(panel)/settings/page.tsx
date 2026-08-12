@@ -70,14 +70,14 @@ export default function AdminSettingsPage() {
       <DepositWalletSettings />
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <h2 className="text-base font-semibold text-text-primary">Other settings</h2>
-            <p className="text-sm text-text-tertiary mt-1">
+            <p className="mt-1 text-sm text-text-tertiary">
               Advanced JSON configuration. Deposit wallets are edited above.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+          <Button variant="outline" size="sm" onClick={load} disabled={loading} className="w-full sm:w-auto">
             <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
             Refresh
           </Button>

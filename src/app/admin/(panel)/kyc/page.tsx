@@ -324,7 +324,7 @@ export default function AdminKycPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
                       <Button
                         type="button"
                         size="sm"
