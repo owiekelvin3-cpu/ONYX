@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -12,8 +13,10 @@ import {
   Lock,
   TrendingUp,
   Wallet,
+  X,
   Zap,
 } from "@/components/icons";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { createClient } from "@/lib/supabase/client";
@@ -26,6 +29,82 @@ import type { SignalPackageRow, TradingSignalRow } from "@/lib/supabase/types";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 type Filter = "active" | "closed" | "all";
+
+function SignalPlanConfirmModal({
+  plan,
+  balance,
+  busy,
+  onClose,
+  onConfirm,
+}: {
+  plan: (typeof SIGNAL_PLANS)[number];
+  balance: number;
+  busy: SignalTier | null;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const { t } = useTranslation();
+  useBodyScrollLock(true);
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="signal-confirm-title"
+    >
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+        aria-label={t("signals.cancel")}
+      />
+      <div className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-t-3xl border border-border bg-bg-secondary p-5 shadow-[var(--shadow-card)] safe-area-bottom sm:rounded-2xl sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <h3 id="signal-confirm-title" className="pr-2 text-lg font-bold text-text-primary">
+            {t("signals.confirmTitle")}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary"
+            aria-label={t("signals.cancel")}
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <p className="mt-2 text-sm text-text-secondary">
+          {t("signals.confirmBody", {
+            amount: formatCurrency(plan.price),
+            name: plan.name,
+            days: plan.days,
+          })}
+        </p>
+        <p className="mt-3 text-xs leading-relaxed text-text-tertiary">{t("signals.riskBody")}</p>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+          <Button type="button" variant="secondary" className="w-full sm:flex-1" onClick={onClose}>
+            {t("signals.cancel")}
+          </Button>
+          <Button
+            type="button"
+            className="w-full sm:flex-1"
+            disabled={busy !== null || balance < plan.price}
+            onClick={onConfirm}
+          >
+            {busy === plan.id ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("signals.subscribe")
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 function rrRatio(entry: string, target: string, stop: string) {
   const e = parseFloat(entry);
@@ -390,41 +469,13 @@ export function SignalsClient() {
       </Card>
 
       {confirmPlan && (
-        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/50 p-4 sm:items-center">
-          <Card className="w-full max-w-md p-5 sm:p-6">
-            <h3 className="text-lg font-bold text-text-primary">{t("signals.confirmTitle")}</h3>
-            <p className="mt-2 text-sm text-text-secondary">
-              {t("signals.confirmBody", {
-                amount: formatCurrency(confirmPlan.price),
-                name: confirmPlan.name,
-                days: confirmPlan.days,
-              })}
-            </p>
-            <p className="mt-3 text-xs text-text-tertiary">{t("signals.riskBody")}</p>
-            <div className="mt-5 flex gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                className="flex-1"
-                onClick={() => setConfirmPlan(null)}
-              >
-                {t("signals.cancel")}
-              </Button>
-              <Button
-                type="button"
-                className="flex-1"
-                disabled={busy !== null || balance < confirmPlan.price}
-                onClick={() => void handlePurchase(confirmPlan.id)}
-              >
-                {busy === confirmPlan.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  t("signals.subscribe")
-                )}
-              </Button>
-            </div>
-          </Card>
-        </div>
+        <SignalPlanConfirmModal
+          plan={confirmPlan}
+          balance={balance}
+          busy={busy}
+          onClose={() => setConfirmPlan(null)}
+          onConfirm={() => void handlePurchase(confirmPlan.id)}
+        />
       )}
     </div>
   );
