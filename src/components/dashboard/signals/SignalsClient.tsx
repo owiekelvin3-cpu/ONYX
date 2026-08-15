@@ -16,7 +16,6 @@ import {
   X,
   Zap,
 } from "@/components/icons";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { createClient } from "@/lib/supabase/client";
@@ -44,13 +43,25 @@ function SignalPlanConfirmModal({
   onConfirm: () => void;
 }) {
   const { t } = useTranslation();
-  useBodyScrollLock(true);
+  const canAfford = balance >= plan.price;
+
+  useEffect(() => {
+    const { documentElement: html, body } = document;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
 
   if (typeof document === "undefined") return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-[80] isolate"
       role="dialog"
       aria-modal="true"
       aria-labelledby="signal-confirm-title"
@@ -61,44 +72,71 @@ function SignalPlanConfirmModal({
         onClick={onClose}
         aria-label={t("signals.cancel")}
       />
-      <div className="relative w-full max-w-md max-h-[85dvh] overflow-y-auto rounded-t-3xl border border-border bg-bg-secondary p-5 shadow-[var(--shadow-card)] safe-area-bottom sm:rounded-2xl sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <h3 id="signal-confirm-title" className="pr-2 text-lg font-bold text-text-primary">
-            {t("signals.confirmTitle")}
-          </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary"
-            aria-label={t("signals.cancel")}
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <p className="mt-2 text-sm text-text-secondary">
-          {t("signals.confirmBody", {
-            amount: formatCurrency(plan.price),
-            name: plan.name,
-            days: plan.days,
-          })}
-        </p>
-        <p className="mt-3 text-xs leading-relaxed text-text-tertiary">{t("signals.riskBody")}</p>
-        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-          <Button type="button" variant="secondary" className="w-full sm:flex-1" onClick={onClose}>
-            {t("signals.cancel")}
-          </Button>
-          <Button
-            type="button"
-            className="w-full sm:flex-1"
-            disabled={busy !== null || balance < plan.price}
-            onClick={onConfirm}
-          >
-            {busy === plan.id ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("signals.subscribe")
+      <div className="absolute inset-x-0 bottom-0 z-10 sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:px-4">
+        <div className="flex max-h-[min(85dvh,calc(100dvh-var(--safe-bottom)))] flex-col overflow-hidden rounded-t-3xl border border-border bg-bg-secondary shadow-[var(--shadow-card)] safe-area-bottom sm:rounded-2xl">
+          <div className="overflow-y-auto p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <h3 id="signal-confirm-title" className="pr-2 text-lg font-bold text-text-primary">
+                {t("signals.confirmTitle")}
+              </h3>
+              <button
+                type="button"
+                onClick={onClose}
+                className="shrink-0 rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary touch-manipulation"
+                aria-label={t("signals.cancel")}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mt-2 text-sm text-text-secondary">
+              {t("signals.confirmBody", {
+                amount: formatCurrency(plan.price),
+                name: plan.name,
+                days: plan.days,
+              })}
+            </p>
+            <p className="mt-3 text-xs leading-relaxed text-text-tertiary">{t("signals.riskBody")}</p>
+            {!canAfford && (
+              <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-700 dark:text-amber-200">
+                {t("signals.insufficientBalance")}
+              </p>
             )}
-          </Button>
+          </div>
+          <div className="shrink-0 border-t border-border p-5 pt-4 sm:p-6 sm:pt-4">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="secondary"
+                size="lg"
+                className="w-full touch-manipulation sm:flex-1"
+                onClick={onClose}
+              >
+                {t("signals.cancel")}
+              </Button>
+              {canAfford ? (
+                <Button
+                  type="button"
+                  size="lg"
+                  className="w-full touch-manipulation sm:flex-1"
+                  disabled={busy !== null}
+                  onClick={onConfirm}
+                >
+                  {busy === plan.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    t("signals.subscribe")
+                  )}
+                </Button>
+              ) : (
+                <Link href="/dashboard/deposit" className="w-full sm:flex-1" onClick={onClose}>
+                  <Button type="button" size="lg" className="w-full touch-manipulation">
+                    <ArrowDownToLine className="h-4 w-4" />
+                    {t("dashboard.navDeposit")}
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>,

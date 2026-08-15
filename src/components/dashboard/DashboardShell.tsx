@@ -53,10 +53,10 @@ export function DashboardShell({
   return (
     <NotificationProvider userId={userId}>
       <UserLocationSync userId={userId} />
-      <div className="decko-shell flex min-h-dvh">
+      <div className="decko-shell flex min-h-dvh w-full min-w-0 overflow-x-clip">
         <DeckoSidebar />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col overflow-x-clip">
           <DeckoMobileTopBar
             userName={userName}
             userEmail={userEmail}

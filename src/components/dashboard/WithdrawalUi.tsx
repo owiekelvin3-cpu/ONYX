@@ -435,7 +435,7 @@ export function WithdrawalSecurityNote() {
       <div className="text-xs text-text-tertiary leading-relaxed sm:text-[13px]">
         <p className="font-medium text-text-secondary">Secure payouts</p>
         <p className="mt-1">
-          All withdrawals are manually reviewed. KYC may be required for bank, wire, or amounts over $10,000.
+          All withdrawals are manually reviewed. Identity verification (KYC) is required before your first withdrawal.
         </p>
       </div>
     </div>

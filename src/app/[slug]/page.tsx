@@ -32,9 +32,9 @@ export default async function SitePage({
 
   if (isLegalSlug(slug)) {
     return (
-      <div className="fin-marketing flex min-h-dvh flex-col lg:flex-row">
+      <div className="fin-marketing flex min-h-dvh w-full min-w-0 flex-col overflow-x-clip lg:flex-row">
         <FinMarketingSidebar />
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col overflow-x-clip">
           <FinMarketingMobileBar />
           <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
             <FinLegalPage page={LEGAL_PAGES[slug]} />
@@ -46,9 +46,9 @@ export default async function SitePage({
   }
 
   return (
-    <div className="fin-marketing flex min-h-dvh flex-col lg:flex-row">
+    <div className="fin-marketing flex min-h-dvh w-full min-w-0 flex-col overflow-x-clip lg:flex-row">
       <FinMarketingSidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-x-clip">
         <FinMarketingMobileBar />
         <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           <div className="mx-auto max-w-3xl">

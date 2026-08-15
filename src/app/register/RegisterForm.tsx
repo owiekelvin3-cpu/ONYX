@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { BRAND } from "@/lib/constants";
+import { BRAND, MIN_ACCOUNT_AGE } from "@/lib/constants";
 import { getAppUrl } from "@/lib/env";
 import { COUNTRIES } from "@/lib/countries";
 import { AuthShell, AuthCardHeader } from "@/components/auth/AuthLayout";
@@ -32,10 +32,10 @@ const REGISTER_STEPS = [
   { label: "Security" },
 ];
 
-/** Latest date allowed — user must be at least 18 */
+/** Latest date allowed — user must be at least MIN_ACCOUNT_AGE */
 function maxBirthDate(): string {
   const d = new Date();
-  d.setFullYear(d.getFullYear() - 18);
+  d.setFullYear(d.getFullYear() - MIN_ACCOUNT_AGE);
   return d.toISOString().slice(0, 10);
 }
 
@@ -62,7 +62,7 @@ function parseDateOfBirth(value: string): string | null {
   return value;
 }
 
-function isAtLeast18(isoDate: string): boolean {
+function isAtLeastMinAge(isoDate: string, minAge = MIN_ACCOUNT_AGE): boolean {
   const dob = new Date(isoDate);
   const today = new Date();
   let age = today.getFullYear() - dob.getFullYear();
@@ -70,7 +70,7 @@ function isAtLeast18(isoDate: string): boolean {
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
     age -= 1;
   }
-  return age >= 18;
+  return age >= minAge;
 }
 
 export default function RegisterForm() {
@@ -104,8 +104,8 @@ export default function RegisterForm() {
       const parsedDob = parseDateOfBirth(dateOfBirth);
       if (!dateOfBirth) errors.dateOfBirth = "Select your date of birth";
       else if (!parsedDob) errors.dateOfBirth = "Enter a valid date";
-      else if (!isAtLeast18(parsedDob))
-        errors.dateOfBirth = "You must be at least 18 years old";
+      else if (!isAtLeastMinAge(parsedDob))
+        errors.dateOfBirth = `You must be at least ${MIN_ACCOUNT_AGE} years old`;
     }
 
     if (current === 3) {
@@ -259,7 +259,7 @@ export default function RegisterForm() {
               required
             />
             <p className="-mt-1 text-[11px] text-text-tertiary">
-              You must be 18 or older.
+              You must be {MIN_ACCOUNT_AGE} or older.
             </p>
           </>
         )}

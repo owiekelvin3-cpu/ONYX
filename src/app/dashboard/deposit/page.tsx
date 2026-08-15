@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
 import { AlertTriangle, Copy, Check, Loader2 } from "@/components/icons";
-import { KycRequiredGate } from "@/components/dashboard/KycRequiredGate";
 
 export default function DepositPage() {
   const router = useRouter();
@@ -135,7 +134,6 @@ export default function DepositPage() {
   }
 
   return (
-    <KycRequiredGate>
     <div className="space-y-4 max-w-2xl">
       <div>
         <h1 className="text-lg font-bold text-text-primary">Deposit</h1>
@@ -289,6 +287,5 @@ export default function DepositPage() {
         </CollapsibleSection>
       )}
     </div>
-    </KycRequiredGate>
   );
 }

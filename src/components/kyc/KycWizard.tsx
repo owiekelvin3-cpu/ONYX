@@ -14,7 +14,6 @@ import { FaceVerificationCapture } from "@/components/kyc/FaceVerificationCaptur
 import { KycVerifyingOverlay } from "@/components/kyc/KycVerifyingOverlay";
 import { Card, Button } from "@/components/ui";
 import {
-  ArrowDownToLine,
   ArrowLeft,
   ArrowRight,
   ArrowUpFromLine,
@@ -28,7 +27,6 @@ import {
   Lock,
   Shield,
   Sparkles,
-  TrendingUp,
   Upload,
   X,
 } from "@/components/icons";
@@ -112,11 +110,7 @@ export function KycWizard({ userId, kycStatus, onComplete }: KycWizardProps) {
   );
 
   const unlockPoints = useMemo(
-    () => [
-      { icon: ArrowDownToLine, label: t("kyc.unlockDeposits") },
-      { icon: ArrowUpFromLine, label: t("kyc.unlockWithdrawals") },
-      { icon: TrendingUp, label: t("kyc.unlockTrading") },
-    ],
+    () => [{ icon: ArrowUpFromLine, label: t("kyc.unlockWithdrawals") }],
     [t]
   );
 

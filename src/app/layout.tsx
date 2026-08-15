@@ -108,11 +108,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} dark h-full overflow-x-hidden`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} dark h-full`} suppressHydrationWarning>
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-dvh antialiased overflow-x-hidden bg-bg-primary text-text-primary">
+      <body className="min-h-dvh w-full antialiased bg-bg-primary text-text-primary">
         <ThemeProvider>
           <I18nProvider>{children}</I18nProvider>
         </ThemeProvider>

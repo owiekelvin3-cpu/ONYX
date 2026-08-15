@@ -1,3 +1,5 @@
+import { MIN_ACCOUNT_AGE } from "@/lib/constants";
+
 export type LegalSection = {
   id: string;
   title: string;
@@ -28,7 +30,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
     effectiveDate: "August 8, 2026",
     contactEmail: "legal@onyxmarkets.site",
     quickFacts: [
-      { label: "Minimum age", value: "18+" },
+      { label: "Minimum age", value: `${MIN_ACCOUNT_AGE}+` },
       { label: "Jurisdiction", value: "Global access" },
       { label: "Account type", value: "Individual & verified" },
       { label: "Support", value: "24/7" },
@@ -50,7 +52,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         title: "2. Eligibility & Registration",
         summary: "Who may open and maintain an account.",
         paragraphs: [
-          "You must be at least 18 years old (or the age of majority in your jurisdiction, whichever is higher) and have the legal capacity to enter into binding contracts.",
+          `You must be at least ${MIN_ACCOUNT_AGE} years old (or the age of majority in your jurisdiction, whichever is higher) and have the legal capacity to enter into binding contracts.`,
           "You represent that you are not located in, ordinarily resident in, or a citizen of any jurisdiction where use of the Platform is prohibited by applicable law, sanctions, or regulatory restriction.",
         ],
         bullets: [
@@ -326,7 +328,7 @@ export const LEGAL_PAGES: Record<"terms" | "privacy", LegalPage> = {
         title: "11. Children's Privacy",
         summary: "Our services are not directed to minors.",
         paragraphs: [
-          "The Platform is not intended for individuals under 18. We do not knowingly collect personal information from children. If you believe a minor has provided us data, contact privacy@onyxmarkets.site and we will take steps to delete it.",
+          `The Platform is not intended for individuals under ${MIN_ACCOUNT_AGE}. We do not knowingly collect personal information from children. If you believe a minor has provided us data, contact privacy@onyxmarkets.site and we will take steps to delete it.`,
         ],
       },
       {

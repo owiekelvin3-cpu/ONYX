@@ -107,7 +107,7 @@ export function Hero({ pairs = MARKET_PAIRS }: { pairs?: MarketPair[] }) {
             </HeroEnter>
 
             <HeroEnter delay={0.32}>
-              <div className="mt-8 sm:mt-10 scroll-x -mx-[max(0.875rem,env(safe-area-inset-left))] px-[max(0.875rem,env(safe-area-inset-left))] sm:mx-0 sm:px-0">
+              <div className="mt-8 sm:mt-10 scroll-x -mx-[var(--page-inline-pad)] px-[var(--page-inline-pad)] sm:mx-0 sm:px-0">
                 <div className="flex xs:grid xs:grid-cols-2 xs:flex-none gap-x-5 sm:gap-x-8 gap-y-3 min-w-max xs:min-w-0 pr-4 xs:pr-0">
                 {featured.map((p, i) => (
                   <motion.div

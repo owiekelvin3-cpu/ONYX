@@ -7,6 +7,9 @@ export const BRAND = {
   domain: "onyxmarkets.site",
 } as const;
 
+/** Minimum age (in years) required to create an account. */
+export const MIN_ACCOUNT_AGE = 15;
+
 export const NAV = {
   BuyCrypto: ["Express Buy", "P2P Trading", "Convert"],
   Markets: ["Spot", "Futures", "Options", "Stocks", "Forex"],

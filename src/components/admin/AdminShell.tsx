@@ -72,7 +72,7 @@ export function AdminShell({
   }
 
   return (
-    <div className="min-h-dvh bg-bg-primary flex">
+    <div className="flex min-h-dvh w-full min-w-0 overflow-x-clip bg-bg-primary">
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-[min(18rem,92vw)] bg-bg-secondary border-r border-border flex flex-col transition-transform duration-200 ease-out lg:static lg:translate-x-0 safe-area-top safe-area-bottom safe-area-x",
