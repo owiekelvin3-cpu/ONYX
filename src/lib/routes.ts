@@ -24,8 +24,8 @@ export const SITE_ROUTES: Record<string, string> = {
 
   // More
   API: "/help",
-  Affiliate: "/register",
-  Referral: "/register",
+  Affiliate: "/dashboard/referrals",
+  Referral: "/dashboard/referrals",
   Features: "/features",
   Pricing: "/fees",
 

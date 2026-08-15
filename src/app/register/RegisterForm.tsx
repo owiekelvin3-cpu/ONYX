@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { validateReferralCode } from "@/lib/api/referrals";
 import { BRAND, MIN_ACCOUNT_AGE } from "@/lib/constants";
 import { getAppUrl } from "@/lib/env";
 import { COUNTRIES } from "@/lib/countries";
@@ -24,6 +25,7 @@ import {
   MapPin,
   Phone,
   User,
+  Share,
 } from "@/components/icons";
 
 const REGISTER_STEPS = [
@@ -85,13 +87,14 @@ export default function RegisterForm() {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("United States");
   const [address, setAddress] = useState("");
+  const [referralCode, setReferralCode] = useState(searchParams.get("ref") ?? "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function validateStep(current: number) {
+  async function validateStep(current: number) {
     const errors: Record<string, string> = {};
 
     if (current === 1) {
@@ -108,17 +111,37 @@ export default function RegisterForm() {
         errors.dateOfBirth = `You must be at least ${MIN_ACCOUNT_AGE} years old`;
     }
 
+    if (current === 2 && referralCode.trim()) {
+      try {
+        const supabase = createClient();
+        const valid = await validateReferralCode(supabase, referralCode.trim());
+        if (!valid) errors.referralCode = "Referral ID not found";
+      } catch {
+        errors.referralCode = "Could not validate referral ID";
+      }
+    }
+
     if (current === 3) {
       if (password.length < 8) errors.password = "Min. 8 characters";
       if (password !== confirmPassword) errors.confirmPassword = "Passwords must match";
+      if (referralCode.trim()) {
+        try {
+          const supabase = createClient();
+          const valid = await validateReferralCode(supabase, referralCode.trim());
+          if (!valid) errors.referralCode = "Referral ID not found";
+        } catch {
+          errors.referralCode = "Could not validate referral ID";
+        }
+      }
     }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   }
 
-  function handleNext() {
-    if (validateStep(step)) setStep((s) => Math.min(s + 1, 3));
+  async function handleNext() {
+    if (!(await validateStep(step))) return;
+    setStep((s) => Math.min(s + 1, 3));
   }
 
   function handleBack() {
@@ -128,7 +151,7 @@ export default function RegisterForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validateStep(3)) return;
+    if (!(await validateStep(3))) return;
 
     const parsedDob = parseDateOfBirth(dateOfBirth);
     if (!parsedDob) return;
@@ -151,6 +174,7 @@ export default function RegisterForm() {
           phone: phone.trim() || null,
           country: country.trim() || null,
           address: address.trim() || null,
+          referral_code: referralCode.trim().toUpperCase() || null,
         },
       },
     });
@@ -301,6 +325,20 @@ export default function RegisterForm() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
+            <AuthInput
+              id="referralCode"
+              label="Referral ID (optional)"
+              type="text"
+              placeholder="Enter a friend's referral code"
+              autoComplete="off"
+              icon={<Share />}
+              value={referralCode}
+              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+              error={fieldErrors.referralCode}
+            />
+            <p className="-mt-1 text-[11px] text-text-tertiary">
+              Have a referral code? Enter it here. Your referrer earns $100 when you make your first deposit.
+            </p>
           </>
         )}
 

@@ -19,6 +19,7 @@ import {
   Receipt,
   Search,
   Settings,
+  Share,
   Shield,
   TrendingUp,
   Users,
@@ -35,6 +36,7 @@ const MAIN_MENU = [
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
   { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
+  { label: "Referrals", href: "/dashboard/referrals", icon: Share },
   { label: "Trading Signals", href: "/dashboard/signals", icon: Zap },
   { label: "Market Analytics", href: "/dashboard/analytics", icon: LineChart },
 ] as const;
