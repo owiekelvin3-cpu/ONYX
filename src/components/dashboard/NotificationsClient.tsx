@@ -12,6 +12,7 @@ import {
 import type { NotificationRow } from "@/lib/supabase/types";
 import { Button } from "@/components/ui/Button";
 import { Bell, Check, Loader2 } from "@/components/icons";
+import { playNotificationSound } from "@/lib/notifications/sound";
 import { cn, formatDate } from "@/lib/utils";
 
 type Filter = "all" | "unread";
@@ -42,7 +43,31 @@ export function NotificationsClient({ userId }: { userId: string }) {
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const row = payload.new as NotificationRow;
+          void playNotificationSound({ dedupeKey: row.id });
+          void load();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => void load()
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
           schema: "public",
           table: "notifications",
           filter: `user_id=eq.${userId}`,

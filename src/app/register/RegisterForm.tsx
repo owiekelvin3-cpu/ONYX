@@ -87,7 +87,7 @@ export default function RegisterForm() {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("United States");
   const [address, setAddress] = useState("");
-  const [referralCode, setReferralCode] = useState(searchParams.get("ref") ?? "");
+  const [referralCode, setReferralCode] = useState((searchParams.get("ref") ?? "").toUpperCase());
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});

@@ -7,8 +7,8 @@ import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import { getUserNotifications } from "@/lib/api/notifications";
 import type { NotificationRow } from "@/lib/supabase/types";
-import { playNotificationSound } from "@/lib/notifications/sound";
-import { showBrowserNotification } from "@/lib/notifications/push";
+import { alertNewNotification } from "@/lib/notifications/alert";
+import { setupNotificationAudioUnlock } from "@/lib/notifications/sound";
 import { Bell, X } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +29,10 @@ export function NotificationProvider({
   const { t } = useTranslation();
   const seenIds = useRef(new Set<string>());
   const [toast, setToast] = useState<ToastState | null>(null);
+
+  useEffect(() => {
+    setupNotificationAudioUnlock();
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -56,9 +60,7 @@ export function NotificationProvider({
           if (seenIds.current.has(row.id)) return;
           seenIds.current.add(row.id);
 
-          playNotificationSound();
-          showBrowserNotification(row.title, row.message, {
-            tag: row.id,
+          alertNewNotification(row, {
             onClick: () => router.push("/dashboard/notifications"),
           });
           setToast({ id: row.id, title: row.title, message: row.message });

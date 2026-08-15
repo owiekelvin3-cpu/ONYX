@@ -89,6 +89,9 @@ export function SettingsNotificationsSection({ hideHeader = false }: { hideHeade
   function handleSoundToggle(enabled: boolean) {
     setSoundEnabled(enabled);
     setSoundEnabledState(enabled);
+    if (enabled) {
+      void playNotificationSound({ force: true });
+    }
   }
 
   async function handleEnablePush() {
@@ -170,7 +173,7 @@ export function SettingsNotificationsSection({ hideHeader = false }: { hideHeade
             enableLabel={t("settingsPage.prefOn")}
             disableLabel={t("settingsPage.prefOff")}
           />
-          <Button size="sm" variant="ghost" onClick={() => playNotificationSound()}>
+          <Button size="sm" variant="ghost" onClick={() => void playNotificationSound({ force: true })}>
             {t("settingsPage.testSound")}
           </Button>
         </div>
