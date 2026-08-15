@@ -75,6 +75,7 @@ export type CopySubscriptionRow = {
   user_id: string;
   trader_name: string;
   allocation: number;
+  profit_earned?: number;
   status: string;
   created_at: string;
 };

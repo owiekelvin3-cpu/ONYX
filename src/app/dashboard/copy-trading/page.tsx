@@ -14,7 +14,7 @@ import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "@/components/icons";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 const COPY_ALLOCATION = 0;
 
@@ -100,6 +100,7 @@ export default function CopyTradingPage() {
           <div className="mt-3 space-y-3">
             {subscriptions.map((sub) => {
               const profile = COPY_TRADERS.find((t) => t.name === sub.trader_name);
+              const profit = Number(sub.profit_earned ?? 0);
               return (
                 <div
                   key={sub.id}
@@ -119,6 +120,20 @@ export default function CopyTradingPage() {
                         {sub.status} · Free
                       </p>
                     </div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary">
+                      Copy P/L
+                    </p>
+                    <p
+                      className={cn(
+                        "text-sm font-semibold tabular-nums",
+                        profit >= 0 ? "text-green" : "text-red"
+                      )}
+                    >
+                      {profit >= 0 ? "+" : ""}
+                      {formatCurrency(profit)}
+                    </p>
                   </div>
                 </div>
               );

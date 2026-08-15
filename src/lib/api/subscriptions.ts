@@ -41,7 +41,7 @@ export async function getCopySubscriptions(
 ): Promise<CopySubscriptionRow[]> {
   const { data, error } = await supabase
     .from("copy_trading_subscriptions")
-    .select("id, user_id, trader_name, allocation, status, created_at")
+    .select("id, user_id, trader_name, allocation, profit_earned, status, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -65,7 +65,7 @@ export async function subscribeToTrader(
       allocation: params.allocation,
       status: "active",
     })
-    .select("id, user_id, trader_name, allocation, status, created_at")
+    .select("id, user_id, trader_name, allocation, profit_earned, status, created_at")
     .single();
 
   if (error) throw new Error(error.message);
