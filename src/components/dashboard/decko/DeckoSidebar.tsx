@@ -9,6 +9,7 @@ import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { SuspendedAvatarBadge } from "@/components/dashboard/AccountSuspendedBanner";
 import {
+  ArrowDownToLine,
   ArrowRight,
   Bot,
   FileCheck,
@@ -33,6 +34,7 @@ const MAIN_MENU = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
   { label: "Spot Trading", href: "/dashboard/trade", icon: TrendingUp },
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
+  { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
   { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },

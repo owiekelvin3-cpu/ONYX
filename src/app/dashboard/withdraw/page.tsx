@@ -34,6 +34,7 @@ import {
   WithdrawalPageHeader,
   WithdrawalBalanceBanner,
   WithdrawalBlockedBanner,
+  WithdrawalKycRequiredBanner,
   WithdrawalSuspendedBanner,
   WithdrawalPendingFeesBanner,
   WithdrawalMethodPicker,
@@ -45,7 +46,7 @@ import {
   WithdrawalHistoryList,
   Input,
 } from "@/components/dashboard/WithdrawalUi";
-import { KycRequiredGate } from "@/components/dashboard/KycRequiredGate";
+import { getKycStatus, type KycStatus } from "@/lib/kyc";
 
 const EMPTY_BANK = {
   accountHolder: "",
@@ -77,6 +78,8 @@ export default function WithdrawPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [canWithdraw, setCanWithdraw] = useState(true);
+  const [kycApproved, setKycApproved] = useState(false);
+  const [kycStatus, setKycStatus] = useState<KycStatus>("none");
   const [isSuspended, setIsSuspended] = useState(false);
   const [suspensionReason, setSuspensionReason] = useState<string | null>(null);
   const [pendingFees, setPendingFees] = useState<UserFeeRow[]>([]);
@@ -118,6 +121,8 @@ export default function WithdrawPage() {
         try {
           const eligibility = await getWithdrawalEligibility(supabase);
           setCanWithdraw(eligibility.can_withdraw);
+          setKycApproved(Boolean(eligibility.kyc_approved));
+          setKycStatus(getKycStatus({ kyc_status: eligibility.kyc_status }));
           setIsSuspended(Boolean(eligibility.is_suspended));
           setSuspensionReason(eligibility.suspension_reason ?? null);
         } catch {
@@ -128,10 +133,12 @@ export default function WithdrawPage() {
             .maybeSingle();
 
           const suspended = Boolean(profile?.is_suspended);
-          const kycApproved = profile?.kyc_status === "approved";
+          const approved = profile?.kyc_status === "approved";
           setIsSuspended(suspended);
           setSuspensionReason(profile?.suspension_reason ?? null);
-          setCanWithdraw(!suspended && kycApproved);
+          setKycApproved(approved);
+          setKycStatus(getKycStatus(profile));
+          setCanWithdraw(!suspended && approved);
         }
 
         try {
@@ -303,6 +310,10 @@ export default function WithdrawPage() {
       router.push("/login");
       return;
     }
+    if (!kycApproved) {
+      setError("Complete KYC verification before withdrawing.");
+      return;
+    }
     if (!canWithdraw) {
       setError("Withdrawals are currently blocked. Check pending fees or contact support.");
       return;
@@ -348,26 +359,31 @@ export default function WithdrawPage() {
     }
   }
 
-  const formDisabled = loading || submitting || !userId || !canWithdraw || (balance ?? 0) <= 0;
+  const formDisabled =
+    loading || submitting || !userId || !kycApproved || !canWithdraw || (balance ?? 0) <= 0;
+  const showWithdrawForm =
+    !loading && !isSuspended && pendingFees.length === 0 && (balance ?? 0) > 0;
 
   return (
-    <KycRequiredGate>
     <div className="space-y-5 max-w-3xl pb-2">
       <WithdrawalPageHeader />
 
       <WithdrawalBalanceBanner balance={balance} loading={loading} />
 
+      {!loading && !kycApproved && !isSuspended && (
+        <WithdrawalKycRequiredBanner status={kycStatus} />
+      )}
       {!canWithdraw && !loading && isSuspended && (
         <WithdrawalSuspendedBanner reason={suspensionReason} />
       )}
-      {!canWithdraw && !loading && !isSuspended && pendingFees.length > 0 && (
+      {!canWithdraw && !loading && !isSuspended && kycApproved && pendingFees.length > 0 && (
         <WithdrawalPendingFeesBanner fees={pendingFees} />
       )}
-      {!canWithdraw && !loading && !isSuspended && pendingFees.length === 0 && (
+      {!canWithdraw && !loading && !isSuspended && kycApproved && pendingFees.length === 0 && (
         <WithdrawalBlockedBanner />
       )}
 
-      {canWithdraw && (balance ?? 0) > 0 && (
+      {showWithdrawForm && (
         <>
           <Card className="rounded-2xl p-4 sm:p-5 space-y-5">
             <WithdrawalMethodPicker method={method} onChange={handleMethodChange} />
@@ -767,6 +783,5 @@ export default function WithdrawPage() {
         </Link>
       </p>
     </div>
-    </KycRequiredGate>
   );
 }

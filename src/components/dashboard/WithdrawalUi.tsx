@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { WithdrawalRow } from "@/lib/supabase/types";
 import type { UserFeeRow } from "@/lib/api/fees";
+import type { KycStatus } from "@/lib/kyc";
 import {
   formatWithdrawalMethodLabel,
   formatWithdrawalDestination,
@@ -34,6 +35,7 @@ import {
   CreditCard,
   Phone,
   Zap,
+  FileCheck,
 } from "@/components/icons";
 
 const METHOD_ICONS: Record<WithdrawalMethodId, typeof Wallet> = {
@@ -126,6 +128,40 @@ export function WithdrawalBlockedBanner() {
         >
           <Comments className="w-3.5 h-3.5" />
           Contact support
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export function WithdrawalKycRequiredBanner({ status }: { status: KycStatus }) {
+  const title =
+    status === "pending"
+      ? "Verification in review"
+      : status === "rejected"
+        ? "Verification needs attention"
+        : "Verify your identity";
+  const desc =
+    status === "pending"
+      ? "Your documents are being reviewed. You can explore payout options while you wait; withdrawals unlock once approved."
+      : status === "rejected"
+        ? "Your last submission was rejected. Complete verification again to unlock withdrawals."
+        : "Identity verification is required before you can submit a withdrawal request.";
+
+  return (
+    <div className="rounded-2xl border border-brand/25 bg-brand/5 p-4 flex gap-3">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand">
+        <FileCheck className="w-4 h-4" />
+      </span>
+      <div>
+        <p className="text-sm font-semibold text-text-primary">{title}</p>
+        <p className="text-xs text-text-tertiary mt-1 leading-relaxed">{desc}</p>
+        <Link
+          href="/dashboard/kyc"
+          className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-brand hover:text-brand-hover"
+        >
+          <FileCheck className="w-3.5 h-3.5" />
+          {status === "pending" ? "View verification status" : "Start verification"}
         </Link>
       </div>
     </div>
