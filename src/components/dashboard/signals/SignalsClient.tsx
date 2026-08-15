@@ -26,6 +26,7 @@ import {
 import { SIGNAL_PLANS, signalTierLabel, signalTierRank, type SignalTier } from "@/lib/signal-plans";
 import type { SignalPackageRow, TradingSignalRow } from "@/lib/supabase/types";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 
 type Filter = "active" | "closed" | "all";
 
@@ -223,6 +224,7 @@ export function SignalsClient() {
       const row = await purchaseSignalPackage(supabase, { userId, planId });
       setSuccess(t("signals.subscribed", { name: row.package_name }));
       setConfirmPlan(null);
+      emitDashboardRefresh();
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Purchase failed.");

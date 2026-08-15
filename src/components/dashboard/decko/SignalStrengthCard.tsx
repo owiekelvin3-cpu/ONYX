@@ -115,7 +115,9 @@ export function SignalStrengthCard({
             </motion.span>
           </div>
           <p className="mt-2 text-xs text-text-tertiary">
-            Desk allocation set by your account team
+            {clamped >= 100
+              ? "Your signals plan is active. Full desk allocation is in effect."
+              : "This figure represents your current trading desk allocation."}
           </p>
         </div>
       </div>
