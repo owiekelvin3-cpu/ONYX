@@ -80,11 +80,14 @@ export default function AdminWithdrawalsPage() {
     return true;
   });
 
+  const pendingCount = rows.filter((w) => w.status === "pending").length;
+
   return (
     <div className="space-y-5 max-w-5xl">
       <AdminPageHeader
         title="Withdrawals"
         subtitle="Process pending withdrawal requests."
+        notificationCount={pendingCount}
         action={
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />

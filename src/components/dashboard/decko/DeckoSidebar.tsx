@@ -11,6 +11,7 @@ import { SuspendedAvatarBadge } from "@/components/dashboard/AccountSuspendedBan
 import {
   ArrowDownToLine,
   ArrowRight,
+  ArrowUpFromLine,
   Bot,
   FileCheck,
   HelpCircle,
@@ -36,6 +37,7 @@ const MAIN_MENU = [
   { label: "Spot Trading", href: "/dashboard/trade", icon: TrendingUp },
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
+  { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt },
   { label: "AI Trading", href: "/dashboard/ai-trading", icon: Bot },
   { label: "Copy Trading", href: "/dashboard/copy-trading", icon: Users },
@@ -71,7 +73,7 @@ export function DeckoSidebar() {
   }
 
   return (
-    <aside className="decko-sidebar hidden w-[248px] shrink-0 flex-col px-4 py-5 lg:flex">
+    <aside className="decko-sidebar hidden h-dvh w-[248px] shrink-0 flex-col overflow-hidden px-4 py-5 lg:flex">
       <Link href="/dashboard" className="mb-6 flex items-center gap-2.5 px-2">
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--decko-accent)]">
           <OnyxLogo size={22} />
@@ -96,6 +98,7 @@ export function DeckoSidebar() {
         </span>
       </div>
 
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
       <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--decko-sidebar-muted)]">
         Main Menu
       </p>
@@ -145,8 +148,9 @@ export function DeckoSidebar() {
           );
         })}
       </nav>
+      </div>
 
-      <div className="mt-auto space-y-3 pt-6">
+      <div className="mt-auto shrink-0 space-y-3 pt-6">
         <Link
           href="/dashboard/deposit"
           className="block rounded-2xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-surface)] p-4 transition-transform hover:scale-[1.02]"

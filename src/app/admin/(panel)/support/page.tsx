@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RefreshCw, Search, User } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -67,6 +67,10 @@ export default function AdminSupportPage() {
 
   const active = conversations.find((c) => c.id === activeId) ?? null;
   const showThread = !!active;
+  const unreadCount = useMemo(
+    () => conversations.reduce((sum, c) => sum + (c.unread_count ?? 0), 0),
+    [conversations]
+  );
 
   const refreshList = useCallback(async (opts?: { soft?: boolean }) => {
     if (!opts?.soft) setLoadingList(true);
@@ -374,6 +378,7 @@ export default function AdminSupportPage() {
         <AdminPageHeader
           title="Support inbox"
           subtitle="Reply to customer conversations, resolve tickets, and track open requests."
+          notificationCount={unreadCount}
         />
       </div>
 

@@ -28,13 +28,13 @@ import {
 const MOBILE_TABS = [
   { labelKey: "dashboard.dock.home", href: "/dashboard", icon: LayoutDashboard },
   { labelKey: "dashboard.dock.trade", href: "/dashboard/trade", icon: TrendingUp, featured: true },
-  { labelKey: "nav.markets", href: "/dashboard/portfolio", icon: Wallet },
+  { labelKey: "dashboard.navWithdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },
   { labelKey: "nav.more", href: null, icon: MoreHorizontal },
 ] as const;
 
 const MORE_MENU_ITEMS = [
   { href: "/dashboard/deposit", labelKey: "dashboard.navDeposit", icon: ArrowDownToLine },
-  { href: "/dashboard/withdraw", labelKey: "dashboard.navWithdraw", icon: ArrowUpFromLine },
+  { href: "/dashboard/portfolio", labelKey: "dashboard.navPortfolio", icon: Wallet },
   { href: "/dashboard/transactions", labelKey: "dashboard.transactions", icon: Receipt },
   { href: "/dashboard/notifications", labelKey: "dashboard.notifications", icon: Bell },
   { href: "/dashboard/ai-trading", labelKey: "dashboard.aiTrading", icon: Bot },

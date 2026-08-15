@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { AdminNotificationBadge } from "@/components/admin/AdminNotificationBadge";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { clearAdminSession } from "@/lib/auth-guards";
 import { createClient } from "@/lib/supabase/client";
+import {
+  ADMIN_NOTIFICATION_ROUTES,
+  getAdminAttentionTotal,
+  useAdminStats,
+} from "@/hooks/useAdminStats";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "@/components/ui/Button";
 import {
@@ -25,6 +31,7 @@ import {
   Bot,
   Copy,
   Zap,
+  Bell,
 } from "@/components/icons";
 
 const ADMIN_LINKS = [
@@ -63,8 +70,25 @@ export function AdminShell({
 }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { stats, refresh } = useAdminStats();
+  const attentionTotal = getAdminAttentionTotal(stats);
   useBodyScrollLock(menuOpen);
   const pageTitle = getPageTitle(pathname);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel("admin-notification-counts")
+      .on("postgres_changes", { event: "*", schema: "public", table: "kyc_submissions" }, () => void refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "deposits" }, () => void refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "withdrawals" }, () => void refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_conversations" }, () => void refresh())
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [refresh]);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -103,6 +127,8 @@ export function AdminShell({
           {ADMIN_LINKS.map((link) => {
             const Icon = link.icon;
             const active = isActive(pathname, link.href, "exact" in link ? link.exact : undefined);
+            const statKey = ADMIN_NOTIFICATION_ROUTES[link.href];
+            const notificationCount = statKey ? stats[statKey] : 0;
             return (
               <Link
                 key={link.href}
@@ -116,7 +142,8 @@ export function AdminShell({
                 )}
               >
                 <Icon className="w-4 h-4 shrink-0" />
-                {link.label}
+                <span className="min-w-0 flex-1 truncate">{link.label}</span>
+                <AdminNotificationBadge count={notificationCount} showIcon={false} />
               </Link>
             );
           })}
@@ -164,7 +191,19 @@ export function AdminShell({
             <p className="truncate text-sm font-semibold text-text-primary lg:hidden">{pageTitle}</p>
             <p className="hidden truncate text-sm font-medium text-text-secondary lg:block">Team Console</p>
           </div>
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-2">
+            <Link
+              href="/admin"
+              className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-bg-tertiary text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
+              aria-label={`${attentionTotal} items need attention`}
+            >
+              <Bell className="h-4 w-4" />
+              {attentionTotal > 0 && (
+                <span className="absolute -right-1 -top-1">
+                  <AdminNotificationBadge count={attentionTotal} showIcon={false} className="px-1 py-0" />
+                </span>
+              )}
+            </Link>
             <ThemeToggle />
           </div>
         </header>

@@ -361,8 +361,7 @@ export default function WithdrawPage() {
 
   const formDisabled =
     loading || submitting || !userId || !kycApproved || !canWithdraw || (balance ?? 0) <= 0;
-  const showWithdrawForm =
-    !loading && !isSuspended && pendingFees.length === 0 && (balance ?? 0) > 0;
+  const showWithdrawForm = !loading && !isSuspended && pendingFees.length === 0;
 
   return (
     <div className="space-y-5 max-w-3xl pb-2">

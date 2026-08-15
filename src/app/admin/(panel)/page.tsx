@@ -26,13 +26,14 @@ const QUICK_LINKS = [
 
 export default function AdminOverviewPage() {
   const { stats, loading, refresh } = useAdminStats();
-  const attention = stats.pendingKyc + stats.pendingDeposits + stats.pendingWithdrawals;
+  const attention = stats.pendingKyc + stats.pendingDeposits + stats.pendingWithdrawals + stats.unreadSupport;
 
   return (
     <div className="space-y-6 max-w-6xl">
       <AdminPageHeader
         title="Overview"
         subtitle="Monitor queues, users, and platform activity."
+        notificationCount={attention}
         action={
           <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -46,7 +47,7 @@ export default function AdminOverviewPage() {
         <p className="text-3xl sm:text-4xl font-bold text-text-primary mt-2">
           {loading ? "—" : attention}
         </p>
-        <p className="text-sm text-text-tertiary mt-1">Pending KYC, deposits, and withdrawals</p>
+        <p className="text-sm text-text-tertiary mt-1">Pending KYC, deposits, withdrawals, and unread support</p>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
           <Link href="/admin/deposits" className="w-full sm:w-auto">
             <Button size="sm" className="w-full sm:w-auto">Review deposits</Button>

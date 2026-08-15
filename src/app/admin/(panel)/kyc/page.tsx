@@ -202,6 +202,7 @@ export default function AdminKycPage() {
       <AdminPageHeader
         title={t("admin.kycTitle")}
         subtitle={t("admin.kycSubtitle")}
+        notificationCount={pendingCount}
         action={
           <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
             <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />

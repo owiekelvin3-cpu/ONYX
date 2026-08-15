@@ -104,11 +104,14 @@ export default function AdminDepositsPage() {
     );
   }
 
+  const pendingCount = deposits.filter((d) => d.status === "pending").length;
+
   return (
     <div className="space-y-5 max-w-5xl">
       <AdminPageHeader
         title="Deposits"
         subtitle="Approve or reject user deposit requests."
+        notificationCount={pendingCount}
         action={
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
             <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
