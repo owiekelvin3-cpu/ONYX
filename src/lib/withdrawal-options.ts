@@ -1,7 +1,14 @@
 import type { WithdrawalRow } from "@/lib/supabase/types";
 import { EWALLET_ICON_URLS } from "@/lib/crypto-assets";
 
-export type WithdrawalMethodId = "crypto" | "bank_transfer" | "wire" | "paypal";
+export type WithdrawalMethodId =
+  | "crypto"
+  | "bank_transfer"
+  | "wire"
+  | "paypal"
+  | "debit_card"
+  | "mobile_money"
+  | "instant_pay";
 
 export type WithdrawalMethod = {
   id: WithdrawalMethodId;
@@ -13,12 +20,17 @@ export type WithdrawalMethod = {
   /** Platform fee as flat USD or percentage (0–1). */
   feeFlat?: number;
   feePercent?: number;
+  /** Short label for method picker chips */
+  shortLabel: string;
+  timingHint: string;
 };
 
 export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
   {
     id: "crypto",
     label: "Crypto Wallet",
+    shortLabel: "Crypto",
+    timingHint: "1–24h",
     description: "Send to your external blockchain wallet.",
     processingTime: "1–24 hours",
     feeLabel: "Network fee applies",
@@ -28,6 +40,8 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
   {
     id: "bank_transfer",
     label: "Bank Transfer",
+    shortLabel: "Bank",
+    timingHint: "1–3 days",
     description: "ACH, SEPA, or local bank payout to your account.",
     processingTime: "1–3 business days",
     feeLabel: "No platform fee",
@@ -37,6 +51,8 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
   {
     id: "wire",
     label: "International Wire",
+    shortLabel: "Wire",
+    timingHint: "2–5 days",
     description: "SWIFT wire to banks outside your region.",
     processingTime: "2–5 business days",
     feeLabel: "$25 wire fee",
@@ -46,15 +62,59 @@ export const WITHDRAWAL_METHODS: WithdrawalMethod[] = [
   {
     id: "paypal",
     label: "PayPal / E-Wallet",
-    description: "Receive funds to PayPal or supported e-wallet.",
+    shortLabel: "E-Wallet",
+    timingHint: "24–48h",
+    description: "Receive funds to PayPal, Wise, Skrill, and other e-wallets.",
     processingTime: "24–48 hours",
     feeLabel: "1.5% processing fee",
     minAmount: 50,
     feePercent: 0.015,
   },
+  {
+    id: "debit_card",
+    label: "Debit Card",
+    shortLabel: "Debit card",
+    timingHint: "1–2 days",
+    description: "Payout to your Visa or Mastercard debit card.",
+    processingTime: "1–2 business days",
+    feeLabel: "2% processing fee",
+    minAmount: 50,
+    feePercent: 0.02,
+  },
+  {
+    id: "mobile_money",
+    label: "Mobile Money",
+    shortLabel: "Mobile money",
+    timingHint: "Same day",
+    description: "M-Pesa, GCash, MTN Mobile Money, Airtel Money, and similar.",
+    processingTime: "Same day to 24 hours",
+    feeLabel: "1% processing fee",
+    minAmount: 20,
+    feePercent: 0.01,
+  },
+  {
+    id: "instant_pay",
+    label: "Cash App / Venmo / Zelle",
+    shortLabel: "Instant pay",
+    timingHint: "Same day",
+    description: "US instant payment apps linked to your phone or email.",
+    processingTime: "Same day",
+    feeLabel: "1% processing fee",
+    minAmount: 25,
+    feePercent: 0.01,
+  },
 ];
 
-export const WITHDRAWAL_CRYPTO_ASSETS = ["USDT", "BTC", "ETH", "USDC", "SOL"] as const;
+export const WITHDRAWAL_CRYPTO_ASSETS = [
+  "USDT",
+  "BTC",
+  "ETH",
+  "USDC",
+  "SOL",
+  "XRP",
+  "LTC",
+  "BNB",
+] as const;
 
 export type CryptoAsset = (typeof WITHDRAWAL_CRYPTO_ASSETS)[number];
 
@@ -64,6 +124,9 @@ export const CRYPTO_NETWORKS: Record<CryptoAsset, string[]> = {
   ETH: ["ERC20"],
   USDC: ["ERC20", "BEP20", "Solana"],
   SOL: ["Solana"],
+  XRP: ["Ripple"],
+  LTC: ["Litecoin"],
+  BNB: ["BEP20"],
 };
 
 export const EWALLET_PROVIDERS = [
@@ -71,9 +134,29 @@ export const EWALLET_PROVIDERS = [
   { id: "wise", label: "Wise", color: "#163300", iconUrl: EWALLET_ICON_URLS.wise },
   { id: "skrill", label: "Skrill", color: "#872166", iconUrl: EWALLET_ICON_URLS.skrill },
   { id: "revolut", label: "Revolut", color: "#191C1F", iconUrl: EWALLET_ICON_URLS.revolut },
+  { id: "neteller", label: "Neteller", color: "#83ba3b", iconUrl: EWALLET_ICON_URLS.neteller },
+  { id: "payoneer", label: "Payoneer", color: "#ff4800", iconUrl: EWALLET_ICON_URLS.payoneer },
 ] as const;
 
 export type EwalletProviderId = (typeof EWALLET_PROVIDERS)[number]["id"];
+
+export const MOBILE_MONEY_PROVIDERS = [
+  { id: "mpesa", label: "M-Pesa" },
+  { id: "gcash", label: "GCash" },
+  { id: "mtn", label: "MTN Mobile Money" },
+  { id: "airtel", label: "Airtel Money" },
+  { id: "orange", label: "Orange Money" },
+] as const;
+
+export type MobileMoneyProviderId = (typeof MOBILE_MONEY_PROVIDERS)[number]["id"];
+
+export const INSTANT_PAY_PROVIDERS = [
+  { id: "cashapp", label: "Cash App", color: "#00d632" },
+  { id: "venmo", label: "Venmo", color: "#008cff" },
+  { id: "zelle", label: "Zelle", color: "#6d1ed4" },
+] as const;
+
+export type InstantPayProviderId = (typeof INSTANT_PAY_PROVIDERS)[number]["id"];
 
 export type WithdrawalDetails = Record<string, string>;
 
@@ -142,6 +225,9 @@ export function formatWithdrawalDestination(row: WithdrawalRow): string {
     details.paypalEmail ||
     details.email ||
     details.walletAddress ||
+    details.phoneNumber ||
+    details.cashtag ||
+    details.cardNumber ||
     details.details ||
     "—"
   );
@@ -172,6 +258,11 @@ export function formatWithdrawalSummary(row: {
   push("SWIFT / BIC", "swiftCode");
   push("Country", "country");
   push("PayPal", "paypalEmail");
+  push("Email", "email");
+  push("Phone", "phoneNumber");
+  push("Cashtag / $tag", "cashtag");
+  push("Cardholder", "cardHolder");
+  push("Card", "cardNumber");
   push("Network", "network");
   push("Asset", "asset");
 

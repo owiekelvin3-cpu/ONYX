@@ -63,6 +63,8 @@ import {
   faUpload,
   faWandMagicSparkles,
   faArrowUpRightFromSquare,
+  faDownload,
+  faShareNodes,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -148,4 +150,6 @@ export const CreditCard = icon(faCreditCard);
 export const Upload = icon(faUpload);
 export const Sparkles = icon(faWandMagicSparkles);
 export const ExternalLink = icon(faArrowUpRightFromSquare);
+export const Download = icon(faDownload);
+export const Share = icon(faShareNodes);
 export const ImageIcon = Image;

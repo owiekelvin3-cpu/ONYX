@@ -36,4 +36,6 @@ export const EWALLET_ICON_URLS: Record<string, string> = {
   wise: "https://cdn.simpleicons.org/wise/163300",
   skrill: "https://cdn.simpleicons.org/skrill/872166",
   revolut: "https://cdn.simpleicons.org/revolut/191C1F",
+  neteller: "https://cdn.simpleicons.org/neteller/83BA3B",
+  payoneer: "https://cdn.simpleicons.org/payoneer/FF4800",
 };

@@ -1285,6 +1285,18 @@
     "submitBank": "Submit bank withdrawal",
     "submitWire": "Submit wire withdrawal",
     "submitEwallet": "Submit e-wallet withdrawal",
+    "submitDebitCard": "Submit debit card withdrawal",
+    "submitMobileMoney": "Submit mobile money withdrawal",
+    "submitInstantPay": "Submit instant pay withdrawal",
+    "debitCardTitle": "Debit card",
+    "debitCardDesc": "Receive funds on your Visa or Mastercard debit card.",
+    "mobileMoneyTitle": "Mobile money",
+    "mobileMoneyDesc": "M-Pesa, GCash, MTN, Airtel Money, Orange Money, and more.",
+    "instantPayTitle": "Cash App / Venmo / Zelle",
+    "instantPayDesc": "Same-day payout to popular US payment apps.",
+    "debitCardTiming": "1–2 business days",
+    "mobileMoneyTiming": "Same day",
+    "instantPayTiming": "Same day",
     "submitting": "Submitting…",
     "submitSuccess": "Withdrawal request submitted. It will stay pending until our team reviews it.",
     "insufficientBalance": "That amount is higher than your available balance.",
@@ -2364,7 +2376,8 @@
   },
   "pwa": {
     "installTitle": "Install ONYX app",
-    "installDesc": "Open faster from your home screen — works like a native app.",
-    "install": "Install"
+    "installDesc": "Add ONYX to your home screen for faster deposits, withdrawals, and trading.",
+    "install": "Install app",
+    "iosHint": "Tap Share, then Add to Home Screen for quick access to your dashboard."
   }
 }

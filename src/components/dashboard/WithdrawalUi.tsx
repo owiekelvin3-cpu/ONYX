@@ -10,6 +10,7 @@ import {
   calculateWithdrawalFee,
   estimateReceiveAmount,
   getWithdrawalMethod,
+  WITHDRAWAL_METHODS,
   type WithdrawalMethodId,
 } from "@/lib/withdrawal-options";
 import { CryptoIcon } from "@/components/crypto/CryptoIcon";
@@ -30,6 +31,9 @@ import {
   Loader2,
   ChevronRight,
   Comments,
+  CreditCard,
+  Phone,
+  Zap,
 } from "@/components/icons";
 
 const METHOD_ICONS: Record<WithdrawalMethodId, typeof Wallet> = {
@@ -37,6 +41,9 @@ const METHOD_ICONS: Record<WithdrawalMethodId, typeof Wallet> = {
   bank_transfer: BuildingColumns,
   wire: MoneyBillTransfer,
   paypal: Mail,
+  debit_card: CreditCard,
+  mobile_money: Phone,
+  instant_pay: Zap,
 };
 
 export function WithdrawalPageHeader() {
@@ -226,22 +233,15 @@ export function WithdrawalMethodPicker({
         <p className="text-xs text-text-tertiary mt-1">How would you like to receive your funds?</p>
       </div>
 
-      <div className="scroll-x flex gap-2.5 pb-1 sm:grid sm:grid-cols-2 sm:gap-3 sm:pb-0 sm:overflow-visible">
-        {(
-          [
-            { id: "crypto" as const, label: "Crypto", sub: "1–24h" },
-            { id: "bank_transfer" as const, label: "Bank", sub: "1–3 days" },
-            { id: "wire" as const, label: "Wire", sub: "2–5 days" },
-            { id: "paypal" as const, label: "E-Wallet", sub: "24–48h" },
-          ] as const
-        ).map((tab) => {
-          const Icon = METHOD_ICONS[tab.id];
-          const active = method === tab.id;
+      <div className="scroll-x flex gap-2.5 pb-1 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-3 sm:pb-0 sm:overflow-visible">
+        {WITHDRAWAL_METHODS.map((item) => {
+          const Icon = METHOD_ICONS[item.id];
+          const active = method === item.id;
           return (
             <button
-              key={tab.id}
+              key={item.id}
               type="button"
-              onClick={() => onChange(tab.id)}
+              onClick={() => onChange(item.id)}
               className={cn(
                 "shrink-0 w-[calc(50%-0.3125rem)] sm:w-auto flex flex-col items-start rounded-xl border p-3.5 text-left transition-all cursor-pointer",
                 active
@@ -257,8 +257,8 @@ export function WithdrawalMethodPicker({
               >
                 <Icon className="w-4 h-4" />
               </span>
-              <span className="text-sm font-semibold text-text-primary">{tab.label}</span>
-              <span className="text-[11px] text-text-tertiary mt-0.5">{tab.sub}</span>
+              <span className="text-sm font-semibold text-text-primary">{item.shortLabel}</span>
+              <span className="text-[11px] text-text-tertiary mt-0.5">{item.timingHint}</span>
             </button>
           );
         })}

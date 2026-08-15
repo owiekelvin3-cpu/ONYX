@@ -7,6 +7,7 @@ import { getAppUrl } from "@/lib/env";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeScript } from "@/components/theme/ThemeScript";
+import { PwaProvider } from "@/components/pwa/PwaProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -81,6 +82,11 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
   },
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: BRAND.name,
+    statusBarStyle: "black-translucent",
+  },
   robots: {
     index: true,
     follow: true,
@@ -114,7 +120,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-dvh w-full antialiased bg-bg-primary text-text-primary">
         <ThemeProvider>
-          <I18nProvider>{children}</I18nProvider>
+          <PwaProvider>
+            <I18nProvider>{children}</I18nProvider>
+          </PwaProvider>
         </ThemeProvider>
       </body>
     </html>

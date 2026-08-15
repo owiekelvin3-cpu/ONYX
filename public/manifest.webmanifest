@@ -1,23 +1,64 @@
 {
   "name": "Onyx Exchange",
   "short_name": "ONYX",
-  "description": "Trade crypto, stocks, and forex on a platform engineered for speed, security, and clarity.",
-  "start_url": "/",
+  "description": "Trade crypto, copy top traders, and manage your portfolio on ONYX Exchange.",
+  "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
   "background_color": "#0a0a0a",
   "theme_color": "#0f0f0f",
+  "categories": ["finance", "business"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
+    {
+      "src": "/pwa-icon-192",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/apple-icon",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "url": "/dashboard",
+      "icons": [{ "src": "/pwa-icon-192", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "src": "/icon",
-      "sizes": "32x32",
-      "type": "image/png",
-      "purpose": "any"
+      "name": "Deposit",
+      "url": "/dashboard/deposit",
+      "icons": [{ "src": "/pwa-icon-192", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Withdraw",
+      "url": "/dashboard/withdraw",
+      "icons": [{ "src": "/pwa-icon-192", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Trade",
+      "url": "/dashboard/trade",
+      "icons": [{ "src": "/pwa-icon-192", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

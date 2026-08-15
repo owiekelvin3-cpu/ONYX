@@ -15,10 +15,14 @@ import type { WithdrawalRow } from "@/lib/supabase/types";
 import {
   WITHDRAWAL_CRYPTO_ASSETS,
   EWALLET_PROVIDERS,
+  MOBILE_MONEY_PROVIDERS,
+  INSTANT_PAY_PROVIDERS,
   getWithdrawalMethod,
   getNetworksForAsset,
   type WithdrawalMethodId,
   type EwalletProviderId,
+  type MobileMoneyProviderId,
+  type InstantPayProviderId,
 } from "@/lib/withdrawal-options";
 import { Card } from "@/components/ui/Card";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
@@ -53,6 +57,21 @@ const EMPTY_BANK = {
   country: "",
 };
 
+const EMPTY_DEBIT = {
+  cardHolder: "",
+  cardNumber: "",
+  expiry: "",
+};
+
+const EMPTY_MOBILE = {
+  accountName: "",
+  phoneNumber: "",
+};
+
+const EMPTY_INSTANT = {
+  handle: "",
+};
+
 export default function WithdrawPage() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
@@ -70,6 +89,11 @@ export default function WithdrawPage() {
   const [bank, setBank] = useState(EMPTY_BANK);
   const [ewalletProvider, setEwalletProvider] = useState<EwalletProviderId>("paypal");
   const [ewalletEmail, setEwalletEmail] = useState("");
+  const [mobileProvider, setMobileProvider] = useState<MobileMoneyProviderId>("mpesa");
+  const [mobile, setMobile] = useState(EMPTY_MOBILE);
+  const [instantProvider, setInstantProvider] = useState<InstantPayProviderId>("cashapp");
+  const [instant, setInstant] = useState(EMPTY_INSTANT);
+  const [debit, setDebit] = useState(EMPTY_DEBIT);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -130,6 +154,21 @@ export default function WithdrawPage() {
     setConfirming(false);
   }
 
+  function updateDebit(field: keyof typeof EMPTY_DEBIT, value: string) {
+    setDebit((prev) => ({ ...prev, [field]: value }));
+    setConfirming(false);
+  }
+
+  function updateMobile(field: keyof typeof EMPTY_MOBILE, value: string) {
+    setMobile((prev) => ({ ...prev, [field]: value }));
+    setConfirming(false);
+  }
+
+  function updateInstant(field: keyof typeof EMPTY_INSTANT, value: string) {
+    setInstant((prev) => ({ ...prev, [field]: value }));
+    setConfirming(false);
+  }
+
   function validateForm(): { destination: string; details: Record<string, string> } | null {
     const value = parsedAmount;
     if (!value || value <= 0) {
@@ -183,18 +222,68 @@ export default function WithdrawPage() {
       };
     }
 
-    if (!ewalletEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ewalletEmail.trim())) {
-      setError("Enter a valid e-wallet email");
-      return null;
+    if (method === "paypal") {
+      if (!ewalletEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ewalletEmail.trim())) {
+        setError("Enter a valid e-wallet email");
+        return null;
+      }
+      return {
+        destination: ewalletEmail.trim(),
+        details: {
+          provider: ewalletProvider,
+          email: ewalletEmail.trim(),
+          type: "ewallet",
+        },
+      };
     }
-    return {
-      destination: ewalletEmail.trim(),
-      details: {
-        provider: ewalletProvider,
-        paypalEmail: ewalletEmail.trim(),
-        type: "paypal",
-      },
-    };
+
+    if (method === "debit_card") {
+      if (!debit.cardHolder.trim() || !debit.cardNumber.trim() || !debit.expiry.trim()) {
+        setError("Complete all debit card fields");
+        return null;
+      }
+      return {
+        destination: debit.cardNumber.trim(),
+        details: {
+          ...debit,
+          type: "debit_card",
+        },
+      };
+    }
+
+    if (method === "mobile_money") {
+      if (!mobile.accountName.trim() || !mobile.phoneNumber.trim()) {
+        setError("Enter account name and mobile money phone number");
+        return null;
+      }
+      return {
+        destination: mobile.phoneNumber.trim(),
+        details: {
+          provider: mobileProvider,
+          accountHolder: mobile.accountName.trim(),
+          phoneNumber: mobile.phoneNumber.trim(),
+          type: "mobile_money",
+        },
+      };
+    }
+
+    if (method === "instant_pay") {
+      if (!instant.handle.trim()) {
+        setError("Enter your Cash App $tag, Venmo @username, or Zelle email/phone");
+        return null;
+      }
+      return {
+        destination: instant.handle.trim(),
+        details: {
+          provider: instantProvider,
+          cashtag: instant.handle.trim(),
+          type: "instant_pay",
+        },
+      };
+    }
+
+    setError("Select a payout method");
+    return null;
   }
 
   function handleReview() {
@@ -233,6 +322,9 @@ export default function WithdrawPage() {
       setAmount("");
       setWalletAddress("");
       setBank(EMPTY_BANK);
+      setDebit(EMPTY_DEBIT);
+      setMobile(EMPTY_MOBILE);
+      setInstant(EMPTY_INSTANT);
       setEwalletEmail("");
       setConfirming(false);
       setSuccess(
@@ -481,6 +573,127 @@ export default function WithdrawPage() {
                       setEwalletEmail(e.target.value);
                       setConfirming(false);
                     }}
+                  />
+                </>
+              )}
+
+              {method === "debit_card" && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input
+                    id="card-holder"
+                    label="Cardholder name *"
+                    placeholder="Name on card"
+                    value={debit.cardHolder}
+                    onChange={(e) => updateDebit("cardHolder", e.target.value)}
+                  />
+                  <Input
+                    id="card-number"
+                    label="Debit card number *"
+                    placeholder="4111 1111 1111 1111"
+                    value={debit.cardNumber}
+                    onChange={(e) => updateDebit("cardNumber", e.target.value)}
+                    className="font-mono text-xs"
+                  />
+                  <Input
+                    id="card-expiry"
+                    label="Expiry (MM/YY) *"
+                    placeholder="08/28"
+                    value={debit.expiry}
+                    onChange={(e) => updateDebit("expiry", e.target.value)}
+                  />
+                  <p className="sm:col-span-2 text-[11px] text-text-tertiary leading-relaxed">
+                    Visa and Mastercard debit cards only. Name must match your verified identity.
+                  </p>
+                </div>
+              )}
+
+              {method === "mobile_money" && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-text-tertiary mb-2">Provider</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {MOBILE_MONEY_PROVIDERS.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setMobileProvider(p.id);
+                            setConfirming(false);
+                          }}
+                          className={cn(
+                            "rounded-xl border px-3 py-2.5 text-left text-xs font-semibold transition-colors cursor-pointer",
+                            mobileProvider === p.id
+                              ? "border-brand/50 bg-brand/5 text-brand"
+                              : "border-border bg-bg-primary text-text-secondary hover:bg-bg-hover"
+                          )}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Input
+                      id="mobile-name"
+                      label="Account name *"
+                      placeholder="Registered account name"
+                      value={mobile.accountName}
+                      onChange={(e) => updateMobile("accountName", e.target.value)}
+                    />
+                    <Input
+                      id="mobile-phone"
+                      label="Mobile money number *"
+                      placeholder="+254 7XX XXX XXX"
+                      value={mobile.phoneNumber}
+                      onChange={(e) => updateMobile("phoneNumber", e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
+
+              {method === "instant_pay" && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-text-tertiary mb-2">App</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {INSTANT_PAY_PROVIDERS.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setInstantProvider(p.id);
+                            setConfirming(false);
+                          }}
+                          className={cn(
+                            "rounded-xl border px-3 py-3 text-center text-xs font-semibold transition-colors cursor-pointer",
+                            instantProvider === p.id
+                              ? "border-brand/50 bg-brand/5 text-brand"
+                              : "border-border bg-bg-primary text-text-secondary hover:bg-bg-hover"
+                          )}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Input
+                    id="instant-handle"
+                    label={
+                      instantProvider === "cashapp"
+                        ? "Cash App $cashtag *"
+                        : instantProvider === "venmo"
+                          ? "Venmo @username *"
+                          : "Zelle email or phone *"
+                    }
+                    placeholder={
+                      instantProvider === "cashapp"
+                        ? "$yourtag"
+                        : instantProvider === "venmo"
+                          ? "@username"
+                          : "you@email.com or +1..."
+                    }
+                    value={instant.handle}
+                    onChange={(e) => updateInstant("handle", e.target.value)}
                   />
                 </>
               )}
