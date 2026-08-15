@@ -5,17 +5,37 @@ import type { WithdrawalDetails, WithdrawalMethodId } from "@/lib/withdrawal-opt
 async function fallbackEligibility(
   supabase: SupabaseClient
 ): Promise<WithdrawalEligibility> {
-  const { count, error } = await supabase
-    .from("user_fees")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "pending");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (error) throw new Error(error.message);
+  const [{ count, error: feesError }, profileResult] = await Promise.all([
+    supabase
+      .from("user_fees")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending"),
+    user
+      ? supabase
+          .from("profiles")
+          .select("is_suspended, suspension_reason, kyc_status")
+          .eq("id", user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+
+  if (feesError) throw new Error(feesError.message);
 
   const pending = count ?? 0;
+  const isSuspended = Boolean(profileResult.data?.is_suspended);
+  const kycApproved = profileResult.data?.kyc_status === "approved";
+
   return {
     pending_fees_count: pending,
-    can_withdraw: pending === 0,
+    can_withdraw: pending === 0 && !isSuspended && kycApproved,
+    is_suspended: isSuspended,
+    suspension_reason: profileResult.data?.suspension_reason ?? null,
+    kyc_status: profileResult.data?.kyc_status ?? "none",
+    kyc_approved: kycApproved,
     portfolio: {},
   };
 }
@@ -60,6 +80,17 @@ export async function submitWithdrawal(
     details: WithdrawalDetails;
   }
 ): Promise<WithdrawalRow> {
+  const eligibility = await getWithdrawalEligibility(supabase);
+  if (!eligibility.can_withdraw) {
+    if (eligibility.is_suspended) {
+      throw new Error("Withdrawals are disabled while your account is suspended.");
+    }
+    if (eligibility.kyc_approved === false) {
+      throw new Error("Complete KYC verification before withdrawing.");
+    }
+    throw new Error("Withdrawals are blocked until outstanding fees are cleared.");
+  }
+
   const { data, error } = await supabase
     .from("withdrawals")
     .insert({

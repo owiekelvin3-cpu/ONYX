@@ -121,7 +121,17 @@ export default function WithdrawPage() {
           setIsSuspended(Boolean(eligibility.is_suspended));
           setSuspensionReason(eligibility.suspension_reason ?? null);
         } catch {
-          setCanWithdraw(true);
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("is_suspended, suspension_reason, kyc_status")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          const suspended = Boolean(profile?.is_suspended);
+          const kycApproved = profile?.kyc_status === "approved";
+          setIsSuspended(suspended);
+          setSuspensionReason(profile?.suspension_reason ?? null);
+          setCanWithdraw(!suspended && kycApproved);
         }
 
         try {

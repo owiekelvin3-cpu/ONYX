@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { clearAdminSession } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
@@ -40,8 +40,45 @@ export function DashboardShell({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [suspended, setSuspended] = useState(Boolean(isSuspended));
+  const [activeSuspensionReason, setActiveSuspensionReason] = useState(suspensionReason ?? null);
   const hideBottomNav = shouldHideMobileBottomNav(pathname);
   useBodyScrollLock(menuOpen);
+
+  useEffect(() => {
+    setSuspended(Boolean(isSuspended));
+    setActiveSuspensionReason(suspensionReason ?? null);
+  }, [isSuspended, suspensionReason]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`profile-suspend-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "profiles",
+          filter: `id=eq.${userId}`,
+        },
+        (payload) => {
+          const row = payload.new as {
+            is_suspended?: boolean;
+            suspension_reason?: string | null;
+          };
+          setSuspended(Boolean(row.is_suspended));
+          setActiveSuspensionReason(row.suspension_reason ?? null);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -63,7 +100,7 @@ export function DashboardShell({
             userName={userName}
             userEmail={userEmail}
             avatarUrl={avatarUrl}
-            isSuspended={isSuspended}
+            isSuspended={suspended}
           />
 
           <main
@@ -74,7 +111,7 @@ export function DashboardShell({
                 : "pb-[calc(5.75rem+var(--safe-bottom))] lg:pb-8"
             )}
           >
-            {isSuspended && <AccountSuspendedBanner reason={suspensionReason} />}
+            {suspended && <AccountSuspendedBanner reason={activeSuspensionReason} />}
             {children}
           </main>
 

@@ -7,7 +7,7 @@ export function StatusBadge({ status }: { status: string }) {
       ? "bg-brand/15 text-brand border-brand/30"
       : normalized === "completed" || normalized === "approved"
         ? "bg-green/15 text-green border-green/30"
-        : normalized === "rejected"
+        : normalized === "rejected" || normalized === "suspended"
           ? "bg-red/15 text-red border-red/30"
           : "bg-bg-hover text-text-tertiary border-border";
 

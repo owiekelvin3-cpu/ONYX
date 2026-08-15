@@ -49,6 +49,7 @@ export default function AdminUsersPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [acting, setActing] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState<"success" | "error">("success");
   const [balanceAmount, setBalanceAmount] = useState("");
   const [balanceReason, setBalanceReason] = useState("");
   const [profitAmount, setProfitAmount] = useState("");
@@ -95,6 +96,11 @@ export default function AdminUsersPage() {
     });
   }, [users, search]);
 
+  function showFeedback(text: string, tone: "success" | "error" = "success") {
+    setMessage(text);
+    setMessageTone(tone);
+  }
+
   async function openUser(id: string) {
     setSelectedId(id);
     setDetailLoading(true);
@@ -105,7 +111,7 @@ export default function AdminUsersPage() {
       const d = await fetchAdminUserDetails(id);
       setDetails(d);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Could not load user");
+      showFeedback(e instanceof Error ? e.message : "Could not load user", "error");
       setDetails(null);
     }
     setDetailLoading(false);
@@ -115,7 +121,7 @@ export default function AdminUsersPage() {
     if (!selectedId) return;
     const reason = moderationReason.trim();
     if (action !== "unsuspend" && reason.length < 3) {
-      setMessage(t("admin.userDetail.reasonRequired"));
+      showFeedback(t("admin.userDetail.reasonRequired"), "error");
       return;
     }
     setActing(true);
@@ -130,7 +136,7 @@ export default function AdminUsersPage() {
               ? reason
               : reason || "Suspension lifted by team",
       });
-      setMessage(
+      showFeedback(
         action === "suspend"
           ? "User suspended"
           : action === "reset_kyc"
@@ -141,7 +147,7 @@ export default function AdminUsersPage() {
       await openUser(selectedId);
       await load();
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Action failed");
+      showFeedback(e instanceof Error ? e.message : "Action failed", "error");
     }
     setActing(false);
   }
@@ -150,7 +156,7 @@ export default function AdminUsersPage() {
     if (!selectedId || !profitAmount) return;
     const raw = Math.abs(parseFloat(profitAmount));
     if (!Number.isFinite(raw) || raw <= 0) {
-      setMessage("Enter a valid profit or loss amount.");
+      showFeedback("Enter a valid profit or loss amount.", "error");
       return;
     }
     setActing(true);
@@ -161,14 +167,14 @@ export default function AdminUsersPage() {
         note: profitNote.trim() || undefined,
       });
       const total = Number(result.profit_total ?? 0);
-      setMessage(
+      showFeedback(
         `${mode === "profit" ? "Profit" : "Loss"} applied. Profit Total is now ${formatCurrency(total)}.`
       );
       setProfitAmount("");
       setProfitNote("");
       await openUser(selectedId);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Profit adjustment failed");
+      showFeedback(e instanceof Error ? e.message : "Profit adjustment failed", "error");
     }
     setActing(false);
   }
@@ -183,12 +189,12 @@ export default function AdminUsersPage() {
         amount: parseFloat(balanceAmount),
         reason: balanceReason.trim(),
       });
-      setMessage(`Balance ${direction}ed`);
+      showFeedback(`Balance ${direction}ed`);
       setBalanceAmount("");
       setBalanceReason("");
       await openUser(selectedId);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Balance adjustment failed");
+      showFeedback(e instanceof Error ? e.message : "Balance adjustment failed", "error");
     }
     setActing(false);
   }
@@ -207,11 +213,11 @@ export default function AdminUsersPage() {
     if (!selectedId) return;
     const amount = parseFloat(feeAmount);
     if (!Number.isFinite(amount) || amount <= 0) {
-      setMessage("Enter a valid fee amount greater than zero.");
+      showFeedback("Enter a valid fee amount greater than zero.", "error");
       return;
     }
     if (!feeLabel.trim()) {
-      setMessage("Fee label is required.");
+      showFeedback("Fee label is required.", "error");
       return;
     }
     setActing(true);
@@ -223,12 +229,12 @@ export default function AdminUsersPage() {
         amount,
         notes: feeNotes.trim() || undefined,
       });
-      setMessage(`Withdrawal fee of ${formatCurrency(amount)} assigned. User must deposit to pay it.`);
+      showFeedback(`Withdrawal fee of ${formatCurrency(amount)} assigned. User must deposit to pay it.`);
       setFeeAmount("");
       setFeeNotes("");
       await openUser(selectedId);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Could not assign fee");
+      showFeedback(e instanceof Error ? e.message : "Could not assign fee", "error");
     }
     setActing(false);
   }
@@ -238,10 +244,10 @@ export default function AdminUsersPage() {
     setActing(true);
     try {
       await updateAdminUserFeeStatus({ feeId, status });
-      setMessage(`Fee marked as ${status}.`);
+      showFeedback(`Fee marked as ${status}.`);
       await openUser(selectedId);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Could not update fee");
+      showFeedback(e instanceof Error ? e.message : "Could not update fee", "error");
     }
     setActing(false);
   }
@@ -250,17 +256,17 @@ export default function AdminUsersPage() {
     if (!selectedId || !details) return;
     const reason = deleteReason.trim() || moderationReason.trim();
     if (reason.length < 3) {
-      setMessage(t("admin.userDetail.reasonRequired"));
+      showFeedback(t("admin.userDetail.reasonRequired"), "error");
       return;
     }
     setActing(true);
     try {
       await deleteAdminUser({ userId: selectedId, reason });
-      setMessage(`Deleted ${details.profile.email}`);
+      showFeedback(`Deleted ${details.profile.email}`);
       closeUser();
       await load();
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : t("admin.userDetail.deleteFailed"));
+      showFeedback(e instanceof Error ? e.message : t("admin.userDetail.deleteFailed"), "error");
     }
     setActing(false);
     setDeleteConfirm(false);
@@ -316,6 +322,22 @@ export default function AdminUsersPage() {
     );
   }
 
+  function renderFeedback() {
+    if (!message) return null;
+    return (
+      <p
+        className={cn(
+          "rounded-lg border px-4 py-3 text-sm",
+          messageTone === "error"
+            ? "border-red/30 bg-red/5 text-red"
+            : "border-green/30 bg-green/5 text-green"
+        )}
+      >
+        {message}
+      </p>
+    );
+  }
+
   function renderUserDetails(options?: { hideHeader?: boolean }) {
     if (!selectedId) return null;
     if (detailLoading) {
@@ -325,6 +347,7 @@ export default function AdminUsersPage() {
 
     return (
       <div className="space-y-4">
+              {renderFeedback()}
               {!options?.hideHeader && (
               <div>
                 <h2 className="text-lg font-semibold text-text-primary">{details.profile.full_name || details.profile.email}</h2>
@@ -761,11 +784,6 @@ export default function AdminUsersPage() {
           }
         />
 
-        {message && !showDetail && (
-          <p className="text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
-            {message}
-          </p>
-        )}
       </div>
 
       {/* Mobile user list */}
@@ -837,23 +855,12 @@ export default function AdminUsersPage() {
         </Card>
       </div>
 
-      {message && showDetail && (
-        <p className="hidden text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary lg:block">
-          {message}
-        </p>
-      )}
-
       <AdminMobilePanel
         open={showDetail}
         title={detailTitle}
         subtitle={details?.profile.email}
         onClose={closeUser}
       >
-        {message && (
-          <p className="mb-4 text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
-            {message}
-          </p>
-        )}
         {renderUserDetails({ hideHeader: true })}
       </AdminMobilePanel>
     </div>
