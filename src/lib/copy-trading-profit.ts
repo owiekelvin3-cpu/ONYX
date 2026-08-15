@@ -15,8 +15,10 @@ export function parseCopyTradingProfitNotification(
 ): CopyTradingProfitEvent | null {
   if (title !== COPY_TRADING_PROFIT_NOTIFICATION_TITLE) return null;
 
-  const traderMatch = message.match(/^(.+?) copied a winning trade/);
-  const amountMatch = message.match(/\+\$([\d,]+\.\d{2})/);
+  const traderMatch = message.match(/^(.+?)\s+copied a winning trade/i);
+  const amountMatch =
+    message.match(/\+\s*\$([\d,]+\.\d{2})/) ??
+    message.match(/added to your balance[^$]*\$([\d,]+\.\d{2})/i);
 
   const traderName = traderMatch?.[1]?.trim() || "Your trader";
   const amount = amountMatch ? Number(amountMatch[1].replace(/,/g, "")) : 0;

@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/subscriptions";
 import type { CopySubscriptionRow } from "@/lib/supabase/types";
 import { COPY_TRADER_SECTIONS, COPY_TRADERS } from "@/lib/copy-traders";
+import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
 import { CopyTraderCard } from "@/components/dashboard/copy-trading/CopyTraderCard";
 import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
@@ -44,6 +45,19 @@ export default function CopyTradingPage() {
       setSubscriptions(rows);
     });
   }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    async function reloadSubscriptions() {
+      const supabase = createClient();
+      const rows = await getCopySubscriptions(supabase, userId!);
+      setSubscriptions(rows);
+    }
+
+    window.addEventListener(DASHBOARD_REFRESH_EVENT, reloadSubscriptions);
+    return () => window.removeEventListener(DASHBOARD_REFRESH_EVENT, reloadSubscriptions);
+  }, [userId]);
 
   function goToSection(index: number) {
     setSectionIndex(index);

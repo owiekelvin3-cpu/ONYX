@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
@@ -9,6 +10,7 @@ import {
   parseCopyTradingProfitNotification,
   type CopyTradingProfitEvent,
 } from "@/lib/copy-trading-profit";
+import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { formatCurrency } from "@/lib/utils";
 import { Check, Copy, TrendingUp } from "@/components/icons";
@@ -149,9 +151,14 @@ export function CopyTradingProfitProvider({
   userId?: string;
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [event, setEvent] = useState<CopyTradingProfitEvent | null>(null);
-  const seenIds = useRef(new Set<string>());
-  const primed = useRef(false);
+  const seenNotificationIds = useRef(new Set<string>());
+
+  const refreshDashboard = useCallback(() => {
+    router.refresh();
+    emitDashboardRefresh();
+  }, [router]);
 
   useEffect(() => {
     if (!userId) return;
@@ -164,15 +171,14 @@ export function CopyTradingProfitProvider({
       .select("id")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .limit(20)
+      .limit(30)
       .then(({ data }) => {
         if (cancelled) return;
-        (data ?? []).forEach((row) => seenIds.current.add(row.id));
-        primed.current = true;
+        (data ?? []).forEach((row) => seenNotificationIds.current.add(row.id));
       });
 
     const channel = supabase
-      .channel(`copy-profit-overlay-${userId}`)
+      .channel(`dashboard-live-${userId}`)
       .on(
         "postgres_changes",
         {
@@ -182,13 +188,38 @@ export function CopyTradingProfitProvider({
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          if (!primed.current) return;
           const row = payload.new as { id: string; title: string; message: string };
-          if (seenIds.current.has(row.id)) return;
-          seenIds.current.add(row.id);
+          if (seenNotificationIds.current.has(row.id)) return;
+          seenNotificationIds.current.add(row.id);
+
+          refreshDashboard();
 
           const parsed = parseCopyTradingProfitNotification(row.title, row.message, row.id);
           if (parsed) setEvent(parsed);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "balances",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          refreshDashboard();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "copy_trading_subscriptions",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          refreshDashboard();
         }
       )
       .subscribe();
@@ -197,12 +228,12 @@ export function CopyTradingProfitProvider({
       cancelled = true;
       void supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [refreshDashboard, userId]);
 
   return (
     <>
       {children}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {event && (
           <CopyTradingProfitOverlay key={event.id} event={event} onDone={() => setEvent(null)} />
         )}

@@ -28,7 +28,6 @@ export function NotificationProvider({
   const router = useRouter();
   const { t } = useTranslation();
   const seenIds = useRef(new Set<string>());
-  const primed = useRef(false);
   const [toast, setToast] = useState<ToastState | null>(null);
 
   useEffect(() => {
@@ -40,7 +39,6 @@ export function NotificationProvider({
     void getUserNotifications(supabase, userId).then((items) => {
       if (cancelled) return;
       items.forEach((item) => seenIds.current.add(item.id));
-      primed.current = true;
     });
 
     const channel = supabase
@@ -54,8 +52,6 @@ export function NotificationProvider({
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          if (!primed.current) return;
-
           const row = payload.new as NotificationRow;
           if (seenIds.current.has(row.id)) return;
           seenIds.current.add(row.id);
