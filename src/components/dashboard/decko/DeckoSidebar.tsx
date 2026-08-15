@@ -29,6 +29,7 @@ import {
 } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import { clearAdminSession } from "@/lib/auth-guards";
+import { useDashboardSearch } from "@/components/dashboard/DashboardSearchProvider";
 
 const MAIN_MENU = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
@@ -59,6 +60,7 @@ export function DeckoSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation();
+  const { openSearch } = useDashboardSearch();
 
   async function logout() {
     const supabase = createClient();
@@ -81,8 +83,13 @@ export function DeckoSidebar() {
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--decko-sidebar-muted)]" />
         <input
           type="search"
-          placeholder="Search here..."
-          className="h-10 w-full rounded-xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-input)] pl-10 pr-12 text-sm text-[var(--decko-sidebar-text)] placeholder:text-[var(--decko-sidebar-muted)] outline-none focus:border-[var(--decko-accent)]/40"
+          readOnly
+          value=""
+          onClick={openSearch}
+          onFocus={openSearch}
+          placeholder={t("dashboard.searchPlaceholder")}
+          aria-label={t("dashboard.searchPlaceholder")}
+          className="h-10 w-full cursor-pointer rounded-xl border border-[var(--decko-sidebar-border)] bg-[var(--decko-sidebar-input)] pl-10 pr-12 text-sm text-[var(--decko-sidebar-text)] placeholder:text-[var(--decko-sidebar-muted)] outline-none focus:border-[var(--decko-accent)]/40"
         />
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md bg-[var(--decko-sidebar-hover)] px-1.5 py-0.5 text-[10px] text-[var(--decko-sidebar-muted)]">
           ⌘K
@@ -177,6 +184,8 @@ export function DeckoMobileTopBar({
   avatarUrl?: string;
   isSuspended?: boolean;
 }) {
+  const { t } = useTranslation();
+  const { openSearch } = useDashboardSearch();
   const initial = (userName || userEmail || "U").charAt(0).toUpperCase();
 
   return (
@@ -188,6 +197,14 @@ export function DeckoMobileTopBar({
         <span className="font-bold text-text-primary">{BRAND.name}</span>
       </Link>
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={openSearch}
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-bg-tertiary text-text-secondary hover:bg-bg-hover hover:text-text-primary"
+          aria-label={t("dashboard.searchPlaceholder")}
+        >
+          <Search className="h-4 w-4" />
+        </button>
         <ThemeToggle className="rounded-lg border border-border bg-bg-tertiary" />
         <div className="relative">
           {avatarUrl ? (

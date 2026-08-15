@@ -12,7 +12,7 @@ export default function GiftCardDepositPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="mx-auto max-w-3xl space-y-4">
       <div>
         <Link
           href="/dashboard/deposit"
@@ -25,19 +25,24 @@ export default function GiftCardDepositPage() {
         <p className="mt-1 text-[13px] text-text-tertiary">{t("deposits.giftCardPageDesc")}</p>
       </div>
 
-      <Card>
+      <Card className="p-4 sm:p-5">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {GIFT_CARD_BRANDS.map((brand) => (
             <Link
               key={brand.id}
               href={`/dashboard/deposit/gift-card/${brand.id}`}
               className={cn(
-                "rounded-xl border border-border bg-bg-primary p-4 text-center transition-colors",
-                "hover:border-brand/30 hover:bg-bg-hover/40"
+                "group flex flex-col items-center gap-3 rounded-2xl border border-border bg-bg-primary p-4 text-center transition-all",
+                "hover:border-brand/30 hover:bg-bg-hover/40 hover:shadow-sm"
               )}
             >
-              <GiftCardBrandTile brand={brand} />
-              <span className="text-xs font-semibold text-text-primary">{brand.label}</span>
+              <GiftCardBrandTile brand={brand} size="lg" />
+              <div className="min-w-0">
+                <span className="block text-sm font-semibold text-text-primary">{brand.label}</span>
+                <span className="mt-0.5 block text-[11px] leading-snug text-text-tertiary line-clamp-2">
+                  {brand.fullName}
+                </span>
+              </div>
             </Link>
           ))}
         </div>

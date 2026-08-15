@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ImageUploadField } from "@/components/dashboard/deposit/ImageUploadField";
+import { GiftCardBrandTile } from "@/components/dashboard/deposit/DepositMethodIcons";
 import { ArrowLeft, Loader2 } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
@@ -109,12 +110,7 @@ export default function GiftCardBrandDepositPage() {
           {t("deposits.backToBrands")}
         </Link>
         <div className="flex items-center gap-4">
-          <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: brand.color }}
-          >
-            <img src={brand.iconUrl} alt="" className="h-7 w-7 object-contain" loading="lazy" />
-          </div>
+          <GiftCardBrandTile brand={brand} size="lg" />
           <div>
             <h1 className="text-lg font-bold text-text-primary">{brand.fullName}</h1>
             <p className="text-[13px] text-text-tertiary">{t("deposits.giftCardFormDesc")}</p>

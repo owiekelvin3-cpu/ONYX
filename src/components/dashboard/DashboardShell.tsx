@@ -15,6 +15,7 @@ import { DeckoMobileDock } from "@/components/dashboard/decko/DeckoMobileDock";
 import { UserLocationSync } from "@/components/dashboard/UserLocationSync";
 import { AccountSuspendedBanner } from "@/components/dashboard/AccountSuspendedBanner";
 import { CopyTradingProfitProvider } from "@/components/dashboard/copy-trading/CopyTradingProfitProvider";
+import { DashboardSearchProvider } from "@/components/dashboard/DashboardSearchProvider";
 
 export function shouldHideMobileBottomNav(pathname: string) {
   return pathname.startsWith("/dashboard/support");
@@ -91,6 +92,7 @@ export function DashboardShell({
   return (
     <NotificationProvider userId={userId}>
       <CopyTradingProfitProvider userId={userId}>
+      <DashboardSearchProvider>
       <UserLocationSync userId={userId} />
       <div className="decko-shell flex min-h-dvh w-full min-w-0 overflow-x-clip">
         <DeckoSidebar />
@@ -125,6 +127,7 @@ export function DashboardShell({
           )}
         </div>
       </div>
+      </DashboardSearchProvider>
       </CopyTradingProfitProvider>
     </NotificationProvider>
   );

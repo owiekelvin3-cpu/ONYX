@@ -473,6 +473,8 @@
     "navTransactions": "Transactions",
     "clientPortal": "Client Portal",
     "searchPlaceholder": "Search portfolio, trades...",
+    "searchNoResults": "No pages match your search.",
+    "searchHint": "Navigate with ↑ ↓ · Enter to open",
     "todayChange": "today",
     "viewAll": "View all",
     "totalBalance": "Total balance",
