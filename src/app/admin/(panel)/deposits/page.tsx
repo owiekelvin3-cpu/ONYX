@@ -6,6 +6,8 @@ import { approveDeposit, rejectDeposit } from "@/lib/admin-api";
 import type { DepositRow } from "@/lib/admin-types";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminFilterBar, AdminListActions } from "@/components/admin/AdminFilterBar";
+import { AdminDepositDetailPanel } from "@/components/admin/AdminDepositDetailPanel";
+import { AdminMobilePanel } from "@/components/admin/AdminMobilePanel";
 import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +24,7 @@ export default function AdminDepositsPage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [acting, setActing] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -38,12 +41,20 @@ export default function AdminDepositsPage() {
     load();
   }, [load]);
 
+  const selected = deposits.find((d) => d.id === selectedId) ?? null;
+  const showDetail = !!selected;
+
+  function closeDetail() {
+    setSelectedId(null);
+  }
+
   async function handleApprove(d: DepositRow) {
     setActing(d.id);
     setMessage("");
     try {
       await approveDeposit(d.id, d.user_id, d.amount);
       setMessage(`Approved ${formatCurrency(d.amount)}`);
+      closeDetail();
       await load();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Action failed");
@@ -57,6 +68,7 @@ export default function AdminDepositsPage() {
     try {
       await rejectDeposit(id);
       setMessage("Deposit rejected");
+      closeDetail();
       await load();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Action failed");
@@ -78,6 +90,20 @@ export default function AdminDepositsPage() {
     { key: "rejected", label: "Rejected" },
   ];
 
+  function renderDetailActions(d: DepositRow) {
+    if (!isPending(d.status)) return null;
+    return (
+      <>
+        <Button size="sm" disabled={acting === d.id} onClick={() => handleApprove(d)}>
+          Approve
+        </Button>
+        <Button size="sm" variant="outline" disabled={acting === d.id} onClick={() => handleReject(d.id)}>
+          Reject
+        </Button>
+      </>
+    );
+  }
+
   return (
     <div className="space-y-5 max-w-5xl">
       <AdminPageHeader
@@ -91,7 +117,7 @@ export default function AdminDepositsPage() {
         }
       />
 
-      {message && (
+      {message && !showDetail && (
         <p className="text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
           {message}
         </p>
@@ -99,55 +125,131 @@ export default function AdminDepositsPage() {
 
       <AdminFilterBar value={filter} onChange={setFilter} options={filters.map((f) => ({ key: f.key, label: f.label }))} />
 
-      <Card className="overflow-hidden p-0">
-        {loading ? (
-          <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
-        ) : filtered.length === 0 ? (
-          <p className="p-8 text-center text-sm text-text-tertiary">No deposits found.</p>
-        ) : (
-          <ul className="divide-y divide-border">
-            {filtered.map((d) => {
-              const userLabel = d.profiles?.full_name || d.profiles?.email || d.user_id.slice(0, 8);
-              const pending = isPending(d.status);
-              const parsedNotes = parseDepositNotes(d.notes ?? null, d.method);
-              return (
-                <li key={d.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-text-primary">{formatCurrency(d.amount)}</span>
-                      <StatusBadge status={d.status} />
-                    </div>
-                    <p className="text-sm text-text-tertiary mt-1">
-                      {userLabel} · {formatDepositMethod(d.method)} · {formatDate(d.created_at)}
-                    </p>
-                    {parsedNotes.type === "gift_card" && parsedNotes.cardCode && (
-                      <p className="text-xs text-text-secondary mt-1 font-mono">
-                        Code: {parsedNotes.cardCode}
-                      </p>
-                    )}
-                    {parsedNotes.type === "plain" && parsedNotes.text && (
-                      <p className="text-xs text-text-tertiary mt-1 truncate">{parsedNotes.text}</p>
-                    )}
-                    {parsedNotes.type === "gift_card" && parsedNotes.additionalNotes && (
-                      <p className="text-xs text-text-tertiary mt-1 truncate">{parsedNotes.additionalNotes}</p>
-                    )}
-                  </div>
-                  {pending && (
-                    <AdminListActions>
-                      <Button size="sm" disabled={acting === d.id} onClick={() => handleApprove(d)}>
-                        Approve
-                      </Button>
-                      <Button size="sm" variant="outline" disabled={acting === d.id} onClick={() => handleReject(d.id)}>
-                        Reject
-                      </Button>
-                    </AdminListActions>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+      <div className={cn("grid gap-4", showDetail && "lg:grid-cols-2")}>
+        <Card className="overflow-hidden p-0">
+          {loading ? (
+            <p className="p-8 text-center text-sm text-text-tertiary">Loading…</p>
+          ) : filtered.length === 0 ? (
+            <p className="p-8 text-center text-sm text-text-tertiary">No deposits found.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {filtered.map((d) => {
+                const userLabel = d.profiles?.full_name || d.profiles?.email || d.user_id.slice(0, 8);
+                const pending = isPending(d.status);
+                const parsedNotes = parseDepositNotes(d.notes ?? null, d.method);
+                const hasImages =
+                  parsedNotes.type === "gift_card" &&
+                  Boolean(parsedNotes.frontImageUrl || parsedNotes.backImageUrl);
+
+                return (
+                  <li key={d.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(d.id)}
+                      className={cn(
+                        "w-full p-4 text-left transition-colors hover:bg-bg-hover",
+                        selectedId === d.id && "bg-brand/5"
+                      )}
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-semibold text-text-primary">{formatCurrency(d.amount)}</span>
+                            <StatusBadge status={d.status} />
+                            {hasImages && (
+                              <span className="rounded-full border border-brand/30 bg-brand/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-brand">
+                                Has images
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-text-tertiary mt-1">
+                            {userLabel} · {formatDepositMethod(d.method)} · {formatDate(d.created_at)}
+                          </p>
+                          {parsedNotes.type === "gift_card" && parsedNotes.cardCode && (
+                            <p className="text-xs text-text-secondary mt-1 font-mono truncate">
+                              Code: {parsedNotes.cardCode}
+                            </p>
+                          )}
+                        </div>
+                        {pending && (
+                          <AdminListActions>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedId(d.id);
+                              }}
+                            >
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              disabled={acting === d.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                void handleApprove(d);
+                              }}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={acting === d.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                void handleReject(d.id);
+                              }}
+                            >
+                              Reject
+                            </Button>
+                          </AdminListActions>
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
+
+        {selected && (
+          <div className="hidden lg:block">
+            {message && (
+              <p className="mb-4 text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
+                {message}
+              </p>
+            )}
+            <AdminDepositDetailPanel
+              deposit={selected}
+              onClose={closeDetail}
+              actions={renderDetailActions(selected)}
+            />
+          </div>
         )}
-      </Card>
+      </div>
+
+      <AdminMobilePanel
+        open={showDetail}
+        title={selected ? formatDepositMethod(selected.method) : "Deposit"}
+        subtitle={selected ? formatCurrency(selected.amount) : undefined}
+        onClose={closeDetail}
+      >
+        {message && (
+          <p className="mb-4 text-sm text-text-secondary border border-border rounded-lg px-4 py-3 bg-bg-secondary">
+            {message}
+          </p>
+        )}
+        {selected && (
+          <AdminDepositDetailPanel
+            deposit={selected}
+            onClose={closeDetail}
+            actions={renderDetailActions(selected)}
+          />
+        )}
+      </AdminMobilePanel>
     </div>
   );
 }

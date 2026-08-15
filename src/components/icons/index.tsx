@@ -65,6 +65,7 @@ import {
   faArrowUpRightFromSquare,
   faDownload,
   faShareNodes,
+  faMagnifyingGlassPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -152,4 +153,5 @@ export const Sparkles = icon(faWandMagicSparkles);
 export const ExternalLink = icon(faArrowUpRightFromSquare);
 export const Download = icon(faDownload);
 export const Share = icon(faShareNodes);
+export const ZoomIn = icon(faMagnifyingGlassPlus);
 export const ImageIcon = Image;
