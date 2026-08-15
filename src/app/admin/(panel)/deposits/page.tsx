@@ -9,8 +9,10 @@ import { AdminFilterBar, AdminListActions } from "@/components/admin/AdminFilter
 import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatDepositMethod } from "@/lib/deposit-options";
+import { parseDepositNotes } from "@/lib/deposit-details";
 import { RefreshCw } from "@/components/icons";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 
 type Filter = "all" | "pending" | "completed" | "rejected";
 
@@ -107,6 +109,7 @@ export default function AdminDepositsPage() {
             {filtered.map((d) => {
               const userLabel = d.profiles?.full_name || d.profiles?.email || d.user_id.slice(0, 8);
               const pending = isPending(d.status);
+              const parsedNotes = parseDepositNotes(d.notes ?? null, d.method);
               return (
                 <li key={d.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                   <div className="flex-1 min-w-0">
@@ -115,9 +118,19 @@ export default function AdminDepositsPage() {
                       <StatusBadge status={d.status} />
                     </div>
                     <p className="text-sm text-text-tertiary mt-1">
-                      {userLabel} · {d.method} · {formatDate(d.created_at)}
+                      {userLabel} · {formatDepositMethod(d.method)} · {formatDate(d.created_at)}
                     </p>
-                    {d.notes && <p className="text-xs text-text-tertiary mt-1 truncate">{d.notes}</p>}
+                    {parsedNotes.type === "gift_card" && parsedNotes.cardCode && (
+                      <p className="text-xs text-text-secondary mt-1 font-mono">
+                        Code: {parsedNotes.cardCode}
+                      </p>
+                    )}
+                    {parsedNotes.type === "plain" && parsedNotes.text && (
+                      <p className="text-xs text-text-tertiary mt-1 truncate">{parsedNotes.text}</p>
+                    )}
+                    {parsedNotes.type === "gift_card" && parsedNotes.additionalNotes && (
+                      <p className="text-xs text-text-tertiary mt-1 truncate">{parsedNotes.additionalNotes}</p>
+                    )}
                   </div>
                   {pending && (
                     <AdminListActions>
