@@ -47,6 +47,7 @@ export type WithdrawalRow = {
   wallet_address?: string | null;
   status: string;
   notes?: string | null;
+  rejection_reason?: string | null;
   created_at: string;
 };
 

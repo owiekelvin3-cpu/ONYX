@@ -7,9 +7,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import {
-  parseCopyTradingProfitNotification,
+  eventFromProfitCredit,
+  type CopyTradingProfitCreditRow,
   type CopyTradingProfitEvent,
 } from "@/lib/copy-trading-profit";
+import {
+  getPendingCopyProfitOverlays,
+  markCopyProfitOverlayShown,
+} from "@/lib/api/copy-trading";
 import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { formatCurrency } from "@/lib/utils";
@@ -29,6 +34,9 @@ function CopyTradingProfitOverlay({
   const [phase, setPhase] = useState(0);
   useBodyScrollLock(true);
 
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+
   useEffect(() => {
     const start = performance.now();
     const duration = 1400;
@@ -47,12 +55,12 @@ function CopyTradingProfitOverlay({
 
   useEffect(() => {
     const statusTimer = window.setInterval(() => setPhase((p) => (p + 1) % 3), 1800);
-    const closeTimer = window.setTimeout(onDone, 5200);
+    const closeTimer = window.setTimeout(() => onDoneRef.current(), 5200);
     return () => {
       window.clearInterval(statusTimer);
       window.clearTimeout(closeTimer);
     };
-  }, [onDone]);
+  }, []);
 
   const statusLines = [
     t("copyTrading.profitOverlayScanning"),
@@ -152,13 +160,31 @@ export function CopyTradingProfitProvider({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [event, setEvent] = useState<CopyTradingProfitEvent | null>(null);
-  const seenNotificationIds = useRef(new Set<string>());
+  const [queue, setQueue] = useState<CopyTradingProfitEvent[]>([]);
+  const queuedIds = useRef(new Set<string>());
 
   const refreshDashboard = useCallback(() => {
     router.refresh();
     emitDashboardRefresh();
   }, [router]);
+
+  const enqueue = useCallback((event: CopyTradingProfitEvent) => {
+    if (queuedIds.current.has(event.id)) return;
+    queuedIds.current.add(event.id);
+    setQueue((prev) => [...prev, event]);
+  }, []);
+
+  const handleDone = useCallback(async (creditId: string) => {
+    try {
+      const supabase = createClient();
+      await markCopyProfitOverlayShown(supabase, creditId);
+    } catch {
+      /* still dismiss so the user is not stuck */
+    }
+
+    setQueue((prev) => prev.filter((item) => item.id !== creditId));
+    refreshDashboard();
+  }, [refreshDashboard]);
 
   useEffect(() => {
     if (!userId) return;
@@ -166,19 +192,29 @@ export function CopyTradingProfitProvider({
     const supabase = createClient();
     let cancelled = false;
 
-    void supabase
-      .from("notifications")
-      .select("id")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(30)
-      .then(({ data }) => {
-        if (cancelled) return;
-        (data ?? []).forEach((row) => seenNotificationIds.current.add(row.id));
-      });
+    void getPendingCopyProfitOverlays(supabase, userId).then((pending) => {
+      if (cancelled) return;
+      pending.forEach((event) => enqueue(event));
+    });
 
     const channel = supabase
       .channel(`dashboard-live-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "copy_trading_profit_credits",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const row = payload.new as CopyTradingProfitCreditRow;
+          const parsed = eventFromProfitCredit(row);
+          if (!parsed) return;
+          refreshDashboard();
+          enqueue(parsed);
+        }
+      )
       .on(
         "postgres_changes",
         {
@@ -188,14 +224,7 @@ export function CopyTradingProfitProvider({
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const row = payload.new as { id: string; title: string; message: string };
-          if (seenNotificationIds.current.has(row.id)) return;
-          seenNotificationIds.current.add(row.id);
-
           refreshDashboard();
-
-          const parsed = parseCopyTradingProfitNotification(row.title, row.message, row.id);
-          if (parsed) setEvent(parsed);
         }
       )
       .on(
@@ -228,14 +257,16 @@ export function CopyTradingProfitProvider({
       cancelled = true;
       void supabase.removeChannel(channel);
     };
-  }, [refreshDashboard, userId]);
+  }, [enqueue, refreshDashboard, userId]);
+
+  const event = queue[0] ?? null;
 
   return (
     <>
       {children}
       <AnimatePresence mode="wait">
         {event && (
-          <CopyTradingProfitOverlay key={event.id} event={event} onDone={() => setEvent(null)} />
+          <CopyTradingProfitOverlay key={event.id} event={event} onDone={() => void handleDone(event.id)} />
         )}
       </AnimatePresence>
     </>

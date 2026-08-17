@@ -130,11 +130,18 @@ export async function completeWithdrawal(withdrawalId: string) {
   if (error) throw error;
 }
 
-export async function rejectWithdrawal(withdrawalId: string) {
+export async function rejectWithdrawal(withdrawalId: string, reason: string) {
   const supabase = createClient();
+  const rejectionReason = reason.trim();
+  if (rejectionReason.length < 8) {
+    throw new Error("A rejection reason is required.");
+  }
   const { error } = await supabase
     .from("withdrawals")
-    .update({ status: "rejected" as TransactionStatus })
+    .update({
+      status: "rejected" as TransactionStatus,
+      rejection_reason: rejectionReason,
+    })
     .eq("id", withdrawalId);
   if (error) throw error;
 }

@@ -564,6 +564,11 @@ export function WithdrawalHistoryList({ withdrawals }: { withdrawals: Withdrawal
               {dest !== "—" && (
                 <p className="text-[11px] text-text-tertiary mt-0.5 font-mono truncate">{dest}</p>
               )}
+              {w.status === "rejected" && w.rejection_reason && (
+                <p className="mt-1 text-[11px] leading-relaxed text-red/90">
+                  Reason: {w.rejection_reason}
+                </p>
+              )}
             </div>
             <ChevronRight className="w-4 h-4 shrink-0 text-text-tertiary opacity-40" aria-hidden />
           </div>

@@ -8,6 +8,25 @@ export type CopyTradingProfitEvent = {
   message: string;
 };
 
+export type CopyTradingProfitCreditRow = {
+  id: string;
+  trader_name: string;
+  amount: number;
+  note?: string | null;
+};
+
+export function eventFromProfitCredit(row: CopyTradingProfitCreditRow): CopyTradingProfitEvent | null {
+  const amount = Number(row.amount);
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  return {
+    id: row.id,
+    traderName: row.trader_name?.trim() || "Your trader",
+    amount,
+    message: "",
+  };
+}
+
 export function parseCopyTradingProfitNotification(
   title: string,
   message: string,
@@ -27,3 +46,4 @@ export function parseCopyTradingProfitNotification(
 
   return { id, traderName, amount, message };
 }
+

@@ -59,7 +59,7 @@ export async function getUserWithdrawals(
   const { data, error } = await supabase
     .from("withdrawals")
     .select(
-      "id, user_id, amount, currency, method, wallet_address, status, notes, created_at"
+      "id, user_id, amount, currency, method, wallet_address, status, notes, rejection_reason, created_at"
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false })

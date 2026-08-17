@@ -10,10 +10,8 @@ import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
-import {
-  formatWithdrawalMethodLabel,
-  formatWithdrawalSummary,
-} from "@/lib/withdrawal-options";
+import { formatWithdrawalMethodLabel, formatWithdrawalSummary } from "@/lib/withdrawal-options";
+import { AdminWithdrawalRejectDialog } from "@/components/admin/AdminWithdrawalRejectDialog";
 import { RefreshCw } from "@/components/icons";
 
 type Filter = "all" | "pending" | "completed" | "rejected";
@@ -24,6 +22,7 @@ export default function AdminWithdrawalsPage() {
   const [filter, setFilter] = useState<Filter>("pending");
   const [acting, setActing] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [rejecting, setRejecting] = useState<WithdrawalRow | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,12 +52,14 @@ export default function AdminWithdrawalsPage() {
     setActing(null);
   }
 
-  async function handleReject(id: string) {
-    setActing(id);
+  async function handleReject(reason: string) {
+    if (!rejecting) return;
+    setActing(rejecting.id);
     setMessage("");
     try {
-      await rejectWithdrawal(id);
+      await rejectWithdrawal(rejecting.id, reason);
       setMessage("Withdrawal rejected");
+      setRejecting(null);
       await load();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Action failed");
@@ -129,13 +130,18 @@ export default function AdminWithdrawalsPage() {
                         {line}
                       </p>
                     ))}
+                    {w.status === "rejected" && w.rejection_reason && (
+                      <p className="mt-2 text-xs leading-relaxed text-red">
+                        Reason: {w.rejection_reason}
+                      </p>
+                    )}
                   </div>
                   {pending && (
                     <AdminListActions>
                       <Button size="sm" disabled={acting === w.id} onClick={() => handleComplete(w.id)}>
                         Complete
                       </Button>
-                      <Button size="sm" variant="outline" disabled={acting === w.id} onClick={() => handleReject(w.id)}>
+                      <Button size="sm" variant="outline" disabled={acting === w.id} onClick={() => setRejecting(w)}>
                         Reject
                       </Button>
                     </AdminListActions>
@@ -146,6 +152,19 @@ export default function AdminWithdrawalsPage() {
           </ul>
         )}
       </Card>
+
+      <AdminWithdrawalRejectDialog
+        open={!!rejecting}
+        amount={rejecting?.amount ?? 0}
+        userLabel={
+          rejecting?.profiles?.full_name || rejecting?.profiles?.email || rejecting?.user_id.slice(0, 8) || ""
+        }
+        busy={acting === rejecting?.id}
+        onClose={() => {
+          if (!acting) setRejecting(null);
+        }}
+        onConfirm={(reason) => void handleReject(reason)}
+      />
     </div>
   );
 }
