@@ -249,7 +249,7 @@ export default function CryptoDepositPage() {
           </Button>
 
           <p className="text-[11px] text-text-tertiary leading-relaxed">
-            Deposits are typically confirmed within 10–30 minutes after team approval. Minimum deposit: $50.
+            Deposits are typically confirmed within 1–24 hours after team approval. Minimum deposit: $50.
           </p>
         </div>
       </Card>
