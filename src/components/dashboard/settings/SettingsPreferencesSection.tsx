@@ -58,7 +58,12 @@ export function SettingsPreferencesSection({ hideHeader = false }: { hideHeader?
             disabled={savingCurrency}
             className="h-10 min-w-[160px] rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary focus:border-brand focus:outline-none"
           >
-            {CURRENCY_CODES.map((code) => (
+            {Array.from(
+              new Set([
+                ...CURRENCY_CODES,
+                ...(preferredCurrency ? [preferredCurrency] : []),
+              ])
+            ).map((code) => (
               <option key={code} value={code}>
                 {code} · {t(`currencies.${code}`, { defaultValue: code })}
               </option>

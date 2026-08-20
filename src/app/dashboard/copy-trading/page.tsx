@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   getCopySubscriptions,
   subscribeToTrader,
+  uncopyTrader,
 } from "@/lib/api/subscriptions";
 import type { CopySubscriptionRow } from "@/lib/supabase/types";
 import { COPY_TRADER_SECTIONS, COPY_TRADERS } from "@/lib/copy-traders";
@@ -14,7 +15,7 @@ import { CopyTraderCard } from "@/components/dashboard/copy-trading/CopyTraderCa
 import { TraderAvatar } from "@/components/dashboard/copy-trading/TraderAvatar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ChevronLeft, ChevronRight } from "@/components/icons";
+import { ChevronLeft, ChevronRight, Loader2 } from "@/components/icons";
 import { cn, formatCurrency } from "@/lib/utils";
 
 const COPY_ALLOCATION = 0;
@@ -80,7 +81,10 @@ export default function CopyTradingPage() {
         traderName,
         allocation: COPY_ALLOCATION,
       });
-      setSubscriptions((prev) => [row, ...prev]);
+      setSubscriptions((prev) => {
+        const without = prev.filter((s) => s.trader_name !== traderName);
+        return [row, ...without];
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Copy subscription failed");
     } finally {
@@ -88,9 +92,30 @@ export default function CopyTradingPage() {
     }
   }
 
-  const activeTraders = new Set(
-    subscriptions.filter((s) => s.status === "active").map((s) => s.trader_name)
-  );
+  async function handleUncopy(traderName: string) {
+    setError("");
+    if (!userId) return;
+
+    setLoadingTrader(traderName);
+    try {
+      const supabase = createClient();
+      await uncopyTrader(supabase, traderName);
+      setSubscriptions((prev) =>
+        prev.map((s) =>
+          s.trader_name === traderName && s.status === "active"
+            ? { ...s, status: "cancelled" }
+            : s
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not uncopy this trader");
+    } finally {
+      setLoadingTrader(null);
+    }
+  }
+
+  const activeSubscriptions = subscriptions.filter((s) => s.status === "active");
+  const activeTraders = new Set(activeSubscriptions.map((s) => s.trader_name));
 
   return (
     <div className="decko-dashboard mx-auto max-w-[1320px] space-y-8 pb-8">
@@ -108,11 +133,11 @@ export default function CopyTradingPage() {
         </p>
       )}
 
-      {subscriptions.length > 0 && (
+      {activeSubscriptions.length > 0 && (
         <Card className="p-4 sm:p-5">
           <h2 className="text-sm font-semibold text-text-primary">Following</h2>
           <div className="mt-3 space-y-3">
-            {subscriptions.map((sub) => {
+            {activeSubscriptions.map((sub) => {
               const profile = COPY_TRADERS.find((t) => t.name === sub.trader_name);
               const profit = Number(sub.profit_earned ?? 0);
               return (
@@ -135,19 +160,34 @@ export default function CopyTradingPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary">
-                      Copy P/L
-                    </p>
-                    <p
-                      className={cn(
-                        "text-sm font-semibold tabular-nums",
-                        profit >= 0 ? "text-green" : "text-red"
-                      )}
+                  <div className="flex shrink-0 items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary">
+                        Copy P/L
+                      </p>
+                      <p
+                        className={cn(
+                          "text-sm font-semibold tabular-nums",
+                          profit >= 0 ? "text-green" : "text-red"
+                        )}
+                      >
+                        {profit >= 0 ? "+" : ""}
+                        {formatCurrency(profit)}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={loadingTrader === sub.trader_name}
+                      onClick={() => handleUncopy(sub.trader_name)}
                     >
-                      {profit >= 0 ? "+" : ""}
-                      {formatCurrency(profit)}
-                    </p>
+                      {loadingTrader === sub.trader_name ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        "Uncopy"
+                      )}
+                    </Button>
                   </div>
                 </div>
               );
@@ -198,6 +238,7 @@ export default function CopyTradingPage() {
               userId={userId}
               loading={loadingTrader === trader.name}
               onCopy={() => handleCopy(trader.name)}
+              onUncopy={() => handleUncopy(trader.name)}
             />
           ))}
         </div>

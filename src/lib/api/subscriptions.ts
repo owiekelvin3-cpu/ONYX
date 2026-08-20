@@ -57,6 +57,35 @@ export async function subscribeToTrader(
     allocation: number;
   }
 ): Promise<CopySubscriptionRow> {
+  const selectCols =
+    "id, user_id, trader_name, allocation, profit_earned, status, created_at";
+
+  const { data: existing, error: existingError } = await supabase
+    .from("copy_trading_subscriptions")
+    .select(selectCols)
+    .eq("user_id", params.userId)
+    .eq("trader_name", params.traderName)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingError) throw new Error(existingError.message);
+
+  if (existing) {
+    if (existing.status === "active") return existing as CopySubscriptionRow;
+
+    const { data: reactivated, error: reactivateError } = await supabase
+      .from("copy_trading_subscriptions")
+      .update({ status: "active", allocation: params.allocation })
+      .eq("id", existing.id)
+      .eq("user_id", params.userId)
+      .select(selectCols)
+      .single();
+
+    if (reactivateError) throw new Error(reactivateError.message);
+    return reactivated as CopySubscriptionRow;
+  }
+
   const { data, error } = await supabase
     .from("copy_trading_subscriptions")
     .insert({
@@ -65,9 +94,19 @@ export async function subscribeToTrader(
       allocation: params.allocation,
       status: "active",
     })
-    .select("id, user_id, trader_name, allocation, profit_earned, status, created_at")
+    .select(selectCols)
     .single();
 
   if (error) throw new Error(error.message);
   return data as CopySubscriptionRow;
+}
+
+export async function uncopyTrader(
+  supabase: SupabaseClient,
+  traderName: string
+): Promise<void> {
+  const { error } = await supabase.rpc("uncopy_trader", {
+    p_trader_name: traderName,
+  });
+  if (error) throw new Error(error.message);
 }

@@ -15,6 +15,7 @@ export function CopyTraderCard({
   userId,
   loading,
   onCopy,
+  onUncopy,
 }: {
   trader: CopyTraderProfile;
   index: number;
@@ -22,6 +23,7 @@ export function CopyTraderCard({
   userId: string | null;
   loading: boolean;
   onCopy: () => void;
+  onUncopy: () => void;
 }) {
   return (
     <motion.article
@@ -80,8 +82,15 @@ export function CopyTraderCard({
 
       <div className="mt-4 pt-1">
         {isActive ? (
-          <Button className="w-full" size="sm" variant="secondary" disabled>
-            Copying
+          <Button
+            type="button"
+            className="w-full"
+            size="sm"
+            variant="outline"
+            disabled={loading}
+            onClick={onUncopy}
+          >
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Uncopy trader"}
           </Button>
         ) : userId ? (
           <Button

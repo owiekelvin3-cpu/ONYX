@@ -605,7 +605,7 @@
     "preferencesTitle": "Preferences",
     "preferencesDesc": "Customize your platform experience.",
     "currency": "Account currency",
-    "currencyDesc": "Switching currency converts your wallet balance, subscriptions, trades, and history using reference FX rates. Search from 170+ world currencies.",
+    "currencyDesc": "Choose how your balance is labeled. Switching currency does not convert or reduce your funds.",
     "currencySearch": "Search currency…",
     "currencyNoMatch": "No currency matches your search.",
     "currencyUpdated": "Account currency updated.",

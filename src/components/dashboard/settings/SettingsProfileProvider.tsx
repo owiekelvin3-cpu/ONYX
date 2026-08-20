@@ -137,6 +137,7 @@ export function SettingsProfileProvider({ children }: { children: ReactNode }) {
 
   const saveCurrency = useCallback(
     async (code: string) => {
+      const previous = preferredCurrency;
       setPreferredCurrency(code);
       setSavingCurrency(true);
       setError("");
@@ -148,13 +149,15 @@ export function SettingsProfileProvider({ children }: { children: ReactNode }) {
         if (rpcError) throw rpcError;
         setCurrencySaved(true);
         window.setTimeout(() => setCurrencySaved(false), 3000);
+        router.refresh();
       } catch {
+        setPreferredCurrency(previous);
         setError("saveFailed");
       } finally {
         setSavingCurrency(false);
       }
     },
-    []
+    [preferredCurrency, router]
   );
 
   const uploadAvatar = useCallback(
