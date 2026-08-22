@@ -19,10 +19,12 @@ import {
   type WalletRow,
 } from "@/components/trading/SpotWalletOverview";
 import { SpotCryptoDepositSheet } from "@/components/trading/SpotCryptoDepositSheet";
+import { SpotBuyCryptoSheet } from "@/components/trading/SpotBuyCryptoSheet";
 import { SpotHoldingTransferSheet } from "@/components/trading/SpotHoldingTransferSheet";
 import type { MarketPair } from "@/lib/market-data";
 import type { HoldingRow } from "@/lib/supabase/types";
 import { filterSpotMarketPairs, SPOT_ASSETS, spotAssetBySymbol } from "@/lib/spot-assets";
+import { DEFAULT_CRYPTO_PARTNERS } from "@/lib/deposit-options";
 import { toTradingViewSymbol } from "@/lib/tradingview-symbols";
 import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
@@ -116,6 +118,7 @@ export default function TradePage() {
   const [success, setSuccess] = useState("");
   const [depositConfig, setDepositConfig] = useState<DepositConfig | null>(null);
   const [depositSheetKey, setDepositSheetKey] = useState<string | null>(null);
+  const [buyCryptoSheetOpen, setBuyCryptoSheetOpen] = useState(false);
   const [transferTarget, setTransferTarget] = useState<WalletRow | null>(null);
   const [transferMode, setTransferMode] = useState<"to_main" | "send_out">("to_main");
 
@@ -185,9 +188,9 @@ export default function TradePage() {
 
   if (!selectedPair) {
     return (
-      <div className="-mx-4 sm:-mx-5 lg:-mx-8">
-        <div className="animate-pulse bg-bg-secondary">
-          <div className="spot-wallet-hero h-52" />
+      <div className="min-w-0">
+        <div className="animate-pulse overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-[var(--shadow-card)]">
+          <div className="spot-wallet-hero h-52 rounded-t-2xl" />
           <div className="h-80 bg-bg-secondary" />
         </div>
       </div>
@@ -296,12 +299,11 @@ export default function TradePage() {
   }
 
   function handleBuyCrypto() {
-    setSide("buy");
-    setActiveTab("trade");
+    setBuyCryptoSheetOpen(true);
   }
 
   const tradePanel = (
-    <Card className="!overflow-hidden !p-0 min-w-0">
+    <Card className="!overflow-hidden !p-0 min-w-0 shadow-[var(--shadow-card)]">
       <SymbolHeader pair={selectedPair} />
       <div className="relative z-[1] h-[240px] min-h-[240px] bg-[#131722] sm:h-[300px] sm:min-h-[300px] lg:h-[360px] xl:h-[420px]">
         <TradingViewAdvancedChart key={selectedPair.symbol} symbol={selectedPair.symbol} />
@@ -335,8 +337,8 @@ export default function TradePage() {
   );
 
   return (
-    <div className="-mx-4 min-w-0 sm:-mx-5 lg:-mx-8">
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)] xl:gap-5">
+    <div className="mx-auto min-w-0 max-w-6xl space-y-3 sm:space-y-4">
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
         <SpotWalletOverview
           userName={userName}
           cashBalance={balance}
@@ -353,7 +355,7 @@ export default function TradePage() {
 
         <div
           className={cn(
-            "min-w-0 px-4 pt-3 sm:px-5 lg:px-0 lg:pt-0 lg:sticky lg:top-20 lg:self-start",
+            "min-w-0 lg:sticky lg:top-20 lg:self-start",
             activeTab !== "trade" && "hidden lg:block"
           )}
         >
@@ -361,7 +363,7 @@ export default function TradePage() {
             <button
               type="button"
               onClick={() => setActiveTab("coins")}
-              className="mb-3 text-sm font-semibold text-[var(--spot-wallet-accent)] lg:hidden touch-target"
+              className="mb-3 text-sm font-semibold text-[var(--brand-accent)] lg:hidden touch-target"
             >
               ← Back to coins
             </button>
@@ -369,6 +371,12 @@ export default function TradePage() {
           {tradePanel}
         </div>
       </div>
+
+      <SpotBuyCryptoSheet
+        open={buyCryptoSheetOpen}
+        partners={depositConfig?.cryptoPartners ?? DEFAULT_CRYPTO_PARTNERS}
+        onClose={() => setBuyCryptoSheetOpen(false)}
+      />
 
       <SpotCryptoDepositSheet
         open={Boolean(depositSheetKey && depositAsset)}
