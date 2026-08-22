@@ -14,7 +14,7 @@ import type { TransactionItem } from "@/lib/supabase/types";
 import {
   StatusBadge,
   TransactionReceiptModal,
-} from "@/components/dashboard/TransactionsClient";
+} from "@/components/dashboard/TransactionReceiptModal";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -25,6 +25,7 @@ import {
 } from "@/components/icons";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { formatDepositMethod } from "@/lib/deposit-options";
 import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
 
 type TxFilter = "all" | "pending" | "completed";
@@ -46,6 +47,14 @@ function matchesFilter(item: TransactionItem, filter: TxFilter) {
   if (filter === "pending") return tone === "pending";
   if (filter === "completed") return tone === "up";
   return true;
+}
+
+function formatRowMethod(method: string | null | undefined) {
+  if (!method) return "";
+  if (method.startsWith("crypto_") || method.startsWith("gift_card_")) {
+    return formatDepositMethod(method);
+  }
+  return method.replace(/_/g, " ");
 }
 
 export function SpotTransactionsSheet({
@@ -224,7 +233,7 @@ export function SpotTransactionsSheet({
                         </div>
                         <p className="mt-0.5 text-xs text-text-tertiary">
                           {formatDate(item.created_at)}
-                          {item.method ? ` · ${item.method.replace(/_/g, " ")}` : ""}
+                          {item.method ? ` · ${formatRowMethod(item.method)}` : ""}
                           {item.tradeType ? ` · ${item.tradeType}` : ""}
                         </p>
                       </div>
@@ -232,7 +241,9 @@ export function SpotTransactionsSheet({
                         <p className="text-sm font-mono font-semibold tabular-nums text-text-primary">
                           {formatCurrency(item.amount)}
                         </p>
-                        <p className="text-[11px] text-brand">{t("transactions.viewReceipt")}</p>
+                        <p className="text-[11px] font-semibold text-[var(--brand-accent)]">
+                          {t("transactions.viewReceipt")}
+                        </p>
                       </div>
                     </button>
                   </li>
