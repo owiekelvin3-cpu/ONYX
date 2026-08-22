@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { OnyxLogo } from "@/components/brand/OnyxLogo";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AdminNotificationBadge } from "@/components/admin/AdminNotificationBadge";
+import { AdminNotificationProvider } from "@/components/admin/AdminNotificationProvider";
 import { BRAND } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { clearAdminSession } from "@/lib/auth-guards";
@@ -98,7 +99,8 @@ export function AdminShell({
   }
 
   return (
-    <div className="flex min-h-dvh w-full min-w-0 overflow-x-clip bg-bg-primary">
+    <AdminNotificationProvider>
+      <div className="flex min-h-dvh w-full min-w-0 overflow-x-clip bg-bg-primary">
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-[min(18rem,92vw)] bg-bg-secondary border-r border-border flex flex-col transition-transform duration-200 ease-out lg:static lg:translate-x-0 safe-area-top safe-area-bottom safe-area-x",
@@ -212,5 +214,6 @@ export function AdminShell({
         </main>
       </div>
     </div>
+    </AdminNotificationProvider>
   );
 }
