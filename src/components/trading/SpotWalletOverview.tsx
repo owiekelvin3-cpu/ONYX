@@ -3,185 +3,229 @@
 import type { HoldingRow } from "@/lib/supabase/types";
 import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Wallet } from "@/components/icons";
+import { ArrowDownToLine, ArrowUpFromLine, TrendingUp } from "@/components/icons";
 import { SPOT_ASSETS } from "@/lib/spot-assets";
-import { cn, formatCurrency, formatNumber } from "@/lib/utils";
+import { cn, formatCurrency, formatNumber, formatPercent } from "@/lib/utils";
 import type { MarketPair } from "@/lib/market-data";
+import Link from "next/link";
 
-type WalletRow = {
+export type WalletRow = {
   symbol: string;
   name: string;
   quantity: number;
   price: number;
   value: number;
+  change24h: number;
   depositKey: string;
   pairSymbol: string;
 };
 
-function buildWalletRows(
-  holdings: HoldingRow[],
-  pairs: MarketPair[]
-): WalletRow[] {
-  const priceBySymbol = new Map<string, number>();
+export type SpotWalletTab = "coins" | "trade" | "cash";
+
+function buildWalletRows(holdings: HoldingRow[], pairs: MarketPair[]): WalletRow[] {
+  const pairBySymbol = new Map<string, MarketPair>();
   for (const pair of pairs) {
-    const base = pair.symbol.split("/")[0];
-    priceBySymbol.set(base, pair.price);
+    pairBySymbol.set(pair.symbol, pair);
   }
 
   return SPOT_ASSETS.map((asset) => {
     const held = holdings.find((h) => h.asset.toUpperCase() === asset.symbol);
     const quantity = Number(held?.quantity ?? 0);
-    const price = priceBySymbol.get(asset.symbol) ?? (asset.symbol === "USDT" ? 1 : 0);
+    const pair = pairBySymbol.get(asset.pairSymbol);
+    const price = pair?.price ?? (asset.symbol === "USDT" ? 1 : 0);
+    const change24h = pair?.change24h ?? 0;
     return {
       symbol: asset.symbol,
       name: asset.name,
       quantity,
       price,
       value: quantity * price,
+      change24h,
       depositKey: asset.depositKey,
       pairSymbol: asset.pairSymbol,
     };
   });
 }
 
+function formatUsdPlain(value: number, decimals = 2) {
+  return `${formatNumber(value, decimals)} USD`;
+}
+
+function HeaderAction({
+  label,
+  icon: Icon,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  icon: typeof ArrowUpFromLine;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex flex-col items-center gap-2 disabled:opacity-45 touch-target"
+    >
+      <span className="flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-white/20 backdrop-blur-sm sm:h-14 sm:w-14">
+        <Icon className="h-5 w-5 text-white" />
+      </span>
+      <span className="text-[11px] font-medium text-white/90 sm:text-xs">{label}</span>
+    </button>
+  );
+}
+
+const TABS: { id: SpotWalletTab; label: string }[] = [
+  { id: "coins", label: "Coins" },
+  { id: "trade", label: "Trade" },
+  { id: "cash", label: "Cash" },
+];
+
 export function SpotWalletOverview({
+  userName,
+  cashBalance,
   holdings,
   pairs,
   selectedSymbol,
+  activeTab,
+  onTabChange,
   onSelectAsset,
-  onDepositAsset,
-  onTransferToMain,
-  onSendOut,
+  onSend,
+  onReceive,
+  onBuyCrypto,
 }: {
+  userName?: string;
+  cashBalance: number | null;
   holdings: HoldingRow[];
   pairs: MarketPair[];
   selectedSymbol: string;
+  activeTab: SpotWalletTab;
+  onTabChange: (tab: SpotWalletTab) => void;
   onSelectAsset: (pair: MarketPair) => void;
-  onDepositAsset: (depositKey: string) => void;
-  onTransferToMain: (row: WalletRow) => void;
-  onSendOut: (row: WalletRow) => void;
+  onSend: () => void;
+  onReceive: () => void;
+  onBuyCrypto: () => void;
 }) {
   const rows = buildWalletRows(holdings, pairs);
   const cryptoValue = rows.reduce((sum, row) => sum + row.value, 0);
-  const activeAssets = rows.filter((r) => r.quantity > 0).length;
+  const displayName = userName?.trim() || "Trader";
+  const hasSendable = rows.some((row) => row.quantity > 0);
 
   return (
-    <div className="space-y-3">
-      <Card className="!p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
-              Crypto holdings
-            </p>
-            <p className="mt-1 text-2xl font-bold font-mono text-text-primary">
-              {formatCurrency(cryptoValue)}
-            </p>
-            <p className="mt-1 text-xs text-text-tertiary">
-              Separate from your main portfolio · {activeAssets} asset
-              {activeAssets === 1 ? "" : "s"}
-            </p>
-          </div>
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
-            <Wallet className="h-5 w-5" />
-          </span>
+    <div className="min-w-0 overflow-hidden rounded-none bg-bg-secondary sm:rounded-2xl sm:border sm:border-border lg:rounded-2xl">
+      <div className="spot-wallet-hero px-4 pb-6 pt-5 sm:px-6 sm:pb-7 sm:pt-6">
+        <div className="text-center">
+          <p className="text-[2rem] font-bold leading-none tracking-tight text-white sm:text-[2.35rem]">
+            {formatUsdPlain(cryptoValue, cryptoValue >= 1000 ? 0 : 2)}
+          </p>
+          <p className="mt-2 text-sm text-white/80">{displayName}</p>
         </div>
-      </Card>
 
-      <Card className="!p-0 overflow-hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-          <div>
-            <h2 className="text-sm font-semibold text-text-primary">Crypto wallet</h2>
-            <p className="text-xs text-text-tertiary">
-              Tap a coin for its chart. Move crypto to your main balance or send to an external wallet.
-            </p>
-          </div>
+        <div className="mt-6 flex justify-center gap-8 sm:gap-10">
+          <HeaderAction label="Send" icon={ArrowUpFromLine} onClick={onSend} disabled={!hasSendable} />
+          <HeaderAction label="Receive" icon={ArrowDownToLine} onClick={onReceive} />
+          <HeaderAction label="Buy crypto" icon={TrendingUp} onClick={onBuyCrypto} />
+        </div>
+      </div>
+
+      <div className="border-b border-border bg-bg-secondary lg:hidden">
+        <div className="flex">
+          {TABS.map((tab) => {
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "relative flex-1 py-3.5 text-sm font-semibold transition-colors touch-target",
+                  active ? "text-[var(--spot-wallet-accent)]" : "text-text-tertiary"
+                )}
+              >
+                {tab.label}
+                {active && (
+                  <span className="absolute inset-x-4 bottom-0 h-0.5 rounded-full bg-[var(--spot-wallet-accent)]" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={cn(activeTab !== "coins" && "hidden lg:block")}>
+        <div className="hidden border-b border-border px-4 py-3 lg:block">
+          <h2 className="text-sm font-semibold text-text-primary">Your coins</h2>
+          <p className="mt-0.5 text-xs text-text-tertiary">Tap a coin to trade or view its chart.</p>
         </div>
 
         <div className="divide-y divide-border">
           {rows.map((row) => {
             const active = selectedSymbol === row.pairSymbol;
             const pair = pairs.find((p) => p.symbol === row.pairSymbol);
-            const hasBalance = row.quantity > 0;
-
-            function openChart() {
-              if (pair) onSelectAsset(pair);
-            }
+            const isUp = row.change24h >= 0;
+            const priceDecimals = row.price < 10 ? 4 : 2;
+            const qtyDecimals = row.quantity < 1 ? 6 : 4;
 
             return (
-              <div
+              <button
                 key={row.symbol}
-                role="button"
-                tabIndex={0}
-                onClick={openChart}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    openChart();
-                  }
+                type="button"
+                onClick={() => {
+                  if (pair) onSelectAsset(pair);
                 }}
                 className={cn(
-                  "flex cursor-pointer flex-col gap-3 px-4 py-3 transition-colors hover:bg-bg-hover/50 sm:flex-row sm:items-center sm:justify-between",
-                  active && "bg-brand/5"
+                  "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors touch-target sm:px-5 sm:py-4",
+                  active && "bg-[var(--spot-wallet-accent)]/5"
                 )}
               >
-                <div className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                  <CryptoIcon symbol={row.symbol} label={row.name} size="md" />
-                  <div className="min-w-0">
-                    <p className="font-semibold text-text-primary">{row.name}</p>
-                    <p className="text-xs text-text-tertiary">{row.symbol}</p>
-                  </div>
+                <CryptoIcon symbol={row.symbol} label={row.name} size="md" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[15px] font-semibold text-text-primary">{row.name}</p>
+                  <p className="mt-0.5 text-xs text-text-tertiary">
+                    <span>{formatUsdPlain(row.price, priceDecimals)}</span>
+                    <span className={cn("ml-2 font-medium", isUp ? "text-green" : "text-red")}>
+                      {formatPercent(row.change24h)}
+                    </span>
+                  </p>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                  <div className="mr-1 text-right">
-                    <p className="font-mono text-sm font-semibold text-text-primary">
-                      {formatNumber(row.quantity, row.quantity < 1 ? 6 : 4)}
-                    </p>
-                    <p className="text-[11px] text-text-tertiary">
-                      {formatCurrency(row.value)} · ${formatNumber(row.price, row.price < 10 ? 4 : 2)}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDepositAsset(row.depositKey);
-                    }}
-                  >
-                    Deposit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={!hasBalance}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onTransferToMain(row);
-                    }}
-                  >
-                    To main
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={!hasBalance}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSendOut(row);
-                    }}
-                  >
-                    Send out
-                  </Button>
+                <div className="shrink-0 text-right">
+                  <p className="font-mono text-[13px] font-semibold text-text-primary sm:text-sm">
+                    {formatNumber(row.quantity, qtyDecimals)} {row.symbol}
+                  </p>
+                  <p className="mt-0.5 text-xs text-text-tertiary">{formatUsdPlain(row.value)}</p>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
-      </Card>
+      </div>
+
+      <div className={cn("px-4 py-5 sm:px-5", activeTab !== "cash" && "hidden lg:hidden")}>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+          Main account cash
+        </p>
+        <p className="mt-2 text-3xl font-bold font-mono text-text-primary">
+          {cashBalance === null ? "—" : formatCurrency(cashBalance)}
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-text-tertiary">
+          Use cash on the Trade tab to buy crypto. Spot holdings stay separate from your main
+          portfolio balance.
+        </p>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+          <Button className="w-full sm:w-auto" onClick={onBuyCrypto}>
+            Buy crypto
+          </Button>
+          <Link href="/dashboard/deposit" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full">
+              Add cash
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
 
-export type { WalletRow };
+export { buildWalletRows };

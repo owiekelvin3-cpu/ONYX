@@ -120,7 +120,7 @@ export function SpotOrderPanel({
               key={fraction}
               type="button"
               onClick={() => setMax(fraction)}
-              className="flex-1 rounded-lg border border-border bg-bg-primary px-2 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-bg-hover"
+              className="flex-1 min-h-10 rounded-lg border border-border bg-bg-primary px-2 py-2 text-[11px] font-semibold text-text-secondary hover:bg-bg-hover touch-target sm:min-h-0 sm:py-1.5"
             >
               {fraction === 1 ? "Max" : `${fraction * 100}%`}
             </button>

@@ -1,20 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { executeTrade, getHoldings, getUsdBalance } from "@/lib/api/trading";
 import { getDepositConfig, type DepositConfig } from "@/lib/api/deposits";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { formatNumber, formatPercent } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { TradingViewAdvancedChart } from "@/components/trading/TradingViewAdvancedChart";
 import { SpotOrderPanel } from "@/components/trading/SpotOrderPanel";
-import { SpotWalletOverview } from "@/components/trading/SpotWalletOverview";
+import {
+  SpotWalletOverview,
+  buildWalletRows,
+  type SpotWalletTab,
+  type WalletRow,
+} from "@/components/trading/SpotWalletOverview";
 import { SpotCryptoDepositSheet } from "@/components/trading/SpotCryptoDepositSheet";
 import { SpotHoldingTransferSheet } from "@/components/trading/SpotHoldingTransferSheet";
-import type { WalletRow } from "@/components/trading/SpotWalletOverview";
 import type { MarketPair } from "@/lib/market-data";
 import type { HoldingRow } from "@/lib/supabase/types";
 import { filterSpotMarketPairs, SPOT_ASSETS, spotAssetBySymbol } from "@/lib/spot-assets";
@@ -28,28 +33,67 @@ function SymbolHeader({ pair }: { pair: MarketPair }) {
   const base = pair.symbol.split("/")[0];
 
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3 px-3 sm:px-4 py-3 border-b border-border bg-bg-secondary">
-      <div className="min-w-0">
-        <h2 className="text-base sm:text-lg font-bold text-text-primary">{base}</h2>
-        <p className="text-[12px] text-text-tertiary mt-0.5">{pair.name}</p>
-        <p className="text-[11px] text-text-tertiary mt-1 font-mono">
+    <div className="flex items-center justify-between gap-2 border-b border-border bg-bg-secondary px-3 py-2.5 sm:items-start sm:gap-3 sm:px-4 sm:py-3">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <h2 className="text-base font-bold text-text-primary sm:text-lg">{base}</h2>
+          <p className="text-[11px] text-text-tertiary sm:hidden">{pair.name}</p>
+        </div>
+        <p className="mt-0.5 hidden text-[12px] text-text-tertiary sm:block">{pair.name}</p>
+        <p className="mt-1 hidden text-[11px] font-mono text-text-tertiary sm:block">
           {toTradingViewSymbol(pair.symbol)}
         </p>
       </div>
 
-      <div className="text-right shrink-0">
-        <p className="text-xl sm:text-2xl font-bold font-mono text-text-primary">
+      <div className="shrink-0 text-right">
+        <p className="text-lg font-bold font-mono text-text-primary sm:text-2xl">
           ${formatNumber(pair.price, priceDecimals)}
         </p>
-        <p
-          className={cn(
-            "text-sm font-mono mt-0.5",
-            isUp ? "text-green" : "text-red"
-          )}
-        >
+        <p className={cn("text-xs font-mono sm:text-sm", isUp ? "text-green" : "text-red")}>
           {formatPercent(pair.change24h)}
         </p>
       </div>
+    </div>
+  );
+}
+
+function TradeQuickActions({
+  row,
+  onDeposit,
+  onTransferToMain,
+  onSendOut,
+}: {
+  row: WalletRow | null;
+  onDeposit: () => void;
+  onTransferToMain: () => void;
+  onSendOut: () => void;
+}) {
+  if (!row) return null;
+  const hasBalance = row.quantity > 0;
+
+  return (
+    <div className="grid grid-cols-3 gap-2 border-t border-border px-3 py-3 sm:px-4">
+      <Button size="sm" variant="outline" className="min-h-10 text-[11px] sm:text-xs" onClick={onDeposit}>
+        Deposit
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="min-h-10 text-[11px] sm:text-xs"
+        disabled={!hasBalance}
+        onClick={onTransferToMain}
+      >
+        To main
+      </Button>
+      <Button
+        size="sm"
+        variant="secondary"
+        className="min-h-10 text-[11px] sm:text-xs"
+        disabled={!hasBalance}
+        onClick={onSendOut}
+      >
+        Send out
+      </Button>
     </div>
   );
 }
@@ -60,10 +104,11 @@ export default function TradePage() {
   const spotPairs = useMemo(() => filterSpotMarketPairs(allPairs), [allPairs]);
 
   const [selectedPair, setSelectedPair] = useState<MarketPair | null>(null);
+  const [activeTab, setActiveTab] = useState<SpotWalletTab>("coins");
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
-  const chartSectionRef = useRef<HTMLDivElement>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | undefined>();
   const [balance, setBalance] = useState<number | null>(null);
   const [holdings, setHoldings] = useState<HoldingRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,6 +118,16 @@ export default function TradePage() {
   const [depositSheetKey, setDepositSheetKey] = useState<string | null>(null);
   const [transferTarget, setTransferTarget] = useState<WalletRow | null>(null);
   const [transferMode, setTransferMode] = useState<"to_main" | "send_out">("to_main");
+
+  const walletRows = useMemo(
+    () => buildWalletRows(holdings, spotPairs),
+    [holdings, spotPairs]
+  );
+
+  const selectedRow = useMemo(
+    () => walletRows.find((row) => row.pairSymbol === selectedPair?.symbol) ?? null,
+    [walletRows, selectedPair]
+  );
 
   const refreshWallet = useCallback(async (uid: string) => {
     const supabase = createClient();
@@ -94,6 +149,14 @@ export default function TradePage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return;
       setUserId(user.id);
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      setUserName(profile?.full_name ?? undefined);
       await refreshWallet(user.id);
     });
   }, [refreshWallet]);
@@ -122,9 +185,11 @@ export default function TradePage() {
 
   if (!selectedPair) {
     return (
-      <div className="space-y-4">
-        <h1 className="text-base sm:text-lg font-bold text-text-primary">Spot Trading</h1>
-        <div className="animate-pulse h-96 rounded-2xl bg-bg-secondary border border-border" />
+      <div className="-mx-4 sm:-mx-5 lg:-mx-8">
+        <div className="animate-pulse bg-bg-secondary">
+          <div className="spot-wallet-hero h-52" />
+          <div className="h-80 bg-bg-secondary" />
+        </div>
       </div>
     );
   }
@@ -204,36 +269,106 @@ export default function TradePage() {
     setTransferMode(mode);
   }
 
-  function selectPair(pair: MarketPair, scrollToChart = true) {
+  function selectPair(pair: MarketPair) {
     setSelectedPair(pair);
     setError("");
     setSuccess("");
-    if (scrollToChart) {
-      requestAnimationFrame(() => {
-        chartSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
+    setActiveTab("trade");
   }
 
-  return (
-    <div className="space-y-3 sm:space-y-4 min-w-0">
-      <div>
-        <h1 className="text-base sm:text-lg font-bold text-text-primary">Spot Trading</h1>
-        <p className="mt-1 max-w-3xl text-sm text-text-tertiary">
-          Your crypto wallet and spot desk in one place. Deposit BTC, ETH, USDT, and more, buy with
-          cash, hold in your wallet, and sell back anytime.
-        </p>
-      </div>
+  function resolveActionRow(): WalletRow | null {
+    if (selectedRow && selectedRow.quantity > 0) return selectedRow;
+    return walletRows.find((row) => row.quantity > 0) ?? selectedRow;
+  }
 
-      <SpotWalletOverview
-        holdings={holdings}
-        pairs={spotPairs}
-        selectedSymbol={selectedPair.symbol}
-        onSelectAsset={selectPair}
-        onDepositAsset={openDeposit}
-        onTransferToMain={(row) => openTransfer(row, "to_main")}
-        onSendOut={(row) => openTransfer(row, "send_out")}
+  function handleSend() {
+    const row = resolveActionRow();
+    if (!row || row.quantity <= 0) return;
+    openTransfer(row, "send_out");
+  }
+
+  function handleReceive() {
+    const depositKey =
+      selectedRow?.depositKey ??
+      (selectedPair ? spotAssetBySymbol(selectedPair.symbol.split("/")[0])?.depositKey : undefined) ??
+      "bitcoin";
+    openDeposit(depositKey);
+  }
+
+  function handleBuyCrypto() {
+    setSide("buy");
+    setActiveTab("trade");
+  }
+
+  const tradePanel = (
+    <Card className="!overflow-hidden !p-0 min-w-0">
+      <SymbolHeader pair={selectedPair} />
+      <div className="relative z-[1] h-[240px] min-h-[240px] bg-[#131722] sm:h-[300px] sm:min-h-[300px] lg:h-[360px] xl:h-[420px]">
+        <TradingViewAdvancedChart key={selectedPair.symbol} symbol={selectedPair.symbol} />
+      </div>
+      <TradeQuickActions
+        row={selectedRow}
+        onDeposit={openDepositForSelectedPair}
+        onTransferToMain={() => selectedRow && openTransfer(selectedRow, "to_main")}
+        onSendOut={() => selectedRow && openTransfer(selectedRow, "send_out")}
       />
+      <div className="border-t border-border p-3 sm:p-4">
+        <SpotOrderPanel
+          symbol={selectedPair.symbol}
+          side={side}
+          onSideChange={setSide}
+          amount={amount}
+          onAmountChange={setAmount}
+          total={total}
+          price={selectedPair.price}
+          cashBalance={balance}
+          heldQuantity={heldQuantity}
+          userId={userId}
+          loading={loading}
+          error={error}
+          success={success}
+          onSubmit={handleTrade}
+          onDeposit={openDepositForSelectedPair}
+        />
+      </div>
+    </Card>
+  );
+
+  return (
+    <div className="-mx-4 min-w-0 sm:-mx-5 lg:-mx-8">
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)] xl:gap-5">
+        <SpotWalletOverview
+          userName={userName}
+          cashBalance={balance}
+          holdings={holdings}
+          pairs={spotPairs}
+          selectedSymbol={selectedPair.symbol}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onSelectAsset={selectPair}
+          onSend={handleSend}
+          onReceive={handleReceive}
+          onBuyCrypto={handleBuyCrypto}
+        />
+
+        <div
+          className={cn(
+            "min-w-0 px-4 pt-3 sm:px-5 lg:px-0 lg:pt-0 lg:sticky lg:top-20 lg:self-start",
+            activeTab !== "trade" && "hidden lg:block"
+          )}
+        >
+          {activeTab === "trade" && (
+            <button
+              type="button"
+              onClick={() => setActiveTab("coins")}
+              className="mb-3 text-sm font-semibold text-[var(--spot-wallet-accent)] lg:hidden touch-target"
+            >
+              ← Back to coins
+            </button>
+          )}
+          {tradePanel}
+        </div>
+      </div>
 
       <SpotCryptoDepositSheet
         open={Boolean(depositSheetKey && depositAsset)}
@@ -261,71 +396,6 @@ export default function TradePage() {
           emitDashboardRefresh();
         }}
       />
-
-      <div
-        ref={chartSectionRef}
-        className="grid lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_340px] gap-3 sm:gap-4 scroll-mt-20"
-      >
-        <div className="space-y-3 min-w-0">
-          <Card className="!p-0 overflow-hidden min-w-0">
-            <SymbolHeader pair={selectedPair} />
-
-            <div className="relative z-[1] h-[280px] sm:h-[360px] lg:h-[420px] xl:h-[480px] min-h-[280px] bg-[#131722]">
-              <TradingViewAdvancedChart
-                key={selectedPair.symbol}
-                symbol={selectedPair.symbol}
-              />
-            </div>
-          </Card>
-
-          <div className="lg:hidden">
-            <Card className="!p-3 sm:!p-4">
-              <SpotOrderPanel
-                symbol={selectedPair.symbol}
-                side={side}
-                onSideChange={setSide}
-                amount={amount}
-                onAmountChange={setAmount}
-                total={total}
-                price={selectedPair.price}
-                cashBalance={balance}
-                heldQuantity={heldQuantity}
-                userId={userId}
-                loading={loading}
-                error={error}
-                success={success}
-                onSubmit={handleTrade}
-                onDeposit={openDepositForSelectedPair}
-              />
-            </Card>
-          </div>
-        </div>
-
-        <div className="hidden lg:block">
-          <Card className="!p-4 sticky top-20">
-            <p className="text-[11px] uppercase tracking-wide text-text-tertiary mb-3">
-              Trade {selectedPair.symbol.split("/")[0]}
-            </p>
-            <SpotOrderPanel
-              symbol={selectedPair.symbol}
-              side={side}
-              onSideChange={setSide}
-              amount={amount}
-              onAmountChange={setAmount}
-              total={total}
-              price={selectedPair.price}
-              cashBalance={balance}
-              heldQuantity={heldQuantity}
-              userId={userId}
-              loading={loading}
-              error={error}
-              success={success}
-              onSubmit={handleTrade}
-              onDeposit={openDepositForSelectedPair}
-            />
-          </Card>
-        </div>
-      </div>
     </div>
   );
 }

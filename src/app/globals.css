@@ -32,6 +32,8 @@
   --shadow-glow: 0 0 0 1px rgba(226, 255, 76, 0.4), 0 8px 24px rgba(226, 255, 76, 0.2);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
+  --spot-wallet-accent: #3b82f6;
+  --spot-wallet-accent-soft: #60a5fa;
   --page-inline-pad: max(0.875rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
 }
 
@@ -321,6 +323,17 @@ body {
 
 .spot-deposit-scan-line {
   animation: spot-deposit-scan 1.8s ease-in-out infinite;
+}
+
+.spot-wallet-hero {
+  background: linear-gradient(180deg, #4f8ef7 0%, #3b82f6 55%, #2563eb 100%);
+  border-radius: 0 0 1.75rem 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .spot-wallet-hero {
+    border-radius: 1.75rem 1.75rem 0 0;
+  }
 }
 
 @keyframes mobile-nav-drawer-in {

@@ -173,7 +173,8 @@ export function SpotHoldingTransferSheet({
         aria-modal="true"
         aria-label={title}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-[91] mx-auto flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[1.75rem] border border-border bg-bg-secondary shadow-2xl safe-area-bottom",
+          "fixed inset-x-0 bottom-0 z-[91] mx-auto flex w-full max-w-lg flex-col overflow-hidden rounded-t-[1.75rem] border border-border bg-bg-secondary shadow-2xl",
+          "max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-bottom)-0.5rem))] pb-[max(0.25rem,var(--safe-bottom))]",
           visible ? "spot-deposit-sheet-enter" : "translate-y-full opacity-0"
         )}
       >
@@ -197,7 +198,7 @@ export function SpotHoldingTransferSheet({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 safe-area-x">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 safe-area-x sm:px-4 sm:py-5">
           {success ? (
             <div className="spot-deposit-step-enter space-y-5 py-4 text-center">
               <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green/15 text-green">
