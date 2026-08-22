@@ -6,10 +6,8 @@ import { motion } from "framer-motion";
 import type { PortfolioSummary } from "@/lib/api/trading";
 import type { ChartPoint } from "@/lib/chart-data";
 import type { TradeRow } from "@/lib/supabase/types";
-import { FIN_CHART_COLORS } from "@/lib/theme";
-import { cn, formatCurrency, formatNumber } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { PortfolioChart } from "@/components/dashboard/PortfolioChartLoader";
-import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   DeckoProgressBar,
@@ -24,17 +22,9 @@ import {
   Wallet,
 } from "@/components/icons";
 
-export type PortfolioHolding = {
-  asset: string;
-  quantity: number;
-  price: number;
-  value: number;
-};
-
 type Props = {
   summary: PortfolioSummary;
   profitTotal: number;
-  holdings: PortfolioHolding[];
   chartData: ChartPoint[];
   recentTrades: TradeRow[];
 };
@@ -95,7 +85,6 @@ function KpiCard({
 export function DeckoPortfolio({
   summary,
   profitTotal,
-  holdings,
   chartData,
   recentTrades,
 }: Props) {
@@ -106,23 +95,6 @@ export function DeckoPortfolio({
     if (chartData.length <= days + 1) return chartData;
     return chartData.slice(-(days + 1));
   }, [chartData, chartRange]);
-
-  const cashPct =
-    summary.totalValue > 0 ? (summary.cashBalance / summary.totalValue) * 100 : 100;
-  const holdingsPct =
-    summary.totalValue > 0 ? (summary.holdingsValue / summary.totalValue) * 100 : 0;
-
-  const holdingsWithShare = useMemo(
-    () =>
-      holdings
-        .map((h, i) => ({
-          ...h,
-          share: summary.totalValue > 0 ? (h.value / summary.totalValue) * 100 : 0,
-          color: FIN_CHART_COLORS[i % FIN_CHART_COLORS.length],
-        }))
-        .sort((a, b) => b.value - a.value),
-    [holdings, summary.totalValue]
-  );
 
   const profitTrend =
     summary.totalValue > 0 ? (profitTotal / summary.totalValue) * 100 : 0;
@@ -155,27 +127,17 @@ export function DeckoPortfolio({
         </div>
       </div>
 
-      <DeckoStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <DeckoStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <KpiCard
-          label="Total Value"
+          label="Main Portfolio"
           numeric={summary.totalValue}
           icon={Wallet}
         />
         <KpiCard
           label="Cash Balance"
           numeric={summary.cashBalance}
-          trend={cashPct}
-          trendLabel="of portfolio"
           icon={ArrowDownToLine}
           delay={0.05}
-        />
-        <KpiCard
-          label="Holdings"
-          numeric={summary.holdingsValue}
-          trend={holdingsPct}
-          trendLabel="allocated"
-          icon={TrendingUp}
-          delay={0.1}
         />
         <KpiCard
           label="Profit Total"
@@ -183,7 +145,7 @@ export function DeckoPortfolio({
           trend={profitTrend}
           trendLabel="realized P&L"
           icon={ArrowUpFromLine}
-          delay={0.15}
+          delay={0.1}
         />
       </DeckoStagger>
 
@@ -222,67 +184,32 @@ export function DeckoPortfolio({
 
         <DeckoStaggerItem className="space-y-4">
           <div className="decko-card p-5">
-            <h2 className="text-lg font-bold text-text-primary">Allocation</h2>
-            <p className="mt-1 text-sm text-text-secondary">Cash vs invested assets</p>
-            <div className="mt-5 space-y-5">
-              <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-text-secondary">Cash</span>
-                  <span className="font-semibold text-text-primary">{cashPct.toFixed(1)}%</span>
-                </div>
-                <DeckoProgressBar value={cashPct} delay={0.15} />
-                <p className="mt-1 text-xs text-text-tertiary">
-                  {formatCurrency(summary.cashBalance, summary.currency)}
-                </p>
-              </div>
-              <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-text-secondary">Holdings</span>
-                  <span className="font-semibold text-text-primary">{holdingsPct.toFixed(1)}%</span>
-                </div>
-                <DeckoProgressBar value={holdingsPct} delay={0.25} />
-                <p className="mt-1 text-xs text-text-tertiary">
-                  {summary.holdingsCount} asset{summary.holdingsCount === 1 ? "" : "s"} ·{" "}
-                  {formatCurrency(summary.holdingsValue, summary.currency)}
-                </p>
-              </div>
+            <h2 className="text-lg font-bold text-text-primary">Main balance</h2>
+            <p className="mt-1 text-sm text-text-secondary">
+              Your portfolio total reflects cash in your main account only.
+            </p>
+            <div className="mt-5">
+              <DeckoProgressBar value={100} delay={0.15} />
+              <p className="mt-2 text-xs text-text-tertiary">
+                {formatCurrency(summary.cashBalance, summary.currency)} available
+              </p>
             </div>
           </div>
 
-          {holdingsWithShare.length > 0 && (
-            <div className="decko-card p-5">
-              <h2 className="text-lg font-bold text-text-primary">Asset Mix</h2>
-              <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-bg-tertiary">
-                {holdingsWithShare.map((h) => (
-                  <div
-                    key={h.asset}
-                    className="h-full transition-all"
-                    style={{
-                      width: `${Math.max(h.share, 0.5)}%`,
-                      backgroundColor: h.color,
-                    }}
-                    title={`${h.asset} ${h.share.toFixed(1)}%`}
-                  />
-                ))}
-              </div>
-              <ul className="mt-4 space-y-2">
-                {holdingsWithShare.slice(0, 4).map((h) => (
-                  <li key={h.asset} className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-2 text-text-secondary">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: h.color }}
-                      />
-                      {h.asset}
-                    </span>
-                    <span className="font-medium tabular-nums text-text-primary">
-                      {h.share.toFixed(1)}%
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div className="decko-card p-5">
+            <h2 className="text-lg font-bold text-text-primary">Spot crypto wallet</h2>
+            <p className="mt-1 text-sm text-text-secondary">
+              Crypto you hold on the spot desk is kept separate and is not included in this portfolio
+              total.
+            </p>
+            <Link
+              href="/dashboard/trade"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--fin-btn-fg)]"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Open Spot Trading
+            </Link>
+          </div>
         </DeckoStaggerItem>
       </div>
 
@@ -290,122 +217,30 @@ export function DeckoPortfolio({
         <div className="decko-card p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-text-primary">Holdings</h2>
-              <p className="text-sm text-text-secondary">Your open positions</p>
+              <h2 className="text-lg font-bold text-text-primary">Spot crypto wallet</h2>
+              <p className="text-sm text-text-secondary">
+                Deposits, holdings, and transfers live on the spot desk — not in this portfolio total.
+              </p>
             </div>
             <Link
               href="/dashboard/trade"
               className="text-xs font-medium text-text-secondary hover:text-text-primary"
             >
-              Open trade desk →
+              Open spot desk →
             </Link>
           </div>
-
-          {holdingsWithShare.length > 0 ? (
-            <>
-              <div className="space-y-2 md:hidden">
-                {holdingsWithShare.map((h, index) => (
-                  <motion.div
-                    key={h.asset}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 + index * 0.04 }}
-                  >
-                    <Link
-                      href="/dashboard/trade"
-                      className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-primary p-4 transition-colors hover:border-[var(--decko-accent)]/40"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <CryptoIcon symbol={h.asset} label={h.asset} size="sm" />
-                        <div className="min-w-0">
-                          <p className="font-semibold text-text-primary">{h.asset}</p>
-                          <p className="text-[11px] text-text-tertiary">
-                            {formatNumber(h.quantity, h.quantity < 1 ? 4 : 2)} units ·{" "}
-                            {h.share.toFixed(1)}%
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-mono text-sm font-semibold tabular-nums text-text-primary">
-                          {formatCurrency(h.value, summary.currency)}
-                        </p>
-                        <p className="font-mono text-[11px] tabular-nums text-text-tertiary">
-                          @ {formatCurrency(h.price, summary.currency)}
-                        </p>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full min-w-[520px]">
-                  <thead>
-                    <tr className="border-b border-border text-[11px] text-text-tertiary">
-                      <th className="py-2 text-left font-medium">Asset</th>
-                      <th className="py-2 text-right font-medium">Quantity</th>
-                      <th className="py-2 text-right font-medium">Price</th>
-                      <th className="py-2 text-right font-medium">Value</th>
-                      <th className="py-2 text-right font-medium">Share</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {holdingsWithShare.map((h) => (
-                      <tr
-                        key={h.asset}
-                        className="border-b border-border/50 text-[13px] transition-colors hover:bg-bg-primary/50"
-                      >
-                        <td className="py-3">
-                          <Link
-                            href="/dashboard/trade"
-                            className="flex items-center gap-2.5 font-medium text-text-primary hover:text-brand"
-                          >
-                            <CryptoIcon symbol={h.asset} label={h.asset} size="xs" tile={false} />
-                            {h.asset}
-                          </Link>
-                        </td>
-                        <td className="py-3 text-right font-mono tabular-nums">
-                          {formatNumber(h.quantity, h.quantity < 1 ? 4 : 2)}
-                        </td>
-                        <td className="py-3 text-right font-mono tabular-nums">
-                          {formatCurrency(h.price, summary.currency)}
-                        </td>
-                        <td className="py-3 text-right font-mono tabular-nums">
-                          {formatCurrency(h.value, summary.currency)}
-                        </td>
-                        <td className="py-3 text-right tabular-nums text-text-secondary">
-                          {h.share.toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-border px-6 py-10 text-center">
-              <p className="text-sm text-text-secondary">No holdings yet.</p>
-              <p className="mt-1 text-xs text-text-tertiary">
-                Fund your account and place your first trade to build a portfolio.
-              </p>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                <Link
-                  href="/dashboard/deposit"
-                  className="inline-flex items-center gap-2 rounded-xl border border-border bg-bg-primary px-4 py-2 text-sm font-semibold text-text-primary"
-                >
-                  <ArrowDownToLine className="h-4 w-4" />
-                  Deposit
-                </Link>
-                <Link
-                  href="/dashboard/trade"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-2 text-sm font-semibold text-[var(--fin-btn-fg)]"
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  Start trading
-                </Link>
-              </div>
-            </div>
-          )}
+          <div className="rounded-2xl border border-dashed border-border px-6 py-8 text-center">
+            <p className="text-sm text-text-secondary">
+              Manage BTC, ETH, USDT, and other spot assets separately from your main balance.
+            </p>
+            <Link
+              href="/dashboard/trade"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[var(--fin-btn-bg)] px-4 py-2 text-sm font-semibold text-[var(--fin-btn-fg)]"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Go to Spot Trading
+            </Link>
+          </div>
         </div>
       </DeckoStaggerItem>
 

@@ -16,9 +16,8 @@ export async function getPortfolioSummary(
   supabase: SupabaseClient,
   userId: string
 ): Promise<PortfolioSummary> {
-  const [cashBalance, holdings, profileRes, depositsRes, withdrawalsRes] = await Promise.all([
+  const [cashBalance, profileRes, depositsRes, withdrawalsRes] = await Promise.all([
     getUsdBalance(supabase, userId),
-    getHoldings(supabase, userId),
     supabase.from("profiles").select("preferred_currency").eq("id", userId).maybeSingle(),
     supabase
       .from("deposits")
@@ -32,17 +31,6 @@ export async function getPortfolioSummary(
       .in("status", ["approved", "completed"]),
   ]);
 
-  let holdingsValue = 0;
-  if (holdings.length > 0) {
-    const values = await Promise.all(
-      holdings.map(async (holding) => {
-        const price = await priceForAsset(holding.asset);
-        return holding.quantity * price;
-      })
-    );
-    holdingsValue = values.reduce((sum, value) => sum + value, 0);
-  }
-
   const totalDeposits = (depositsRes.data ?? []).reduce(
     (sum, row) => sum + Number(row.amount),
     0
@@ -54,13 +42,59 @@ export async function getPortfolioSummary(
 
   return {
     cashBalance,
-    holdingsValue,
-    totalValue: cashBalance + holdingsValue,
-    holdingsCount: holdings.length,
+    /** Spot crypto wallet — excluded from main portfolio total */
+    holdingsValue: 0,
+    totalValue: cashBalance,
+    holdingsCount: 0,
     currency: profileRes.data?.preferred_currency ?? "USD",
     totalDeposits,
     totalWithdrawals,
   };
+}
+
+/** Spot desk only — not included in main portfolio total */
+export async function getSpotHoldingsSummary(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{ holdingsValue: number; holdingsCount: number }> {
+  const holdings = await getHoldings(supabase, userId);
+  if (holdings.length === 0) {
+    return { holdingsValue: 0, holdingsCount: 0 };
+  }
+
+  const values = await Promise.all(
+    holdings.map(async (holding) => {
+      const price = await priceForAsset(holding.asset);
+      return holding.quantity * price;
+    })
+  );
+
+  return {
+    holdingsValue: values.reduce((sum, value) => sum + value, 0),
+    holdingsCount: holdings.filter((h) => Number(h.quantity) > 0).length,
+  };
+}
+
+export async function requestSpotHoldingWithdrawal(
+  supabase: SupabaseClient,
+  params: {
+    asset: string;
+    quantity: number;
+    walletAddress: string;
+    network: string;
+    usdAmount: number;
+  }
+): Promise<string> {
+  const { data, error } = await supabase.rpc("request_spot_holding_withdrawal", {
+    p_asset: params.asset,
+    p_quantity: params.quantity,
+    p_wallet_address: params.walletAddress,
+    p_network: params.network,
+    p_usd_amount: params.usdAmount,
+  });
+
+  if (error) throw new Error(error.message);
+  return String(data);
 }
 
 export async function getUsdBalance(

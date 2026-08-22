@@ -202,6 +202,10 @@ export async function rejectWithdrawal(withdrawalId: string, reason: string) {
     })
     .eq("id", withdrawalId);
   if (error) throw error;
+
+  await supabase.rpc("restore_spot_holding_on_withdrawal_reject", {
+    p_withdrawal_id: withdrawalId,
+  });
 }
 
 export async function updateKycStatus(

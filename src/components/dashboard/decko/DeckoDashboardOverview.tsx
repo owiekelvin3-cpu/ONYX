@@ -278,9 +278,6 @@ export function DeckoDashboardOverview({
   const monthly = useMemo(() => buildMonthlyBars(summary, recentTrades), [summary, recentTrades]);
   const chartMonths = useMemo(() => monthly.slice(-6), [monthly]);
 
-  const holdingsPct =
-    summary.totalValue > 0 ? (summary.holdingsValue / summary.totalValue) * 100 : 50;
-
   const profitTrend =
     summary.totalValue > 0 ? (profitTotal / summary.totalValue) * 100 : 0;
   const depositTrend =
@@ -486,17 +483,17 @@ export function DeckoDashboardOverview({
       <div className="grid grid-cols-1 gap-3.5 sm:gap-4 lg:grid-cols-2">
         <DeckoStaggerItem>
           <div className="decko-card p-4 sm:p-5 lg:p-6">
-            <h2 className="text-base font-bold text-text-primary lg:text-lg">Portfolio Allocation</h2>
-            <div className="mt-4 lg:mt-6">
-              <div className="mb-2 flex items-center justify-between gap-2 text-sm">
-                <span className="text-text-secondary">Holdings Value</span>
-                <span className="font-semibold text-text-primary">{holdingsPct.toFixed(1)}%</span>
-              </div>
-              <DeckoProgressBar value={holdingsPct} delay={0.2} />
-              <p className="mt-3 text-sm text-text-tertiary">
-                {formatCurrency(summary.holdingsValue, summary.currency)} invested across open positions
-              </p>
-            </div>
+            <h2 className="text-base font-bold text-text-primary lg:text-lg">Spot crypto wallet</h2>
+            <p className="mt-3 text-sm text-text-tertiary leading-relaxed">
+              Crypto on the spot desk is kept separate from your main portfolio total. Deposit, hold,
+              and transfer assets on Spot Trading.
+            </p>
+            <Link
+              href="/dashboard/trade"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border bg-bg-primary px-4 py-2 text-sm font-semibold text-text-primary hover:bg-bg-hover"
+            >
+              Open Spot Trading
+            </Link>
           </div>
         </DeckoStaggerItem>
 

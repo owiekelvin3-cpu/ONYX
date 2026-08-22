@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { executeTrade, getHoldings, getUsdBalance } from "@/lib/api/trading";
@@ -9,13 +9,12 @@ import { useLivePrices } from "@/hooks/useLivePrices";
 import { Card } from "@/components/ui/Card";
 import { formatNumber, formatPercent } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import { TradingViewTickerTape } from "@/components/trading/TradingViewTickerTape";
 import { TradingViewAdvancedChart } from "@/components/trading/TradingViewAdvancedChart";
-import { TradingViewTechnicalAnalysis } from "@/components/trading/TradingViewTechnicalAnalysis";
-import { SpotMarketList } from "@/components/trading/SpotMarketList";
 import { SpotOrderPanel } from "@/components/trading/SpotOrderPanel";
 import { SpotWalletOverview } from "@/components/trading/SpotWalletOverview";
 import { SpotCryptoDepositSheet } from "@/components/trading/SpotCryptoDepositSheet";
+import { SpotHoldingTransferSheet } from "@/components/trading/SpotHoldingTransferSheet";
+import type { WalletRow } from "@/components/trading/SpotWalletOverview";
 import type { MarketPair } from "@/lib/market-data";
 import type { HoldingRow } from "@/lib/supabase/types";
 import { filterSpotMarketPairs, SPOT_ASSETS, spotAssetBySymbol } from "@/lib/spot-assets";
@@ -23,15 +22,7 @@ import { toTradingViewSymbol } from "@/lib/tradingview-symbols";
 import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
 
-function SymbolHeader({
-  pair,
-  onToggleMarkets,
-  marketsOpen,
-}: {
-  pair: MarketPair;
-  onToggleMarkets?: () => void;
-  marketsOpen?: boolean;
-}) {
+function SymbolHeader({ pair }: { pair: MarketPair }) {
   const isUp = pair.change24h >= 0;
   const priceDecimals = pair.price < 10 ? 4 : 2;
   const base = pair.symbol.split("/")[0];
@@ -39,18 +30,7 @@ function SymbolHeader({
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 px-3 sm:px-4 py-3 border-b border-border bg-bg-secondary">
       <div className="min-w-0">
-        {onToggleMarkets ? (
-          <button
-            type="button"
-            onClick={onToggleMarkets}
-            className="flex items-center gap-1.5 text-left touch-target"
-          >
-            <span className="text-base sm:text-lg font-bold text-text-primary">{base}</span>
-            <span className="text-brand text-sm">{marketsOpen ? "▴" : "▾"}</span>
-          </button>
-        ) : (
-          <h2 className="text-base sm:text-lg font-bold text-text-primary">{base}</h2>
-        )}
+        <h2 className="text-base sm:text-lg font-bold text-text-primary">{base}</h2>
         <p className="text-[12px] text-text-tertiary mt-0.5">{pair.name}</p>
         <p className="text-[11px] text-text-tertiary mt-1 font-mono">
           {toTradingViewSymbol(pair.symbol)}
@@ -82,7 +62,7 @@ export default function TradePage() {
   const [selectedPair, setSelectedPair] = useState<MarketPair | null>(null);
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
-  const [showMobileMarkets, setShowMobileMarkets] = useState(false);
+  const chartSectionRef = useRef<HTMLDivElement>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [holdings, setHoldings] = useState<HoldingRow[]>([]);
@@ -91,6 +71,8 @@ export default function TradePage() {
   const [success, setSuccess] = useState("");
   const [depositConfig, setDepositConfig] = useState<DepositConfig | null>(null);
   const [depositSheetKey, setDepositSheetKey] = useState<string | null>(null);
+  const [transferTarget, setTransferTarget] = useState<WalletRow | null>(null);
+  const [transferMode, setTransferMode] = useState<"to_main" | "send_out">("to_main");
 
   const refreshWallet = useCallback(async (uid: string) => {
     const supabase = createClient();
@@ -217,11 +199,20 @@ export default function TradePage() {
     if (asset) openDeposit(asset.depositKey);
   }
 
-  function selectPair(pair: MarketPair) {
+  function openTransfer(row: WalletRow, mode: "to_main" | "send_out") {
+    setTransferTarget(row);
+    setTransferMode(mode);
+  }
+
+  function selectPair(pair: MarketPair, scrollToChart = true) {
     setSelectedPair(pair);
-    setShowMobileMarkets(false);
     setError("");
     setSuccess("");
+    if (scrollToChart) {
+      requestAnimationFrame(() => {
+        chartSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
 
   return (
@@ -235,12 +226,13 @@ export default function TradePage() {
       </div>
 
       <SpotWalletOverview
-        cashBalance={balance}
         holdings={holdings}
         pairs={spotPairs}
         selectedSymbol={selectedPair.symbol}
         onSelectAsset={selectPair}
         onDepositAsset={openDeposit}
+        onTransferToMain={(row) => openTransfer(row, "to_main")}
+        onSendOut={(row) => openTransfer(row, "send_out")}
       />
 
       <SpotCryptoDepositSheet
@@ -254,16 +246,29 @@ export default function TradePage() {
         onSubmitted={() => emitDashboardRefresh()}
       />
 
-      <TradingViewTickerTape />
+      <SpotHoldingTransferSheet
+        open={Boolean(transferTarget)}
+        mode={transferMode}
+        assetSymbol={transferTarget?.symbol ?? "BTC"}
+        assetName={transferTarget?.name ?? "Bitcoin"}
+        pairSymbol={transferTarget?.pairSymbol ?? "BTC/USDT"}
+        price={transferTarget?.price ?? 0}
+        heldQuantity={transferTarget?.quantity ?? 0}
+        userId={userId}
+        onClose={() => setTransferTarget(null)}
+        onComplete={() => {
+          if (userId) void refreshWallet(userId);
+          emitDashboardRefresh();
+        }}
+      />
 
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_340px] gap-3 sm:gap-4">
+      <div
+        ref={chartSectionRef}
+        className="grid lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_340px] gap-3 sm:gap-4 scroll-mt-20"
+      >
         <div className="space-y-3 min-w-0">
           <Card className="!p-0 overflow-hidden min-w-0">
-            <SymbolHeader
-              pair={selectedPair}
-              onToggleMarkets={() => setShowMobileMarkets((v) => !v)}
-              marketsOpen={showMobileMarkets}
-            />
+            <SymbolHeader pair={selectedPair} />
 
             <div className="relative z-[1] h-[280px] sm:h-[360px] lg:h-[420px] xl:h-[480px] min-h-[280px] bg-[#131722]">
               <TradingViewAdvancedChart
@@ -271,24 +276,7 @@ export default function TradePage() {
                 symbol={selectedPair.symbol}
               />
             </div>
-
-            <div className="hidden lg:block">
-              <SpotMarketList
-                pairs={spotPairs}
-                selectedSymbol={selectedPair.symbol}
-                onSelect={selectPair}
-              />
-            </div>
           </Card>
-
-          {showMobileMarkets && (
-            <SpotMarketList
-              pairs={spotPairs}
-              selectedSymbol={selectedPair.symbol}
-              onSelect={selectPair}
-              compact
-            />
-          )}
 
           <div className="lg:hidden">
             <Card className="!p-3 sm:!p-4">
@@ -313,8 +301,8 @@ export default function TradePage() {
           </div>
         </div>
 
-        <div className="hidden lg:flex flex-col gap-3">
-          <Card className="!p-4 flex-1">
+        <div className="hidden lg:block">
+          <Card className="!p-4 sticky top-20">
             <p className="text-[11px] uppercase tracking-wide text-text-tertiary mb-3">
               Trade {selectedPair.symbol.split("/")[0]}
             </p>
@@ -334,16 +322,6 @@ export default function TradePage() {
               success={success}
               onSubmit={handleTrade}
               onDeposit={openDepositForSelectedPair}
-            />
-          </Card>
-
-          <Card className="!p-3">
-            <p className="text-[11px] uppercase tracking-wide text-text-tertiary mb-2 px-1">
-              Technical Analysis
-            </p>
-            <TradingViewTechnicalAnalysis
-              key={selectedPair.symbol}
-              symbol={selectedPair.symbol}
             />
           </Card>
         </div>
