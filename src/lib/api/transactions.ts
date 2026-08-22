@@ -1,9 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { TransactionItem } from "@/lib/supabase/types";
 import { tradeNotional } from "@/lib/api/trading";
-import { SPOT_DEPOSIT_METHOD_ASSET, SPOT_PAIR_SYMBOLS } from "@/lib/spot-assets";
-
-const SPOT_DEPOSIT_METHODS = new Set(Object.keys(SPOT_DEPOSIT_METHOD_ASSET));
+import { SPOT_PAIR_SYMBOLS } from "@/lib/spot-assets";
+import { isSpotWalletDepositNotes } from "@/lib/spot-wallet-deposits";
 
 export function transactionStatusTone(status: string): "default" | "up" | "down" | "pending" {
   const normalized = status.toLowerCase();
@@ -19,12 +18,11 @@ export function isSpotTransaction(item: TransactionItem): boolean {
   }
 
   if (item.kind === "deposit") {
-    return Boolean(item.method && SPOT_DEPOSIT_METHODS.has(item.method));
+    return isSpotWalletDepositNotes(item.notes);
   }
 
   if (item.kind === "withdrawal") {
-    if (item.notes?.includes("spot_holding_withdrawal")) return true;
-    return Boolean(item.method && SPOT_DEPOSIT_METHODS.has(item.method));
+    return Boolean(item.notes?.includes("spot_holding_withdrawal"));
   }
 
   return false;

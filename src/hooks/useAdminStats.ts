@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { isCryptoDepositMethod } from "@/lib/deposit-options";
+import { isSpotWalletDepositNotes } from "@/lib/spot-wallet-deposits";
 
 export interface AdminStats {
   totalUsers: number;
@@ -70,7 +70,7 @@ export function useAdminStats() {
     const [users, kyc, deposits, withdrawals, trades, support] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("kyc_submissions").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      supabase.from("deposits").select("amount, status, method"),
+      supabase.from("deposits").select("amount, status, method, notes"),
       supabase.from("withdrawals").select("amount, status"),
       supabase.from("trades").select("id", { count: "exact", head: true }).in("status", ["pending", "approved"]),
       supabase
@@ -87,8 +87,8 @@ export function useAdminStats() {
       totalUsers: users.count ?? 0,
       pendingKyc: kyc.count ?? 0,
       pendingDeposits: pending.length,
-      pendingCryptoDeposits: pending.filter((d) => isCryptoDepositMethod(String(d.method ?? ""))).length,
-      pendingOtherDeposits: pending.filter((d) => !isCryptoDepositMethod(String(d.method ?? ""))).length,
+      pendingCryptoDeposits: pending.filter((d) => isSpotWalletDepositNotes(d.notes)).length,
+      pendingOtherDeposits: pending.filter((d) => !isSpotWalletDepositNotes(d.notes)).length,
       pendingWithdrawals: wData.filter((w) => w.status === "pending").length,
       unreadSupport: countUnreadSupport(support.data ?? []),
       totalDeposits: depData

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { SPOT_DEPOSIT_METHOD_ASSET } from "@/lib/spot-assets";
+import { isSpotWalletDepositNotes } from "@/lib/spot-wallet-deposits";
 import type {
   AdminBalanceDirection,
   AdminModerationUiAction,
@@ -96,16 +97,19 @@ export async function approveDeposit(
   const supabase = createClient();
 
   let depositMethod = method;
+  const { data: depositRow } = await supabase
+    .from("deposits")
+    .select("method, notes")
+    .eq("id", depositId)
+    .maybeSingle();
+
   if (!depositMethod) {
-    const { data: depositRow } = await supabase
-      .from("deposits")
-      .select("method")
-      .eq("id", depositId)
-      .maybeSingle();
     depositMethod = depositRow?.method ?? undefined;
   }
 
+  const depositNotes = depositRow?.notes;
   const cryptoAsset = depositMethod ? SPOT_DEPOSIT_METHOD_ASSET[depositMethod] : undefined;
+  const spotWalletDeposit = isSpotWalletDepositNotes(depositNotes);
 
   const { error: depErr } = await supabase
     .from("deposits")
@@ -113,7 +117,7 @@ export async function approveDeposit(
     .eq("id", depositId);
   if (depErr) throw depErr;
 
-  if (cryptoAsset) {
+  if (cryptoAsset && spotWalletDeposit) {
     const priceRes = await fetch("/api/prices");
     const priceJson = priceRes.ok ? await priceRes.json() : null;
     const pairs = (priceJson?.pairs ?? []) as Array<{ symbol: string; price: number }>;

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TransactionItem } from "@/lib/supabase/types";
 import { formatDepositMethod } from "@/lib/deposit-options";
+import { formatSpotWalletDepositNotes } from "@/lib/spot-wallet-deposits";
 import { transactionStatusTone } from "@/lib/api/transactions";
 import { X } from "@/components/icons";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
@@ -36,6 +37,9 @@ function formatTransactionMethod(method: string | null | undefined): string | nu
 }
 
 function formatTransactionNotes(notes: string | null | undefined): string | null {
+  const spotDeposit = formatSpotWalletDepositNotes(notes);
+  if (spotDeposit) return spotDeposit;
+
   if (!notes?.trim()) return null;
 
   try {

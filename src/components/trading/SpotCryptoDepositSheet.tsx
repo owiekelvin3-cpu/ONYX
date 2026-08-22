@@ -19,6 +19,7 @@ import {
   X,
 } from "@/components/icons";
 import { DEPOSIT_CRYPTO_LABELS } from "@/lib/deposit-options";
+import { buildSpotWalletDepositNotes } from "@/lib/spot-wallet-deposits";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { cn, formatCurrency } from "@/lib/utils";
 
@@ -108,7 +109,7 @@ export function SpotCryptoDepositSheet({
         userId,
         amount: value,
         method: `crypto_${depositKey}`,
-        notes: `Spot wallet deposit — ${DEPOSIT_CRYPTO_LABELS[depositKey] ?? assetName}`,
+        notes: buildSpotWalletDepositNotes(DEPOSIT_CRYPTO_LABELS[depositKey] ?? assetName),
       });
       setSubmittedAmount(value);
       setStep("reviewing");

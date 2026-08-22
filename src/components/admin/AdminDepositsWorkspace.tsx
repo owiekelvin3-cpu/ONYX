@@ -12,7 +12,8 @@ import { AdminMobilePanel } from "@/components/admin/AdminMobilePanel";
 import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { formatDepositMethod, isCryptoDepositMethod } from "@/lib/deposit-options";
+import { formatDepositMethod } from "@/lib/deposit-options";
+import { isSpotWalletDepositNotes } from "@/lib/spot-wallet-deposits";
 import { parseDepositNotes } from "@/lib/deposit-details";
 import { RefreshCw } from "@/components/icons";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
@@ -26,9 +27,9 @@ type AdminDepositsWorkspaceProps = {
   emptyMessage?: string;
 };
 
-function matchesVariant(method: string, variant: "crypto" | "other") {
-  const crypto = isCryptoDepositMethod(method);
-  return variant === "crypto" ? crypto : !crypto;
+function matchesVariant(deposit: DepositRow, variant: "crypto" | "other") {
+  const spotWallet = isSpotWalletDepositNotes(deposit.notes);
+  return variant === "crypto" ? spotWallet : !spotWallet;
 }
 
 export function AdminDepositsWorkspace({
@@ -53,7 +54,7 @@ export function AdminDepositsWorkspace({
       .select("*, profiles(email, full_name)")
       .order("created_at", { ascending: false });
     if (!error) {
-      const rows = ((data as DepositRow[]) ?? []).filter((d) => matchesVariant(d.method, variant));
+      const rows = ((data as DepositRow[]) ?? []).filter((d) => matchesVariant(d, variant));
       setDeposits(rows);
     }
     setLoading(false);
