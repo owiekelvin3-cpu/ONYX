@@ -264,13 +264,63 @@ body {
   }
 }
 
-@keyframes mobile-nav-backdrop-in {
+@keyframes spot-deposit-sheet-in {
   from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spot-deposit-step-in {
+  from {
+    transform: translateY(16px);
     opacity: 0;
   }
   to {
+    transform: translateY(0);
     opacity: 1;
   }
+}
+
+@keyframes spot-deposit-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.7;
+  }
+}
+
+@keyframes spot-deposit-scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.spot-deposit-sheet-enter {
+  animation: spot-deposit-sheet-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.spot-deposit-step-enter {
+  animation: spot-deposit-step-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.spot-deposit-pulse-ring {
+  animation: spot-deposit-pulse 2s ease-in-out infinite;
+}
+
+.spot-deposit-scan-line {
+  animation: spot-deposit-scan 1.8s ease-in-out infinite;
 }
 
 @keyframes mobile-nav-drawer-in {

@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Loader2 } from "@/components/icons";
-import { cryptoDepositPath, spotAssetByPair } from "@/lib/spot-assets";
+import { spotAssetByPair } from "@/lib/spot-assets";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +22,7 @@ type SpotOrderPanelProps = {
   error: string;
   success: string;
   onSubmit: () => void;
+  onDeposit?: () => void;
 };
 
 export function SpotOrderPanel({
@@ -40,6 +40,7 @@ export function SpotOrderPanel({
   error,
   success,
   onSubmit,
+  onDeposit,
 }: SpotOrderPanelProps) {
   const base = symbol.split("/")[0];
   const asset = spotAssetByPair(symbol);
@@ -161,13 +162,14 @@ export function SpotOrderPanel({
           )}
         </Button>
 
-        {asset && (
-          <Link
-            href={cryptoDepositPath(asset.depositKey)}
-            className="block text-center text-xs font-semibold text-brand hover:text-brand-hover"
+        {asset && onDeposit && (
+          <button
+            type="button"
+            onClick={onDeposit}
+            className="block w-full text-center text-xs font-semibold text-brand hover:text-brand-hover"
           >
             Deposit {asset.name} instead
-          </Link>
+          </button>
         )}
       </div>
     </div>

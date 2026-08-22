@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { isCryptoDepositMethod } from "@/lib/deposit-options";
 
 export interface AdminStats {
   totalUsers: number;
   pendingKyc: number;
   pendingDeposits: number;
+  pendingCryptoDeposits: number;
+  pendingOtherDeposits: number;
   pendingWithdrawals: number;
   unreadSupport: number;
   totalDeposits: number;
@@ -18,6 +21,8 @@ const EMPTY: AdminStats = {
   totalUsers: 0,
   pendingKyc: 0,
   pendingDeposits: 0,
+  pendingCryptoDeposits: 0,
+  pendingOtherDeposits: 0,
   pendingWithdrawals: 0,
   unreadSupport: 0,
   totalDeposits: 0,
@@ -42,12 +47,15 @@ export function getAdminAttentionTotal(stats: AdminStats) {
 export type AdminNotificationStatKey =
   | "pendingKyc"
   | "pendingDeposits"
+  | "pendingCryptoDeposits"
+  | "pendingOtherDeposits"
   | "pendingWithdrawals"
   | "unreadSupport";
 
 export const ADMIN_NOTIFICATION_ROUTES: Partial<Record<string, AdminNotificationStatKey>> = {
   "/admin/kyc": "pendingKyc",
-  "/admin/deposits": "pendingDeposits",
+  "/admin/deposits": "pendingOtherDeposits",
+  "/admin/crypto-deposits": "pendingCryptoDeposits",
   "/admin/withdrawals": "pendingWithdrawals",
   "/admin/support": "unreadSupport",
 };
@@ -62,7 +70,7 @@ export function useAdminStats() {
     const [users, kyc, deposits, withdrawals, trades, support] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("kyc_submissions").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      supabase.from("deposits").select("amount, status"),
+      supabase.from("deposits").select("amount, status, method"),
       supabase.from("withdrawals").select("amount, status"),
       supabase.from("trades").select("id", { count: "exact", head: true }).in("status", ["pending", "approved"]),
       supabase
@@ -74,10 +82,13 @@ export function useAdminStats() {
     const depData = deposits.data ?? [];
     const wData = withdrawals.data ?? [];
 
+    const pending = depData.filter((d) => d.status === "pending");
     setStats({
       totalUsers: users.count ?? 0,
       pendingKyc: kyc.count ?? 0,
-      pendingDeposits: depData.filter((d) => d.status === "pending").length,
+      pendingDeposits: pending.length,
+      pendingCryptoDeposits: pending.filter((d) => isCryptoDepositMethod(String(d.method ?? ""))).length,
+      pendingOtherDeposits: pending.filter((d) => !isCryptoDepositMethod(String(d.method ?? ""))).length,
       pendingWithdrawals: wData.filter((w) => w.status === "pending").length,
       unreadSupport: countUnreadSupport(support.data ?? []),
       totalDeposits: depData

@@ -18,7 +18,8 @@ import {
 
 const QUICK_LINKS = [
   { href: "/admin/kyc", label: "KYC Review", icon: FileCheck, statKey: "pendingKyc" as const },
-  { href: "/admin/deposits", label: "Deposits", icon: ArrowDownToLine, statKey: "pendingDeposits" as const },
+  { href: "/admin/crypto-deposits", label: "Crypto Deposits", icon: ArrowDownToLine, statKey: "pendingCryptoDeposits" as const },
+  { href: "/admin/deposits", label: "Other Deposits", icon: ArrowDownToLine, statKey: "pendingOtherDeposits" as const },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine, statKey: "pendingWithdrawals" as const },
   { href: "/admin/support", label: "Support", icon: Comments, statKey: null },
   { href: "/admin/users", label: "Users", icon: Users, statKey: "totalUsers" as const },
@@ -49,8 +50,11 @@ export default function AdminOverviewPage() {
         </p>
         <p className="text-sm text-text-tertiary mt-1">Pending KYC, deposits, withdrawals, and unread support</p>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+          <Link href="/admin/crypto-deposits" className="w-full sm:w-auto">
+            <Button size="sm" className="w-full sm:w-auto">Review crypto deposits</Button>
+          </Link>
           <Link href="/admin/deposits" className="w-full sm:w-auto">
-            <Button size="sm" className="w-full sm:w-auto">Review deposits</Button>
+            <Button size="sm" variant="outline" className="w-full sm:w-auto">Other deposits</Button>
           </Link>
           <Link href="/admin/withdrawals" className="w-full sm:w-auto">
             <Button size="sm" variant="outline" className="w-full sm:w-auto">Review withdrawals</Button>

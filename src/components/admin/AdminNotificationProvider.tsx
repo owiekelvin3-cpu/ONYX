@@ -10,6 +10,7 @@ import {
   ensureAdminNotificationsEnabled,
 } from "@/lib/notifications/admin-setup";
 import { setupNotificationAudioUnlock } from "@/lib/notifications/sound";
+import { isCryptoDepositMethod } from "@/lib/deposit-options";
 import { formatCurrency, cn } from "@/lib/utils";
 import { Bell, X } from "@/components/icons";
 
@@ -79,12 +80,13 @@ export function AdminNotificationProvider({ children }: { children: ReactNode })
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "deposits" },
         (payload) => {
-          const row = payload.new as { id?: string; status?: string; amount?: number };
+          const row = payload.new as { id?: string; status?: string; amount?: number; method?: string };
           if (row.status !== "pending" || !row.id) return;
+          const crypto = isCryptoDepositMethod(row.method ?? "");
           notify({
-            title: "New deposit request",
+            title: crypto ? "New crypto deposit" : "New deposit request",
             body: formatMoney(row.amount),
-            href: "/admin/deposits",
+            href: crypto ? "/admin/crypto-deposits" : "/admin/deposits",
             dedupeKey: `deposit-${row.id}`,
           });
         }
@@ -93,13 +95,14 @@ export function AdminNotificationProvider({ children }: { children: ReactNode })
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "deposits" },
         (payload) => {
-          const row = payload.new as { id?: string; status?: string; amount?: number };
+          const row = payload.new as { id?: string; status?: string; amount?: number; method?: string };
           const old = payload.old as { status?: string };
           if (row.status !== "pending" || old.status === "pending" || !row.id) return;
+          const crypto = isCryptoDepositMethod(row.method ?? "");
           notify({
-            title: "Deposit needs review",
+            title: crypto ? "Crypto deposit needs review" : "Deposit needs review",
             body: formatMoney(row.amount),
-            href: "/admin/deposits",
+            href: crypto ? "/admin/crypto-deposits" : "/admin/deposits",
             dedupeKey: `deposit-update-${row.id}-${Date.now()}`,
           });
         }

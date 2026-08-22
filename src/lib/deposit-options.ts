@@ -121,10 +121,6 @@ export function getGiftCardBrand(brandId: string): GiftCardBrand | undefined {
   return GIFT_CARD_BRANDS.find((b) => b.id === brandId);
 }
 
-export function getActivePartners(partners: PurchasePartner[] | undefined): PurchasePartner[] {
-  return (partners ?? []).filter((p) => p.enabled !== false);
-}
-
 export function formatDepositMethod(method: string): string {
   if (method.startsWith("gift_card_")) {
     const brandId = method.replace("gift_card_", "");
@@ -136,4 +132,12 @@ export function formatDepositMethod(method: string): string {
     return DEPOSIT_CRYPTO_LABELS[key] ?? key;
   }
   return method.replace(/_/g, " ");
+}
+
+export function isCryptoDepositMethod(method: string): boolean {
+  return method.startsWith("crypto_");
+}
+
+export function getActivePartners(partners: PurchasePartner[] | undefined): PurchasePartner[] {
+  return (partners ?? []).filter((p) => p.enabled !== false);
 }

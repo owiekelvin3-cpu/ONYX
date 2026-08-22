@@ -6,7 +6,7 @@ import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ArrowDownToLine, Wallet } from "@/components/icons";
-import { SPOT_ASSETS, cryptoDepositPath } from "@/lib/spot-assets";
+import { SPOT_ASSETS } from "@/lib/spot-assets";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 import type { MarketPair } from "@/lib/market-data";
 
@@ -52,12 +52,14 @@ export function SpotWalletOverview({
   pairs,
   selectedSymbol,
   onSelectAsset,
+  onDepositAsset,
 }: {
   cashBalance: number | null;
   holdings: HoldingRow[];
   pairs: MarketPair[];
   selectedSymbol: string;
   onSelectAsset: (pair: MarketPair) => void;
+  onDepositAsset: (depositKey: string) => void;
 }) {
   const rows = buildWalletRows(holdings, pairs);
   const cryptoValue = rows.reduce((sum, row) => sum + row.value, 0);
@@ -161,11 +163,9 @@ export function SpotWalletOverview({
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Link href={cryptoDepositPath(row.depositKey)}>
-                      <Button size="sm" variant="outline">
-                        Deposit
-                      </Button>
-                    </Link>
+                    <Button size="sm" variant="outline" onClick={() => onDepositAsset(row.depositKey)}>
+                      Deposit
+                    </Button>
                     <Button
                       size="sm"
                       variant="secondary"

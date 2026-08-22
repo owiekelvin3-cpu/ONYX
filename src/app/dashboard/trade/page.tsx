@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { executeTrade, getHoldings, getUsdBalance } from "@/lib/api/trading";
+import { getDepositConfig, type DepositConfig } from "@/lib/api/deposits";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { Card } from "@/components/ui/Card";
 import { formatNumber, formatPercent } from "@/lib/utils";
@@ -14,9 +15,10 @@ import { TradingViewTechnicalAnalysis } from "@/components/trading/TradingViewTe
 import { SpotMarketList } from "@/components/trading/SpotMarketList";
 import { SpotOrderPanel } from "@/components/trading/SpotOrderPanel";
 import { SpotWalletOverview } from "@/components/trading/SpotWalletOverview";
+import { SpotCryptoDepositSheet } from "@/components/trading/SpotCryptoDepositSheet";
 import type { MarketPair } from "@/lib/market-data";
 import type { HoldingRow } from "@/lib/supabase/types";
-import { filterSpotMarketPairs } from "@/lib/spot-assets";
+import { filterSpotMarketPairs, SPOT_ASSETS, spotAssetBySymbol } from "@/lib/spot-assets";
 import { toTradingViewSymbol } from "@/lib/tradingview-symbols";
 import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
@@ -87,6 +89,8 @@ export default function TradePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [depositConfig, setDepositConfig] = useState<DepositConfig | null>(null);
+  const [depositSheetKey, setDepositSheetKey] = useState<string | null>(null);
 
   const refreshWallet = useCallback(async (uid: string) => {
     const supabase = createClient();
@@ -96,6 +100,11 @@ export default function TradePage() {
     ]);
     setBalance(bal);
     setHoldings(rows);
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void getDepositConfig(supabase).then(setDepositConfig);
   }, []);
 
   useEffect(() => {
@@ -193,6 +202,21 @@ export default function TradePage() {
     }
   }
 
+  const depositAsset = depositSheetKey
+    ? SPOT_ASSETS.find((a) => a.depositKey === depositSheetKey) ?? null
+    : null;
+
+  function openDeposit(depositKey: string) {
+    setDepositSheetKey(depositKey);
+  }
+
+  function openDepositForSelectedPair() {
+    if (!selectedPair) return;
+    const base = selectedPair.symbol.split("/")[0];
+    const asset = spotAssetBySymbol(base);
+    if (asset) openDeposit(asset.depositKey);
+  }
+
   function selectPair(pair: MarketPair) {
     setSelectedPair(pair);
     setShowMobileMarkets(false);
@@ -216,6 +240,18 @@ export default function TradePage() {
         pairs={spotPairs}
         selectedSymbol={selectedPair.symbol}
         onSelectAsset={selectPair}
+        onDepositAsset={openDeposit}
+      />
+
+      <SpotCryptoDepositSheet
+        open={Boolean(depositSheetKey && depositAsset)}
+        depositKey={depositAsset?.depositKey ?? "bitcoin"}
+        assetName={depositAsset?.name ?? "Bitcoin"}
+        assetSymbol={depositAsset?.symbol ?? "BTC"}
+        walletAddress={depositConfig?.cryptoWallets?.[depositAsset?.depositKey ?? "bitcoin"] ?? ""}
+        userId={userId}
+        onClose={() => setDepositSheetKey(null)}
+        onSubmitted={() => emitDashboardRefresh()}
       />
 
       <TradingViewTickerTape />
@@ -271,6 +307,7 @@ export default function TradePage() {
                 error={error}
                 success={success}
                 onSubmit={handleTrade}
+                onDeposit={openDepositForSelectedPair}
               />
             </Card>
           </div>
@@ -296,6 +333,7 @@ export default function TradePage() {
               error={error}
               success={success}
               onSubmit={handleTrade}
+              onDeposit={openDepositForSelectedPair}
             />
           </Card>
 
