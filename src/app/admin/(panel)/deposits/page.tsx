@@ -54,7 +54,7 @@ export default function AdminDepositsPage() {
     setActing(d.id);
     setMessage("");
     try {
-      await approveDeposit(d.id, d.user_id, d.amount);
+      await approveDeposit(d.id, d.user_id, d.amount, d.method);
       setMessage(`Approved ${formatCurrency(d.amount)}`);
       closeDetail();
       await load();

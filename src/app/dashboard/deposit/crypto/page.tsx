@@ -12,7 +12,7 @@ import {
 } from "@/lib/api/deposits";
 import { getPendingUserFees, sumPendingFees } from "@/lib/api/fees";
 import type { DepositRow } from "@/lib/supabase/types";
-import { DEPOSIT_CRYPTO_LABELS, formatDepositMethod } from "@/lib/deposit-options";
+import { DEPOSIT_CRYPTO_LABELS, DEPOSIT_CRYPTO_KEYS, formatDepositMethod } from "@/lib/deposit-options";
 import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
@@ -26,6 +26,8 @@ export default function CryptoDepositPage() {
   const searchParams = useSearchParams();
   const feeIdParam = searchParams.get("feeId");
   const amountParam = searchParams.get("amount");
+  const assetParam = searchParams.get("asset");
+  const fromTrade = searchParams.get("from") === "trade";
   const [config, setConfig] = useState<DepositConfig | null>(null);
   const [deposits, setDeposits] = useState<DepositRow[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -39,6 +41,12 @@ export default function CryptoDepositPage() {
   const [pendingFeesTotal, setPendingFeesTotal] = useState(0);
   const [relatedFeeId, setRelatedFeeId] = useState<string | null>(null);
   const [feePrefilled, setFeePrefilled] = useState(false);
+
+  useEffect(() => {
+    if (assetParam && DEPOSIT_CRYPTO_KEYS.includes(assetParam)) {
+      setSelected(assetParam);
+    }
+  }, [assetParam]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -136,11 +144,11 @@ export default function CryptoDepositPage() {
     <div className="space-y-4 max-w-2xl">
       <div>
         <Link
-          href="/dashboard/deposit"
+          href={fromTrade ? "/dashboard/trade" : "/dashboard/deposit"}
           className="mb-3 inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-brand"
         >
           <ArrowLeft className="h-4 w-4" />
-          All deposit methods
+          {fromTrade ? "Back to Spot Trading" : "All deposit methods"}
         </Link>
         <h1 className="text-lg font-bold text-text-primary">Cryptocurrency</h1>
         <p className="text-[13px] text-text-tertiary mt-1">

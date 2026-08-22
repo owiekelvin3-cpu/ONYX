@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { SPOT_DEPOSIT_METHOD_ASSET } from "@/lib/spot-assets";
 import type {
   AdminBalanceDirection,
   AdminModerationUiAction,
@@ -86,13 +87,63 @@ export async function adjustAdminUserProfit(params: {
   };
 }
 
-export async function approveDeposit(depositId: string, userId: string, amount: number) {
+export async function approveDeposit(
+  depositId: string,
+  userId: string,
+  amount: number,
+  method?: string
+) {
   const supabase = createClient();
+
+  let depositMethod = method;
+  if (!depositMethod) {
+    const { data: depositRow } = await supabase
+      .from("deposits")
+      .select("method")
+      .eq("id", depositId)
+      .maybeSingle();
+    depositMethod = depositRow?.method ?? undefined;
+  }
+
+  const cryptoAsset = depositMethod ? SPOT_DEPOSIT_METHOD_ASSET[depositMethod] : undefined;
+
   const { error: depErr } = await supabase
     .from("deposits")
     .update({ status: "completed" as TransactionStatus })
     .eq("id", depositId);
   if (depErr) throw depErr;
+
+  if (cryptoAsset) {
+    const priceRes = await fetch("/api/prices");
+    const priceJson = priceRes.ok ? await priceRes.json() : null;
+    const pairs = (priceJson?.pairs ?? []) as Array<{ symbol: string; price: number }>;
+    const pair = pairs.find((p) => p.symbol.toUpperCase().startsWith(`${cryptoAsset}/`));
+    const unitPrice = cryptoAsset === "USDT" ? 1 : Number(pair?.price ?? 0);
+    if (unitPrice <= 0) {
+      throw new Error(`Could not price ${cryptoAsset} deposit for wallet credit.`);
+    }
+
+    const quantity = amount / unitPrice;
+    const { data: existing } = await supabase
+      .from("holdings")
+      .select("quantity")
+      .eq("user_id", userId)
+      .eq("asset", cryptoAsset)
+      .maybeSingle();
+
+    const newQty = Number(existing?.quantity ?? 0) + quantity;
+    const { error: holdErr } = await supabase.from("holdings").upsert(
+      { user_id: userId, asset: cryptoAsset, quantity: newQty },
+      { onConflict: "user_id,asset" }
+    );
+    if (holdErr) throw holdErr;
+
+    const { error: settleErr } = await supabase.rpc("settle_pending_fees_from_deposit", {
+      p_deposit_id: depositId,
+    });
+    if (settleErr) throw settleErr;
+    return;
+  }
 
   const [{ data: bal }, { data: profile }] = await Promise.all([
     supabase.from("balances").select("amount, currency").eq("user_id", userId).single(),

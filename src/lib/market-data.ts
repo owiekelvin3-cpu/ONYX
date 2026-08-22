@@ -19,6 +19,8 @@ export const MARKET_PAIRS: MarketPair[] = [
   { symbol: "EUR/USD", name: "Euro / US Dollar", price: 1.0842, change24h: -0.12, volume24h: 1200000000, category: "forex" },
   { symbol: "GBP/USD", name: "British Pound / USD", price: 1.2678, change24h: 0.08, volume24h: 890000000, category: "forex" },
   { symbol: "DOGE/USDT", name: "Dogecoin", price: 0.3421, change24h: 5.67, volume24h: 340000000, category: "crypto" },
+  { symbol: "USDT/USD", name: "Tether", price: 1, change24h: 0.01, volume24h: 52000000000, category: "crypto" },
+  { symbol: "LTC/USDT", name: "Litecoin", price: 98.5, change24h: 1.2, volume24h: 480000000, category: "crypto" },
   { symbol: "ADA/USDT", name: "Cardano", price: 0.9876, change24h: -0.34, volume24h: 210000000, category: "crypto" },
 ];
 

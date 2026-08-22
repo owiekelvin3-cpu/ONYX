@@ -1,7 +1,12 @@
 import { unstable_cache } from "next/cache";
+import { SPOT_ASSETS } from "@/lib/spot-assets";
 import { MARKET_PAIRS, type MarketPair } from "@/lib/market-data";
 
-/** CoinGecko IDs for crypto pairs — stocks/forex keep fallback values */
+const COINGECKO_BY_PAIR = Object.fromEntries(
+  SPOT_ASSETS.map((a) => [a.pairSymbol, a.coingeckoId])
+) as Record<string, string>;
+
+/** Legacy + marketing pairs still use this map */
 const COINGECKO_IDS: Record<string, string> = {
   "BTC/USDT": "bitcoin",
   "ETH/USDT": "ethereum",
@@ -9,7 +14,10 @@ const COINGECKO_IDS: Record<string, string> = {
   "BNB/USDT": "binancecoin",
   "XRP/USDT": "ripple",
   "DOGE/USDT": "dogecoin",
+  "LTC/USDT": "litecoin",
+  "USDT/USD": "tether",
   "ADA/USDT": "cardano",
+  ...COINGECKO_BY_PAIR,
 };
 
 type CoinGeckoRow = { usd: number; usd_24h_change?: number };

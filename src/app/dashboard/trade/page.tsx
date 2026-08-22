@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { executeTrade, getUsdBalance } from "@/lib/api/trading";
+import { executeTrade, getHoldings, getUsdBalance } from "@/lib/api/trading";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { Card } from "@/components/ui/Card";
 import { formatNumber, formatPercent } from "@/lib/utils";
@@ -13,8 +13,13 @@ import { TradingViewAdvancedChart } from "@/components/trading/TradingViewAdvanc
 import { TradingViewTechnicalAnalysis } from "@/components/trading/TradingViewTechnicalAnalysis";
 import { SpotMarketList } from "@/components/trading/SpotMarketList";
 import { SpotOrderPanel } from "@/components/trading/SpotOrderPanel";
+import { SpotWalletOverview } from "@/components/trading/SpotWalletOverview";
 import type { MarketPair } from "@/lib/market-data";
+import type { HoldingRow } from "@/lib/supabase/types";
+import { filterSpotMarketPairs } from "@/lib/spot-assets";
 import { toTradingViewSymbol } from "@/lib/tradingview-symbols";
+import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
+import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
 
 function SymbolHeader({
   pair,
@@ -27,6 +32,7 @@ function SymbolHeader({
 }) {
   const isUp = pair.change24h >= 0;
   const priceDecimals = pair.price < 10 ? 4 : 2;
+  const base = pair.symbol.split("/")[0];
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 px-3 sm:px-4 py-3 border-b border-border bg-bg-secondary">
@@ -37,15 +43,11 @@ function SymbolHeader({
             onClick={onToggleMarkets}
             className="flex items-center gap-1.5 text-left touch-target"
           >
-            <span className="text-base sm:text-lg font-bold text-text-primary">
-              {pair.symbol}
-            </span>
+            <span className="text-base sm:text-lg font-bold text-text-primary">{base}</span>
             <span className="text-brand text-sm">{marketsOpen ? "▴" : "▾"}</span>
           </button>
         ) : (
-          <h2 className="text-base sm:text-lg font-bold text-text-primary">
-            {pair.symbol}
-          </h2>
+          <h2 className="text-base sm:text-lg font-bold text-text-primary">{base}</h2>
         )}
         <p className="text-[12px] text-text-tertiary mt-0.5">{pair.name}</p>
         <p className="text-[11px] text-text-tertiary mt-1 font-mono">
@@ -72,41 +74,65 @@ function SymbolHeader({
 
 export default function TradePage() {
   const router = useRouter();
-  const { pairs } = useLivePrices();
+  const { pairs: allPairs } = useLivePrices();
+  const spotPairs = useMemo(() => filterSpotMarketPairs(allPairs), [allPairs]);
+
   const [selectedPair, setSelectedPair] = useState<MarketPair | null>(null);
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const [showMobileMarkets, setShowMobileMarkets] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
+  const [holdings, setHoldings] = useState<HoldingRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const refreshWallet = useCallback(async (uid: string) => {
+    const supabase = createClient();
+    const [bal, rows] = await Promise.all([
+      getUsdBalance(supabase, uid),
+      getHoldings(supabase, uid),
+    ]);
+    setBalance(bal);
+    setHoldings(rows);
+  }, []);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return;
       setUserId(user.id);
-      const bal = await getUsdBalance(supabase, user.id);
-      setBalance(bal);
+      await refreshWallet(user.id);
     });
-  }, []);
+  }, [refreshWallet]);
 
   useEffect(() => {
-    if (pairs.length === 0) return;
+    if (!userId) return;
+    const reload = () => void refreshWallet(userId);
+    window.addEventListener(DASHBOARD_REFRESH_EVENT, reload);
+    return () => window.removeEventListener(DASHBOARD_REFRESH_EVENT, reload);
+  }, [refreshWallet, userId]);
+
+  useEffect(() => {
+    if (spotPairs.length === 0) return;
     setSelectedPair((prev) => {
-      const match = pairs.find((p) => p.symbol === prev?.symbol);
-      return match ?? pairs[0];
+      const match = spotPairs.find((p) => p.symbol === prev?.symbol);
+      return match ?? spotPairs[0];
     });
-  }, [pairs]);
+  }, [spotPairs]);
+
+  const heldQuantity = useMemo(() => {
+    if (!selectedPair) return 0;
+    const base = selectedPair.symbol.split("/")[0];
+    const row = holdings.find((h) => h.asset.toUpperCase() === base);
+    return Number(row?.quantity ?? 0);
+  }, [holdings, selectedPair]);
 
   if (!selectedPair) {
     return (
       <div className="space-y-4">
-        <h1 className="text-base sm:text-lg font-bold text-text-primary">
-          Spot Trading
-        </h1>
+        <h1 className="text-base sm:text-lg font-bold text-text-primary">Spot Trading</h1>
         <div className="animate-pulse h-96 rounded-2xl bg-bg-secondary border border-border" />
       </div>
     );
@@ -132,6 +158,16 @@ export default function TradePage() {
       return;
     }
 
+    if (side === "sell" && qty > heldQuantity) {
+      setError(`You only hold ${heldQuantity} ${pair.symbol.split("/")[0]}`);
+      return;
+    }
+
+    if (side === "buy" && balance !== null && total > balance) {
+      setError("Insufficient cash balance. Deposit funds to buy crypto.");
+      return;
+    }
+
     setLoading(true);
     try {
       const supabase = createClient();
@@ -143,12 +179,12 @@ export default function TradePage() {
         price: pair.price,
       });
 
-      const bal = await getUsdBalance(supabase, userId);
-      setBalance(bal);
+      await refreshWallet(userId);
       setAmount("");
       setSuccess(
-        `${side === "buy" ? "Bought" : "Sold"} ${qty} ${pair.symbol.split("/")[0]} for $${formatNumber(total, 2)}`
+        `${side === "buy" ? "Bought" : "Sold"} ${qty} ${pair.symbol.split("/")[0]} · ${side === "buy" ? "Added to your crypto wallet" : "Cash credited to your balance"}`
       );
+      emitDashboardRefresh();
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Trade failed");
@@ -160,13 +196,27 @@ export default function TradePage() {
   function selectPair(pair: MarketPair) {
     setSelectedPair(pair);
     setShowMobileMarkets(false);
+    setError("");
+    setSuccess("");
   }
 
   return (
     <div className="space-y-3 sm:space-y-4 min-w-0">
-      <h1 className="text-base sm:text-lg font-bold text-text-primary">
-        Spot Trading
-      </h1>
+      <div>
+        <h1 className="text-base sm:text-lg font-bold text-text-primary">Spot Trading</h1>
+        <p className="mt-1 max-w-3xl text-sm text-text-tertiary">
+          Your crypto wallet and spot desk in one place. Deposit BTC, ETH, USDT, and more, buy with
+          cash, hold in your wallet, and sell back anytime.
+        </p>
+      </div>
+
+      <SpotWalletOverview
+        cashBalance={balance}
+        holdings={holdings}
+        pairs={spotPairs}
+        selectedSymbol={selectedPair.symbol}
+        onSelectAsset={selectPair}
+      />
 
       <TradingViewTickerTape />
 
@@ -188,7 +238,7 @@ export default function TradePage() {
 
             <div className="hidden lg:block">
               <SpotMarketList
-                pairs={pairs}
+                pairs={spotPairs}
                 selectedSymbol={selectedPair.symbol}
                 onSelect={selectPair}
               />
@@ -197,7 +247,7 @@ export default function TradePage() {
 
           {showMobileMarkets && (
             <SpotMarketList
-              pairs={pairs}
+              pairs={spotPairs}
               selectedSymbol={selectedPair.symbol}
               onSelect={selectPair}
               compact
@@ -213,7 +263,9 @@ export default function TradePage() {
                 amount={amount}
                 onAmountChange={setAmount}
                 total={total}
-                balance={balance}
+                price={selectedPair.price}
+                cashBalance={balance}
+                heldQuantity={heldQuantity}
                 userId={userId}
                 loading={loading}
                 error={error}
@@ -227,7 +279,7 @@ export default function TradePage() {
         <div className="hidden lg:flex flex-col gap-3">
           <Card className="!p-4 flex-1">
             <p className="text-[11px] uppercase tracking-wide text-text-tertiary mb-3">
-              Order
+              Trade {selectedPair.symbol.split("/")[0]}
             </p>
             <SpotOrderPanel
               symbol={selectedPair.symbol}
@@ -236,7 +288,9 @@ export default function TradePage() {
               amount={amount}
               onAmountChange={setAmount}
               total={total}
-              balance={balance}
+              price={selectedPair.price}
+              cashBalance={balance}
+              heldQuantity={heldQuantity}
               userId={userId}
               loading={loading}
               error={error}
