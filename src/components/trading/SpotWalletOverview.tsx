@@ -3,7 +3,7 @@
 import type { HoldingRow } from "@/lib/supabase/types";
 import { CryptoIcon } from "@/components/crypto/CryptoIcon";
 import { Button } from "@/components/ui/Button";
-import { ArrowDownToLine, ArrowUpFromLine, TrendingUp } from "@/components/icons";
+import { ArrowDownToLine, ArrowUpFromLine, Receipt, TrendingUp } from "@/components/icons";
 import { SPOT_ASSETS } from "@/lib/spot-assets";
 import { cn, formatCurrency, formatNumber, formatPercent } from "@/lib/utils";
 import type { MarketPair } from "@/lib/market-data";
@@ -95,6 +95,8 @@ export function SpotWalletOverview({
   onSend,
   onReceive,
   onBuyCrypto,
+  onOpenTransactions,
+  pendingTransactionCount = 0,
 }: {
   userName?: string;
   cashBalance: number | null;
@@ -107,6 +109,8 @@ export function SpotWalletOverview({
   onSend: () => void;
   onReceive: () => void;
   onBuyCrypto: () => void;
+  onOpenTransactions: () => void;
+  pendingTransactionCount?: number;
 }) {
   const rows = buildWalletRows(holdings, pairs);
   const cryptoValue = rows.reduce((sum, row) => sum + row.value, 0);
@@ -115,7 +119,21 @@ export function SpotWalletOverview({
 
   return (
     <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-[var(--shadow-card)]">
-      <div className="spot-wallet-hero rounded-t-2xl px-5 pb-6 pt-5 sm:px-6 sm:pb-7 sm:pt-6">
+      <div className="spot-wallet-hero relative rounded-t-2xl px-5 pb-6 pt-5 sm:px-6 sm:pb-7 sm:pt-6">
+        <button
+          type="button"
+          onClick={onOpenTransactions}
+          aria-label="Spot wallet transactions"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 transition-colors hover:bg-white/15 sm:right-6 sm:top-5 touch-target"
+        >
+          <Receipt className="h-5 w-5" />
+          {pendingTransactionCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[10px] font-bold text-white">
+              {pendingTransactionCount > 9 ? "9+" : pendingTransactionCount}
+            </span>
+          )}
+        </button>
+
         <div className="text-center">
           <p className="text-[2rem] font-bold leading-none tracking-tight text-white sm:text-[2.35rem]">
             {formatUsdPlain(cryptoValue, cryptoValue >= 1000 ? 0 : 2)}

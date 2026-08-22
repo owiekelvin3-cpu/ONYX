@@ -23,7 +23,7 @@ const KIND_ICONS = {
   trade: TrendingUp,
 } as const;
 
-function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status }: { status: string }) {
   const tone = transactionStatusTone(status);
   return (
     <span
@@ -40,7 +40,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function TransactionReceiptModal({
+export function TransactionReceiptModal({
   item,
   onClose,
 }: {

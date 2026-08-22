@@ -1,6 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { TransactionItem } from "@/lib/supabase/types";
 import { tradeNotional } from "@/lib/api/trading";
+import { SPOT_DEPOSIT_METHOD_ASSET, SPOT_PAIR_SYMBOLS } from "@/lib/spot-assets";
+
+const SPOT_DEPOSIT_METHODS = new Set(Object.keys(SPOT_DEPOSIT_METHOD_ASSET));
 
 export function transactionStatusTone(status: string): "default" | "up" | "down" | "pending" {
   const normalized = status.toLowerCase();
@@ -8,6 +11,31 @@ export function transactionStatusTone(status: string): "default" | "up" | "down"
   if (["rejected", "failed", "cancelled", "canceled"].includes(normalized)) return "down";
   if (["pending", "processing", "review"].includes(normalized)) return "pending";
   return "default";
+}
+
+export function isSpotTransaction(item: TransactionItem): boolean {
+  if (item.kind === "trade") {
+    return Boolean(item.asset && SPOT_PAIR_SYMBOLS.has(item.asset));
+  }
+
+  if (item.kind === "deposit") {
+    return Boolean(item.method && SPOT_DEPOSIT_METHODS.has(item.method));
+  }
+
+  if (item.kind === "withdrawal") {
+    if (item.notes?.includes("spot_holding_withdrawal")) return true;
+    return Boolean(item.method && SPOT_DEPOSIT_METHODS.has(item.method));
+  }
+
+  return false;
+}
+
+export function filterSpotTransactions(items: TransactionItem[]): TransactionItem[] {
+  return items.filter(isSpotTransaction);
+}
+
+export function countPendingTransactions(items: TransactionItem[]): number {
+  return items.filter((item) => transactionStatusTone(item.status) === "pending").length;
 }
 
 export async function getUserTransactions(

@@ -20,7 +20,13 @@ import {
 } from "@/components/trading/SpotWalletOverview";
 import { SpotCryptoDepositSheet } from "@/components/trading/SpotCryptoDepositSheet";
 import { SpotBuyCryptoSheet } from "@/components/trading/SpotBuyCryptoSheet";
+import { SpotTransactionsSheet } from "@/components/trading/SpotTransactionsSheet";
 import { SpotHoldingTransferSheet } from "@/components/trading/SpotHoldingTransferSheet";
+import {
+  countPendingTransactions,
+  filterSpotTransactions,
+  getUserTransactions,
+} from "@/lib/api/transactions";
 import type { MarketPair } from "@/lib/market-data";
 import type { HoldingRow } from "@/lib/supabase/types";
 import { filterSpotMarketPairs, SPOT_ASSETS, spotAssetBySymbol } from "@/lib/spot-assets";
@@ -119,6 +125,8 @@ export default function TradePage() {
   const [depositConfig, setDepositConfig] = useState<DepositConfig | null>(null);
   const [depositSheetKey, setDepositSheetKey] = useState<string | null>(null);
   const [buyCryptoSheetOpen, setBuyCryptoSheetOpen] = useState(false);
+  const [transactionsSheetOpen, setTransactionsSheetOpen] = useState(false);
+  const [pendingTxCount, setPendingTxCount] = useState(0);
   const [transferTarget, setTransferTarget] = useState<WalletRow | null>(null);
   const [transferMode, setTransferMode] = useState<"to_main" | "send_out">("to_main");
 
@@ -132,6 +140,12 @@ export default function TradePage() {
     [walletRows, selectedPair]
   );
 
+  const refreshSpotTransactions = useCallback(async (uid: string) => {
+    const supabase = createClient();
+    const rows = filterSpotTransactions(await getUserTransactions(supabase, uid, 40));
+    setPendingTxCount(countPendingTransactions(rows));
+  }, []);
+
   const refreshWallet = useCallback(async (uid: string) => {
     const supabase = createClient();
     const [bal, rows] = await Promise.all([
@@ -140,7 +154,8 @@ export default function TradePage() {
     ]);
     setBalance(bal);
     setHoldings(rows);
-  }, []);
+    await refreshSpotTransactions(uid);
+  }, [refreshSpotTransactions]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -351,6 +366,8 @@ export default function TradePage() {
           onSend={handleSend}
           onReceive={handleReceive}
           onBuyCrypto={handleBuyCrypto}
+          onOpenTransactions={() => setTransactionsSheetOpen(true)}
+          pendingTransactionCount={pendingTxCount}
         />
 
         <div
@@ -371,6 +388,15 @@ export default function TradePage() {
           {tradePanel}
         </div>
       </div>
+
+      <SpotTransactionsSheet
+        open={transactionsSheetOpen}
+        userId={userId}
+        onClose={() => {
+          setTransactionsSheetOpen(false);
+          if (userId) void refreshSpotTransactions(userId);
+        }}
+      />
 
       <SpotBuyCryptoSheet
         open={buyCryptoSheetOpen}
