@@ -265,13 +265,18 @@ export default function CryptoDepositPage() {
                 key={d.id}
                 className="flex items-center justify-between py-2 border-b border-border last:border-0 text-[13px]"
               >
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="font-medium">{formatCurrency(d.amount)}</p>
                   <p className="text-[11px] text-text-tertiary capitalize">
                     {formatDepositMethod(d.method)} · {d.status}
                   </p>
+                  {d.status === "rejected" && d.rejection_reason && (
+                    <p className="mt-1 text-[11px] text-red line-clamp-2">
+                      Reason: {d.rejection_reason}
+                    </p>
+                  )}
                 </div>
-                <p className="text-[11px] text-text-tertiary">
+                <p className="shrink-0 text-[11px] text-text-tertiary">
                   {new Date(d.created_at).toLocaleDateString()}
                 </p>
               </div>

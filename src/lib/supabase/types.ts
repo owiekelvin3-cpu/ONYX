@@ -35,6 +35,7 @@ export type DepositRow = {
   method: string;
   status: string;
   notes?: string | null;
+  rejection_reason?: string | null;
   created_at: string;
 };
 

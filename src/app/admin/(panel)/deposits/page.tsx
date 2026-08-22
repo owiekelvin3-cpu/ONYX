@@ -7,6 +7,7 @@ import type { DepositRow } from "@/lib/admin-types";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminFilterBar, AdminListActions } from "@/components/admin/AdminFilterBar";
 import { AdminDepositDetailPanel } from "@/components/admin/AdminDepositDetailPanel";
+import { AdminDepositRejectDialog } from "@/components/admin/AdminDepositRejectDialog";
 import { AdminMobilePanel } from "@/components/admin/AdminMobilePanel";
 import { StatusBadge, isPending } from "@/components/admin/StatusBadge";
 import { Card } from "@/components/ui/Card";
@@ -25,6 +26,7 @@ export default function AdminDepositsPage() {
   const [acting, setActing] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [rejecting, setRejecting] = useState<DepositRow | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -62,12 +64,14 @@ export default function AdminDepositsPage() {
     setActing(null);
   }
 
-  async function handleReject(id: string) {
-    setActing(id);
+  async function handleReject(reason: string) {
+    if (!rejecting) return;
+    setActing(rejecting.id);
     setMessage("");
     try {
-      await rejectDeposit(id);
+      await rejectDeposit(rejecting.id, reason);
       setMessage("Deposit rejected");
+      setRejecting(null);
       closeDetail();
       await load();
     } catch (e) {
@@ -97,7 +101,7 @@ export default function AdminDepositsPage() {
         <Button size="sm" disabled={acting === d.id} onClick={() => handleApprove(d)}>
           Approve
         </Button>
-        <Button size="sm" variant="outline" disabled={acting === d.id} onClick={() => handleReject(d.id)}>
+        <Button size="sm" variant="outline" disabled={acting === d.id} onClick={() => setRejecting(d)}>
           Reject
         </Button>
       </>
@@ -168,6 +172,11 @@ export default function AdminDepositsPage() {
                           <p className="text-sm text-text-tertiary mt-1">
                             {userLabel} · {formatDepositMethod(d.method)} · {formatDate(d.created_at)}
                           </p>
+                          {d.status === "rejected" && d.rejection_reason && (
+                            <p className="mt-1 text-xs text-red line-clamp-2">
+                              Reason: {d.rejection_reason}
+                            </p>
+                          )}
                           {parsedNotes.type === "gift_card" && parsedNotes.cardCode && (
                             <p className="text-xs text-text-secondary mt-1 font-mono truncate">
                               Code: {parsedNotes.cardCode}
@@ -202,7 +211,7 @@ export default function AdminDepositsPage() {
                               disabled={acting === d.id}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                void handleReject(d.id);
+                                setRejecting(d);
                               }}
                             >
                               Reject
@@ -253,6 +262,17 @@ export default function AdminDepositsPage() {
           />
         )}
       </AdminMobilePanel>
+
+      <AdminDepositRejectDialog
+        open={!!rejecting}
+        amount={rejecting?.amount ?? 0}
+        userLabel={
+          rejecting?.profiles?.full_name || rejecting?.profiles?.email || rejecting?.user_id.slice(0, 8) || "User"
+        }
+        busy={acting === rejecting?.id}
+        onClose={() => setRejecting(null)}
+        onConfirm={handleReject}
+      />
     </div>
   );
 }

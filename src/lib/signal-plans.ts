@@ -1,4 +1,11 @@
-export type SignalTier = "starter" | "professional" | "elite" | "institutional";
+export type SignalTier =
+  | "starter"
+  | "professional"
+  | "elite"
+  | "institutional"
+  | "premier"
+  | "executive"
+  | "sovereign";
 
 export type SignalPlan = {
   id: SignalTier;
@@ -64,6 +71,45 @@ export const SIGNAL_PLANS: SignalPlan[] = [
       "30-day access",
     ],
   },
+  {
+    id: "premier",
+    name: "Premier Desk",
+    price: 10000,
+    days: 30,
+    description: "Premium desk access with priority publication and expanded macro coverage.",
+    features: [
+      "Premier desk + all lower tiers",
+      "Priority macro and FX setups",
+      "Dedicated support queue",
+      "30-day access",
+    ],
+  },
+  {
+    id: "executive",
+    name: "Executive Desk",
+    price: 15000,
+    days: 30,
+    description: "Executive-tier signals with advanced multi-asset coverage and faster alerts.",
+    features: [
+      "Executive desk + premier access",
+      "Advanced multi-asset setups",
+      "Executive desk notifications",
+      "30-day access",
+    ],
+  },
+  {
+    id: "sovereign",
+    name: "Sovereign Desk",
+    price: 20000,
+    days: 30,
+    description: "Top-tier sovereign desk with the full signal stack and white-glove support.",
+    features: [
+      "Full sovereign desk access",
+      "Highest-priority signal feed",
+      "White-glove desk support",
+      "30-day access",
+    ],
+  },
 ];
 
 /** Legacy tier ids still stored on older rows or admin desk publishes. */
@@ -75,6 +121,9 @@ const LEGACY_TIER_RANK: Record<string, number> = {
   vip: 3,
   elite: 3,
   institutional: 4,
+  premier: 5,
+  executive: 6,
+  sovereign: 7,
 };
 
 export function signalTierRank(tier: string | null | undefined): number {

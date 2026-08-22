@@ -207,6 +207,10 @@ export function AdminDepositDetailPanel({
           <DetailRow label={t("admin.amount")} value={formatCurrency(deposit.amount)} />
           <DetailRow label={t("admin.submitted")} value={formatDate(deposit.created_at)} />
 
+          {deposit.status === "rejected" && deposit.rejection_reason && (
+            <DetailRow label="Rejection reason" value={deposit.rejection_reason} />
+          )}
+
           {meta.type === "gift_card" && meta.cardCode && (
             <DetailRow label={t("admin.cardCode")} value={<CopyableValue value={meta.cardCode} />} />
           )}

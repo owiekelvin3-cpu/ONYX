@@ -44,14 +44,14 @@ export default function AdminSignalsPage() {
   const [grantUserId, setGrantUserId] = useState("");
   const [bulkNote, setBulkNote] = useState("Platform signal adjustment");
   const [grantDays, setGrantDays] = useState("30");
-  const [grantTier, setGrantTier] = useState("basic");
+  const [grantTier, setGrantTier] = useState("starter");
 
   const [symbol, setSymbol] = useState("BTC/USD");
   const [direction, setDirection] = useState<"buy" | "sell">("buy");
   const [entry, setEntry] = useState("");
   const [target, setTarget] = useState("");
   const [stop, setStop] = useState("");
-  const [minTier, setMinTier] = useState<"basic" | "pro" | "vip">("basic");
+  const [minTier, setMinTier] = useState("starter");
   const [confidence, setConfidence] = useState("75");
   const [notes, setNotes] = useState("");
 
@@ -541,11 +541,16 @@ export default function AdminSignalsPage() {
                 <select
                   className="mt-1 h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm"
                   value={minTier}
-                  onChange={(e) => setMinTier(e.target.value as "basic" | "pro" | "vip")}
+                  onChange={(e) => setMinTier(e.target.value)}
                 >
-                  <option value="basic">Basic</option>
-                  <option value="pro">Pro</option>
-                  <option value="vip">VIP</option>
+                  {SIGNAL_PLANS.map((plan) => (
+                    <option key={plan.id} value={plan.id}>
+                      {plan.name}
+                    </option>
+                  ))}
+                  <option value="basic">Basic (legacy)</option>
+                  <option value="pro">Pro (legacy)</option>
+                  <option value="vip">VIP (legacy)</option>
                 </select>
               </label>
               <Input

@@ -84,6 +84,7 @@ export interface DepositRow {
   method: string;
   status: TransactionStatus;
   notes: string | null;
+  rejection_reason?: string | null;
   created_at: string;
   profiles?: { email: string; full_name: string | null } | null;
 }

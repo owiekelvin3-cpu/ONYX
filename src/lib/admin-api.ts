@@ -112,11 +112,18 @@ export async function approveDeposit(depositId: string, userId: string, amount: 
   if (settleErr) throw settleErr;
 }
 
-export async function rejectDeposit(depositId: string) {
+export async function rejectDeposit(depositId: string, reason: string) {
   const supabase = createClient();
+  const rejectionReason = reason.trim();
+  if (rejectionReason.length < 8) {
+    throw new Error("A rejection reason is required.");
+  }
   const { error } = await supabase
     .from("deposits")
-    .update({ status: "rejected" as TransactionStatus })
+    .update({
+      status: "rejected" as TransactionStatus,
+      rejection_reason: rejectionReason,
+    })
     .eq("id", depositId);
   if (error) throw error;
 }

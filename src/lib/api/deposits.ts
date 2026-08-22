@@ -55,7 +55,7 @@ export async function getUserDeposits(
 ): Promise<DepositRow[]> {
   const { data, error } = await supabase
     .from("deposits")
-    .select("id, user_id, amount, currency, method, status, notes, created_at")
+    .select("id, user_id, amount, currency, method, status, notes, rejection_reason, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -86,7 +86,7 @@ export async function submitDeposit(
       notes: params.notes ?? null,
       related_fee_id: params.relatedFeeId ?? null,
     })
-    .select("id, user_id, amount, currency, method, status, notes, created_at")
+    .select("id, user_id, amount, currency, method, status, notes, rejection_reason, created_at")
     .single();
 
   if (error) throw new Error(error.message);
