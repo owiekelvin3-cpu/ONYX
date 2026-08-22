@@ -175,7 +175,7 @@ export function SpotWalletOverview({
       <div className={cn(activeTab !== "coins" && "hidden lg:block")}>
         <div className="hidden border-b border-border px-5 py-3 sm:px-6 lg:block">
           <h2 className="text-sm font-semibold text-text-primary">Your coins</h2>
-          <p className="mt-0.5 text-xs text-text-tertiary">Tap a coin to trade or view its chart.</p>
+          <p className="mt-0.5 text-xs text-text-tertiary">Select a coin, then open Trade to view its chart.</p>
         </div>
 
         <div className="divide-y divide-border">

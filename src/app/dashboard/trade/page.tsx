@@ -291,7 +291,6 @@ export default function TradePage() {
     setSelectedPair(pair);
     setError("");
     setSuccess("");
-    setActiveTab("trade");
   }
 
   function resolveActionRow(): WalletRow | null {
@@ -353,7 +352,13 @@ export default function TradePage() {
 
   return (
     <div className="mx-auto min-w-0 max-w-6xl space-y-3 sm:space-y-4">
-      <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+      <div
+        className={cn(
+          "grid gap-3 sm:gap-4",
+          activeTab === "trade" &&
+            "lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]"
+        )}
+      >
         <SpotWalletOverview
           userName={userName}
           cashBalance={balance}
@@ -370,12 +375,7 @@ export default function TradePage() {
           pendingTransactionCount={pendingTxCount}
         />
 
-        <div
-          className={cn(
-            "min-w-0 lg:sticky lg:top-20 lg:self-start",
-            activeTab !== "trade" && "hidden lg:block"
-          )}
-        >
+        <div className={cn("min-w-0 lg:sticky lg:top-20 lg:self-start", activeTab !== "trade" && "hidden")}>
           {activeTab === "trade" && (
             <button
               type="button"
