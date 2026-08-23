@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 import {
   executeMemeTrade,
   getMemeWalletItems,
-  getTodayMemeMarket,
   heldMemeQuantity,
   memeCoinPrice,
 } from "@/lib/api/meme-trading";
@@ -55,14 +54,19 @@ export default function DashboardMemeCoinsPage() {
 
   const refreshWallet = useCallback(async (uid: string) => {
     const supabase = createClient();
-    const [cash, items, market] = await Promise.all([
+    const [cash, items, marketRes] = await Promise.all([
       getUsdBalance(supabase, uid),
       getMemeWalletItems(supabase, uid),
-      getTodayMemeMarket(supabase),
+      fetch("/api/meme-coins", { cache: "no-store" }),
     ]);
     setCashBalance(cash);
     setBagItems(items);
-    setMarketCoins(market);
+    if (marketRes.ok) {
+      const payload = (await marketRes.json()) as { coins?: MemeCoinRow[] };
+      setMarketCoins(payload.coins ?? []);
+    } else {
+      setMarketCoins([]);
+    }
   }, []);
 
   useEffect(() => {

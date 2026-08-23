@@ -1,4 +1,5 @@
 import type { MemeCoinRow } from "@/lib/meme-coins/types";
+import { ensureTodayMemeCoinsSeeded } from "@/lib/meme-coins/ensure-seeded";
 import { utcToday } from "@/lib/meme-coins/sync";
 import { createClient } from "@/lib/supabase/server";
 
@@ -6,14 +7,26 @@ export async function getMemeCoinsForDate(date?: string): Promise<MemeCoinRow[]>
   const listDate = date ?? utcToday();
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("daily_meme_coins")
-    .select("*")
-    .eq("list_date", listDate)
-    .eq("status", "active")
-    .in("source", ["trending", "onyx_generated"])
-    .order("featured", { ascending: false })
-    .order("sort_order", { ascending: true });
+  const query = () =>
+    supabase
+      .from("daily_meme_coins")
+      .select("*")
+      .eq("list_date", listDate)
+      .eq("status", "active")
+      .in("source", ["trending", "onyx_generated"])
+      .order("featured", { ascending: false })
+      .order("sort_order", { ascending: true });
+
+  let { data, error } = await query();
+
+  if (!error && listDate === utcToday() && (data?.length ?? 0) === 0) {
+    try {
+      await ensureTodayMemeCoinsSeeded();
+      ({ data, error } = await query());
+    } catch (seedErr) {
+      console.error("getMemeCoinsForDate auto-seed:", seedErr);
+    }
+  }
 
   if (error) {
     console.error("getMemeCoinsForDate:", error.message);

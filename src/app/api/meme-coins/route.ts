@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { ensureTodayMemeCoinsSeeded } from "@/lib/meme-coins/ensure-seeded";
 import { utcToday } from "@/lib/meme-coins/sync";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date") ?? utcToday();
-  const limit = Math.min(Number(searchParams.get("limit") ?? "40"), 100);
-
+async function fetchCoins(date: string, limit: number) {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  return supabase
     .from("daily_meme_coins")
     .select("*")
     .eq("list_date", date)
@@ -19,6 +16,23 @@ export async function GET(request: Request) {
     .order("featured", { ascending: false })
     .order("sort_order", { ascending: true })
     .limit(limit);
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const date = searchParams.get("date") ?? utcToday();
+  const limit = Math.min(Number(searchParams.get("limit") ?? "40"), 100);
+
+  let { data, error } = await fetchCoins(date, limit);
+
+  if (!error && date === utcToday() && (data?.length ?? 0) === 0) {
+    try {
+      await ensureTodayMemeCoinsSeeded();
+      ({ data, error } = await fetchCoins(date, limit));
+    } catch (seedErr) {
+      console.error("meme-coins auto-seed:", seedErr);
+    }
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
