@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { RefreshCw } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import {
   executeMemeTrade,
@@ -38,6 +40,9 @@ export default function DashboardMemeCoinsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const prevTotalRef = useRef(0);
+  const [balanceDirection, setBalanceDirection] = useState<"up" | "down" | "flat">("flat");
 
   const allBaseCoins = useMemo(() => {
     const byId = new Map<string, MemeCoinRow>();
@@ -69,6 +74,15 @@ export default function DashboardMemeCoinsPage() {
   const bagCost = useMemo(() => bagItems.reduce((sum, item) => sum + item.costBasis, 0), [bagItems]);
   const bagPnl = bagValue - bagCost;
   const bagPnlPct = bagCost > 0 ? (bagPnl / bagCost) * 100 : 0;
+  const totalBalance = (cashBalance ?? 0) + bagValue;
+
+  useEffect(() => {
+    const prev = prevTotalRef.current;
+    if (prev > 0 && Math.abs(totalBalance - prev) > 0.001) {
+      setBalanceDirection(totalBalance > prev ? "up" : "down");
+    }
+    prevTotalRef.current = totalBalance;
+  }, [totalBalance]);
 
   const heldQuantity = useMemo(
     () => (selectedCoin ? heldMemeQuantity(bagItems, selectedCoin.id) : 0),
@@ -133,6 +147,17 @@ export default function DashboardMemeCoinsPage() {
     window.addEventListener(DASHBOARD_REFRESH_EVENT, reload);
     return () => window.removeEventListener(DASHBOARD_REFRESH_EVENT, reload);
   }, [refreshWallet, userId]);
+
+  const handleRefresh = useCallback(async () => {
+    if (!userId || refreshing) return;
+    setRefreshing(true);
+    try {
+      await refreshWallet(userId);
+      emitDashboardRefresh();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshWallet, refreshing, userId]);
 
   useEffect(() => {
     if (!selectedCoin && liveMarketCoins.length > 0) {
@@ -201,6 +226,26 @@ export default function DashboardMemeCoinsPage() {
 
   return (
     <div className="mx-auto min-w-0 max-w-6xl space-y-3 sm:space-y-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-text-primary sm:text-2xl">Meme Coins</h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Total balance updates live as meme prices move.
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="shrink-0 touch-target"
+          disabled={refreshing || !userId}
+          onClick={() => void handleRefresh()}
+        >
+          <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+          Refresh
+        </Button>
+      </div>
+
       <div
         className={cn(
           "grid gap-3 sm:gap-4",
@@ -210,6 +255,8 @@ export default function DashboardMemeCoinsPage() {
       >
         <MemeCoinWalletOverview
           userName={userName}
+          totalBalance={totalBalance}
+          balanceDirection={balanceDirection}
           bagValue={bagValue}
           bagPnl={bagPnl}
           bagPnlPct={bagPnlPct}

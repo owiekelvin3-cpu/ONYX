@@ -252,6 +252,8 @@ function CoinListRow({
 
 export function MemeCoinWalletOverview({
   userName,
+  totalBalance,
+  balanceDirection,
   bagValue,
   bagPnl,
   bagPnlPct,
@@ -264,6 +266,8 @@ export function MemeCoinWalletOverview({
   onSelectCoin,
 }: {
   userName?: string;
+  totalBalance: number;
+  balanceDirection?: "up" | "down" | "flat";
   bagValue: number;
   bagPnl: number;
   bagPnlPct: number;
@@ -291,9 +295,21 @@ export function MemeCoinWalletOverview({
     <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-[var(--shadow-card)]">
       <div className="spot-wallet-hero relative rounded-t-2xl px-5 pb-6 pt-5 sm:px-6 sm:pb-7 sm:pt-6">
         <div className="text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Meme bag · Live</p>
-          <p className="mt-2 text-[2rem] font-bold leading-none tracking-tight text-white sm:text-[2.35rem]">
-            {formatCurrency(bagValue, "USD")}
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">
+            Total balance · Live
+          </p>
+          <p
+            className={cn(
+              "mt-2 text-[2rem] font-bold leading-none tracking-tight transition-colors duration-300 sm:text-[2.35rem]",
+              balanceDirection === "up"
+                ? "text-green-300"
+                : balanceDirection === "down"
+                  ? "text-red-300"
+                  : "text-white"
+            )}
+          >
+            {formatCurrency(totalBalance, "USD")}
+            {balanceDirection === "up" ? " ↑" : balanceDirection === "down" ? " ↓" : ""}
           </p>
           {bagItems.length > 0 ? (
             <p
@@ -307,14 +323,35 @@ export function MemeCoinWalletOverview({
             </p>
           ) : null}
           <p className="mt-2 text-sm text-white/80">{displayName}</p>
-          {cashBalance !== null ? (
-            <p className="mt-1 text-xs text-white/60">
-              Main cash {formatCurrency(cashBalance)} ·{" "}
-              <Link href="/dashboard/deposit" className="underline hover:text-white">
-                Add funds
-              </Link>
+          <div className="mt-3 space-y-1 text-xs text-white/60">
+            <p>
+              Meme bag{" "}
+              <span
+                className={cn(
+                  "font-mono font-semibold transition-colors duration-300",
+                  balanceDirection === "up"
+                    ? "text-green-300"
+                    : balanceDirection === "down"
+                      ? "text-red-300"
+                      : "text-white/90"
+                )}
+              >
+                {formatCurrency(bagValue)}
+              </span>
             </p>
-          ) : null}
+            {cashBalance !== null ? (
+              <p>
+                Main cash{" "}
+                <span className="font-mono font-semibold text-white/90">
+                  {formatCurrency(cashBalance)}
+                </span>
+                {" · "}
+                <Link href="/dashboard/deposit" className="underline hover:text-white">
+                  Add funds
+                </Link>
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
 
