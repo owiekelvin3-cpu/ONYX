@@ -2,6 +2,7 @@
 export const MARKETING_NAV = [
   { label: "Products", href: "/products" },
   { label: "Community", href: "/community" },
+  { label: "Meme Coins", href: "/meme-coins" },
   { label: "Markets", href: "/markets" },
   { label: "Trading", href: "/trading" },
 ] as const;
@@ -17,6 +18,7 @@ export const MARKETING_PAGES = [
   { slug: "", title: "Home", href: "/" },
   { slug: "products", title: "Products", href: "/products" },
   { slug: "community", title: "Community", href: "/community" },
+  { slug: "meme-coins", title: "Meme Coin Daily", href: "/meme-coins" },
   { slug: "markets", title: "Markets", href: "/markets" },
   { slug: "trading", title: "Trading", href: "/trading" },
   { slug: "features", title: "Features", href: "/features" },

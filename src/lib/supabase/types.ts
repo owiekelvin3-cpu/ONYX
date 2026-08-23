@@ -161,3 +161,24 @@ export type TradingSignalRow = {
   published_at: string;
   closed_at?: string | null;
 };
+
+export type DailyMemeCoinRow = {
+  id: string;
+  list_date: string;
+  symbol: string;
+  name: string;
+  slug: string;
+  source: "trending" | "onyx_generated" | "admin_manual";
+  coingecko_id: string | null;
+  price_usd: number | null;
+  change_24h: number | null;
+  market_cap_usd: number | null;
+  image_url: string | null;
+  description: string | null;
+  tags: string[];
+  featured: boolean;
+  status: "active" | "archived";
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};

@@ -21,6 +21,7 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  Sparkles,
   X,
 } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ const SIDEBAR = [
   { href: "/", icon: LayoutDashboard, label: "Overview" },
   { href: "/products", icon: Wallet, label: "Products" },
   { href: "/community", icon: Users, label: "Community" },
+  { href: "/meme-coins", icon: Sparkles, label: "Meme Coins" },
   { href: "/markets", icon: Globe, label: "Markets" },
   { href: "/trading", icon: TrendingUp, label: "Trading" },
   { href: "/features", icon: Star, label: "Features" },

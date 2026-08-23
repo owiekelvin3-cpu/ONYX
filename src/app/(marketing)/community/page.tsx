@@ -45,9 +45,14 @@ export default function CommunityPage() {
       <section className="fin-page-plain py-8 sm:py-12">
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-bold text-text-primary sm:text-xl">Editor&apos;s picks</h2>
-          <Link href="/dashboard/copy-trading" className="text-sm text-brand hover:underline">
-            See all ideas
-          </Link>
+          <div className="flex flex-wrap gap-3 text-sm">
+            <Link href="/meme-coins" className="text-brand hover:underline">
+              Meme Coin Daily
+            </Link>
+            <Link href="/dashboard/copy-trading" className="text-brand hover:underline">
+              See all ideas
+            </Link>
+          </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {IDEAS.map((idea) => (
