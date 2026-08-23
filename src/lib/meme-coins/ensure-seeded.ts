@@ -11,7 +11,7 @@ export async function ensureTodayMemeCoinsSeeded(): Promise<boolean> {
     .select("id", { count: "exact", head: true })
     .eq("list_date", listDate)
     .eq("status", "active")
-    .in("source", ["trending", "onyx_generated"]);
+    .eq("source", "trending");
 
   if (error) {
     console.error("ensureTodayMemeCoinsSeeded count:", error.message);

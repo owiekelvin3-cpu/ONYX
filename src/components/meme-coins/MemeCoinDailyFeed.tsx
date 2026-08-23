@@ -1,18 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
 import type { MemeCoinRow } from "@/lib/meme-coins/types";
 import { MemeCoinGrid } from "@/components/meme-coins/MemeCoinGrid";
 import { cn } from "@/lib/utils";
-
-type TabId = "all" | "trending" | "onyx";
-
-const TABS: { id: TabId; label: string }[] = [
-  { id: "all", label: "Today" },
-  { id: "trending", label: "Live Trending" },
-  { id: "onyx", label: "ONYX Originals" },
-];
 
 export function MemeCoinDailyFeed({
   coins,
@@ -23,34 +14,14 @@ export function MemeCoinDailyFeed({
   listDate: string;
   recentDates: string[];
 }) {
-  const [tab, setTab] = useState<TabId>("all");
-
-  const visibleCoins = useMemo(
-    () => coins.filter((c) => c.source !== "admin_manual"),
-    [coins]
-  );
-
-  const filtered = useMemo(() => {
-    if (tab === "trending") return visibleCoins.filter((c) => c.source === "trending");
-    if (tab === "onyx") return visibleCoins.filter((c) => c.source === "onyx_generated");
-    return visibleCoins;
-  }, [visibleCoins, tab]);
-
-  const stats = useMemo(
-    () => ({
-      total: visibleCoins.length,
-      trending: visibleCoins.filter((c) => c.source === "trending").length,
-      onyx: visibleCoins.filter((c) => c.source === "onyx_generated").length,
-    }),
-    [visibleCoins]
-  );
+  const visibleCoins = coins.filter((c) => c.source !== "admin_manual");
 
   return (
     <div className="space-y-8">
       <section className="rounded-xl border border-brand/20 bg-brand/5 p-5 sm:p-6">
         <h2 className="text-lg font-bold text-text-primary">Trade meme coins in your dashboard</h2>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-          Buy and hold today&apos;s meme picks in your ONYX meme wallet — same instant settlement from your main USD balance.
+          Buy and hold today&apos;s live meme picks — instant settlement from your main USD balance.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
@@ -68,11 +39,10 @@ export function MemeCoinDailyFeed({
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2">
         {[
-          { label: "Today's list", value: stats.total },
-          { label: "Live trending", value: stats.trending },
-          { label: "ONYX originals", value: stats.onyx },
+          { label: "Live coins today", value: visibleCoins.length },
+          { label: "Updated", value: listDate },
         ].map((item) => (
           <div key={item.label} className="rounded-xl border border-border bg-bg-secondary p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">
@@ -92,7 +62,7 @@ export function MemeCoinDailyFeed({
       <section>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text-primary sm:text-xl">Daily meme coin picks</h2>
+            <h2 className="text-lg font-bold text-text-primary sm:text-xl">Live meme coin market</h2>
             <p className="text-sm text-text-secondary">
               Updated for {new Date(`${listDate}T12:00:00Z`).toLocaleDateString(undefined, {
                 weekday: "long",
@@ -122,25 +92,7 @@ export function MemeCoinDailyFeed({
           ) : null}
         </div>
 
-        <div className="mb-5 flex flex-wrap gap-2">
-          {TABS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setTab(item.id)}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-                tab === item.id
-                  ? "bg-brand text-bg-primary"
-                  : "border border-border bg-bg-secondary text-text-secondary hover:text-text-primary"
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        <MemeCoinGrid coins={filtered} />
+        <MemeCoinGrid coins={visibleCoins} />
       </section>
     </div>
   );

@@ -28,7 +28,7 @@ export default function AdminMemeCoinsPage() {
       .from("daily_meme_coins")
       .select("*")
       .eq("list_date", listDate)
-      .in("source", ["trending", "onyx_generated"])
+      .eq("source", "trending")
       .order("sort_order", { ascending: true });
 
     if (loadError) setError(loadError.message);
@@ -43,8 +43,8 @@ export default function AdminMemeCoinsPage() {
   const stats = useMemo(
     () => ({
       total: coins.filter((c) => c.status === "active").length,
-      trending: coins.filter((c) => c.source === "trending" && c.status === "active").length,
-      generated: coins.filter((c) => c.source === "onyx_generated" && c.status === "active").length,
+      coingecko: coins.filter((c) => c.coingecko_id && c.status === "active").length,
+      liveFill: coins.filter((c) => !c.coingecko_id && c.status === "active").length,
     }),
     [coins]
   );
@@ -67,7 +67,7 @@ export default function AdminMemeCoinsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Sync failed");
       flash(
-        `Synced ${data.listDate}: +${data.inserted} new (${data.trending} trending, ${data.generated} ONYX). Total ${data.total}.`
+        `Synced ${data.listDate}: +${data.inserted} new (${data.trending} CoinGecko, ${data.generated} live market). Total ${data.total}.`
       );
       await load();
     } catch (err) {
@@ -109,7 +109,7 @@ export default function AdminMemeCoinsPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Meme Coin Daily"
-        subtitle="Import trending meme coins and generate ONYX originals for the user meme wallet."
+        subtitle="Import live trending meme coins and fill today's market for the user meme wallet."
         action={
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" disabled={busy} onClick={() => void runSync(false)}>
@@ -139,8 +139,8 @@ export default function AdminMemeCoinsPage() {
       <div className="grid gap-3 sm:grid-cols-3">
         {[
           { label: "Active today", value: stats.total },
-          { label: "Trending", value: stats.trending },
-          { label: "ONYX generated", value: stats.generated },
+          { label: "CoinGecko live", value: stats.coingecko },
+          { label: "Market live", value: stats.liveFill },
         ].map((item) => (
           <Card key={item.label} className="p-4">
             <p className="text-xs uppercase tracking-wide text-text-tertiary">{item.label}</p>
@@ -154,7 +154,7 @@ export default function AdminMemeCoinsPage() {
           <div>
             <h2 className="font-semibold">Daily market list</h2>
             <p className="text-sm text-text-secondary">
-              Target: 10 coins per day (up to 7 trending + ONYX originals). Users trade these in{" "}
+              Target: 10 live coins per day from CoinGecko trending and market fill. Users trade these in{" "}
               <a href="/dashboard/meme-coins" className="text-brand hover:underline">
                 Meme Wallet
               </a>

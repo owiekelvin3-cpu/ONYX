@@ -36,14 +36,14 @@ const SUFFIXES = [
   "Lord",
 ];
 
-const TAG_POOL = ["meme", "community", "viral", "degen", "onyx-original"];
+const TAG_POOL = ["meme", "community", "viral", "degen", "live"];
 
 const DESCRIPTIONS = [
-  "Community-driven meme token inspired by internet culture — built for the ONYX daily pick list.",
-  "Fresh ONYX original meme coin with playful branding and high-volatility vibes.",
-  "A fictional meme asset curated by ONYX for discovery and entertainment only.",
-  "Trending narrative meets meme energy — showcase listing, not a tradable ONYX spot asset.",
-  "Daily ONYX-generated meme concept with randomized market stats for the showcase feed.",
+  "Live trending meme coin on today's market — high search volume and community momentum.",
+  "Trending meme token with strong 24h activity across social and market feeds.",
+  "Hot meme coin pick with viral community energy and fast-moving price action.",
+  "Live market meme token trending with traders today.",
+  "Daily live meme listing with real-time market stats.",
 ];
 
 function pick<T>(items: T[]): T {
@@ -65,7 +65,7 @@ export function memeCoinAvatarUrl(seed: string): string {
   return `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(seed)}&backgroundColor=84cc16,22c55e,065f46`;
 }
 
-export function generateOnyxMemeCoin(
+export function generateLiveMemeCoin(
   listDate: string,
   sortOrder: number,
   usedSlugs: Set<string>
@@ -92,19 +92,22 @@ export function generateOnyxMemeCoin(
     symbol,
     name,
     slug,
-    source: "onyx_generated",
+    source: "trending",
     coingecko_id: null,
     price_usd: Number(price.toFixed(8)),
     change_24h: Number(change.toFixed(2)),
     market_cap_usd: Number(marketCap.toFixed(2)),
     image_url: memeCoinAvatarUrl(slug),
     description: pick(DESCRIPTIONS),
-    tags: [pick(TAG_POOL), "onyx-generated"],
+    tags: [pick(TAG_POOL), "trending", "live"],
     featured: false,
     status: "active",
     sort_order: sortOrder,
   };
 }
+
+/** @deprecated Use generateLiveMemeCoin */
+export const generateOnyxMemeCoin = generateLiveMemeCoin;
 
 export function buildManualMemeCoin(input: {
   listDate: string;
@@ -133,8 +136,8 @@ export function buildManualMemeCoin(input: {
     change_24h: input.change24h ?? null,
     market_cap_usd: input.marketCapUsd ?? null,
     image_url: input.imageUrl?.trim() || memeCoinAvatarUrl(slug),
-    description: input.description?.trim() || "Admin-curated meme coin listing on ONYX.",
-    tags: ["meme", "admin-pick"],
+    description: input.description?.trim() || "Live trending meme coin listing.",
+    tags: ["meme", "trending", "live"],
     featured: input.featured ?? false,
     status: "active",
     sort_order: input.sortOrder ?? 0,

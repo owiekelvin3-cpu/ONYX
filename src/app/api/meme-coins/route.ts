@@ -12,7 +12,7 @@ async function fetchCoins(date: string, limit: number) {
     .select("*")
     .eq("list_date", date)
     .eq("status", "active")
-    .in("source", ["trending", "onyx_generated"])
+    .eq("source", "trending")
     .order("featured", { ascending: false })
     .order("sort_order", { ascending: true })
     .limit(limit);

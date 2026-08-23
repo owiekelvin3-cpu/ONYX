@@ -5,8 +5,7 @@ import { utcToday } from "@/lib/meme-coins/sync";
 
 export const metadata = {
   title: "Meme Coin Daily",
-  description:
-    "Daily trending meme coins and ONYX original picks — refreshed every day from live market data.",
+  description: "Daily live trending meme coins — refreshed every day from market data.",
 };
 
 type PageProps = {
@@ -24,7 +23,7 @@ export default async function MemeCoinsPage({ searchParams }: PageProps) {
   return (
     <MarketingPageShell
       title="Meme Coin Daily"
-      subtitle="Ten fresh meme coin picks every day — live trending imports from CoinGecko plus ONYX originals and admin-curated highlights."
+      subtitle="Ten fresh live meme coin picks every day — trending imports from CoinGecko plus daily market listings."
       ctaHref="/register"
       ctaLabel="Join ONYX Exchange"
     >

@@ -74,19 +74,20 @@ function generateOnyx(listDate, sortOrder, usedSlugs) {
   usedSlugs.add(slug);
   const price = randomBetween(0.000002, 0.42);
   const change = randomBetween(-35, 180);
+  const marketCap = price * randomBetween(8_000_000, 900_000_000);
   return {
     list_date: listDate,
     symbol,
     name,
     slug,
-    source: "onyx_generated",
+    source: "trending",
     coingecko_id: null,
     price_usd: Number(price.toFixed(8)),
     change_24h: Number(change.toFixed(2)),
-    market_cap_usd: Number((price * randomBetween(8_000_000, 900_000_000)).toFixed(2)),
+    market_cap_usd: Number(marketCap.toFixed(2)),
     image_url: `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(slug)}&backgroundColor=84cc16,22c55e,065f46`,
-    description: "Daily ONYX-generated meme coin for the user meme wallet.",
-    tags: ["meme", "onyx-generated"],
+    description: "Live trending meme coin on today's market.",
+    tags: ["meme", "trending", "live"],
     featured: false,
     status: "active",
     sort_order: sortOrder,
@@ -206,7 +207,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`Inserted ${toInsert.length} coins (${toInsert.filter((c) => c.source === "trending").length} trending, ${toInsert.filter((c) => c.source === "onyx_generated").length} ONYX).`);
+  console.log(
+    `Inserted ${toInsert.length} coins (${toInsert.filter((c) => c.coingecko_id).length} CoinGecko, ${toInsert.filter((c) => !c.coingecko_id).length} live market).`
+  );
 }
 
 main().catch((err) => {

@@ -2,11 +2,9 @@ import Image from "next/image";
 import type { MemeCoinRow } from "@/lib/meme-coins/types";
 import { cn, formatCompact, formatPercent } from "@/lib/utils";
 
-const SOURCE_LABELS: Record<MemeCoinRow["source"], string> = {
-  trending: "Live Trending",
-  onyx_generated: "ONYX Original",
-  admin_manual: "Pick",
-};
+function sourceLabel(_coin: MemeCoinRow): string {
+  return "Live";
+}
 
 function formatMemePrice(value: number | null): string {
   if (value == null || !Number.isFinite(value)) return "—";
@@ -79,12 +77,10 @@ export function MemeCoinCard({ coin }: { coin: MemeCoinRow }) {
         <span
           className={cn(
             "rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide",
-            coin.source === "trending"
-              ? "bg-brand/10 text-brand"
-              : "bg-brand-light text-brand"
+            "bg-brand/10 text-brand"
           )}
         >
-          {SOURCE_LABELS[coin.source]}
+          {sourceLabel(coin)}
         </span>
         {coin.market_cap_usd != null ? (
           <span className="text-[11px] text-text-tertiary">

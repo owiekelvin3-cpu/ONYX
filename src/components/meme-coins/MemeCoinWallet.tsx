@@ -20,8 +20,8 @@ function formatMemePrice(value: number): string {
 
 const SOURCE_LABEL: Record<MemeCoinRow["source"], string> = {
   trending: "Live",
-  onyx_generated: "ONYX",
-  admin_manual: "Pick",
+  onyx_generated: "Live",
+  admin_manual: "Live",
 };
 
 export function MemeCoinOrderPanel({

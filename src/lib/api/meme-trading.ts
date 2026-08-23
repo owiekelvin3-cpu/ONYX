@@ -91,7 +91,7 @@ export async function getTodayMemeMarket(
     .select("*")
     .eq("list_date", listDate)
     .eq("status", "active")
-    .in("source", ["trending", "onyx_generated"])
+    .eq("source", "trending")
     .order("featured", { ascending: false })
     .order("sort_order", { ascending: true });
 

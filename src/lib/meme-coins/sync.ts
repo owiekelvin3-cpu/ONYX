@@ -1,8 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { generateOnyxMemeCoin, slugifyMemeCoin } from "@/lib/meme-coins/generate";
+import { generateLiveMemeCoin, slugifyMemeCoin } from "@/lib/meme-coins/generate";
 import {
   DAILY_MEME_COIN_TARGET,
-  ONYX_SLOT_MIN,
+  LIVE_FILL_MIN,
   TRENDING_SLOT_MAX,
   type MemeCoinInsert,
   type MemeCoinRow,
@@ -216,7 +216,7 @@ export async function runDailyMemeCoinSync(
       inserted: 0,
       skipped: rows.length,
       trending: rows.filter((r) => r.source === "trending").length,
-      generated: rows.filter((r) => r.source === "onyx_generated").length,
+      generated: rows.filter((r) => !r.coingecko_id).length,
       total: rows.length,
     };
   }
@@ -232,7 +232,7 @@ export async function runDailyMemeCoinSync(
   const candidates = mergeTrendingCandidates(trending, memeMarkets);
   const trendingTarget = Math.min(
     TRENDING_SLOT_MAX,
-    Math.max(DAILY_MEME_COIN_TARGET - ONYX_SLOT_MIN, 0)
+    Math.max(DAILY_MEME_COIN_TARGET - LIVE_FILL_MIN, 0)
   );
 
   const toInsert: MemeCoinInsert[] = [];
@@ -245,9 +245,9 @@ export async function runDailyMemeCoinSync(
     toInsert.push(buildTrendingInsert(coin, listDate, sortOrder++, "24h search + meme category"));
   }
 
-  const onyxNeeded = Math.max(DAILY_MEME_COIN_TARGET - rows.length - toInsert.length, 0);
-  for (let i = 0; i < onyxNeeded; i++) {
-    toInsert.push(generateOnyxMemeCoin(listDate, sortOrder++, usedSlugs));
+  const fillNeeded = Math.max(DAILY_MEME_COIN_TARGET - rows.length - toInsert.length, 0);
+  for (let i = 0; i < fillNeeded; i++) {
+    toInsert.push(generateLiveMemeCoin(listDate, sortOrder++, usedSlugs));
   }
 
   if (toInsert.length === 0) {
@@ -256,7 +256,7 @@ export async function runDailyMemeCoinSync(
       inserted: 0,
       skipped: rows.length,
       trending: rows.filter((r) => r.source === "trending").length,
-      generated: rows.filter((r) => r.source === "onyx_generated").length,
+      generated: rows.filter((r) => !r.coingecko_id).length,
       total: rows.length,
     };
   }
@@ -270,8 +270,8 @@ export async function runDailyMemeCoinSync(
     throw new Error(insertError.message);
   }
 
-  const trendingCount = toInsert.filter((r) => r.source === "trending").length;
-  const generatedCount = toInsert.filter((r) => r.source === "onyx_generated").length;
+  const trendingCount = toInsert.filter((r) => r.coingecko_id).length;
+  const generatedCount = toInsert.filter((r) => !r.coingecko_id).length;
 
   return {
     listDate,

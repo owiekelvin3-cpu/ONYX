@@ -34,4 +34,6 @@ export type MemeCoinInsert = Omit<
 
 export const DAILY_MEME_COIN_TARGET = 10;
 export const TRENDING_SLOT_MAX = 7;
-export const ONYX_SLOT_MIN = 3;
+export const LIVE_FILL_MIN = 3;
+/** @deprecated Use LIVE_FILL_MIN */
+export const ONYX_SLOT_MIN = LIVE_FILL_MIN;
