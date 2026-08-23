@@ -34,7 +34,7 @@ import {
   Zap,
   Bell,
   Wallet,
-  Sparkles,
+  Coins,
 } from "@/components/icons";
 
 const ADMIN_LINKS = [
@@ -47,7 +47,7 @@ const ADMIN_LINKS = [
   { href: "/admin/ai-trading", label: "AI Trading", icon: Bot },
   { href: "/admin/copy-trading", label: "Copy Trading", icon: Copy },
   { href: "/admin/signals", label: "Signals", icon: Zap },
-  { href: "/admin/meme-coins", label: "Meme Coins", icon: Sparkles },
+  { href: "/admin/meme-coins", label: "Meme Coins", icon: Coins },
   { href: "/admin/support", label: "Support", icon: Comments },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ] as const;

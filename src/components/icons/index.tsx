@@ -66,6 +66,7 @@ import {
   faDownload,
   faShareNodes,
   faMagnifyingGlassPlus,
+  faCoins,
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
@@ -154,4 +155,5 @@ export const ExternalLink = icon(faArrowUpRightFromSquare);
 export const Download = icon(faDownload);
 export const Share = icon(faShareNodes);
 export const ZoomIn = icon(faMagnifyingGlassPlus);
+export const Coins = icon(faCoins);
 export const ImageIcon = Image;
