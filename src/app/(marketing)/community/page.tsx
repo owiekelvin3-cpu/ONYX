@@ -46,8 +46,8 @@ export default function CommunityPage() {
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-bold text-text-primary sm:text-xl">Editor&apos;s picks</h2>
           <div className="flex flex-wrap gap-3 text-sm">
-            <Link href="/meme-coins" className="text-brand hover:underline">
-              Meme Coin Daily
+            <Link href="/dashboard/meme-coins" className="text-brand hover:underline">
+              Meme Coin Wallet
             </Link>
             <Link href="/dashboard/copy-trading" className="text-brand hover:underline">
               See all ideas

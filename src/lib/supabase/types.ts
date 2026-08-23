@@ -182,3 +182,23 @@ export type DailyMemeCoinRow = {
   created_at: string;
   updated_at: string;
 };
+
+export type MemeHoldingRow = {
+  id: string;
+  user_id: string;
+  meme_coin_id: string;
+  quantity: number;
+  avg_cost_usd: number | null;
+  updated_at: string;
+};
+
+export type MemeTradeRow = {
+  id: string;
+  user_id: string;
+  meme_coin_id: string;
+  type: "buy" | "sell";
+  quantity: number;
+  price_usd: number;
+  status: string;
+  created_at: string;
+};

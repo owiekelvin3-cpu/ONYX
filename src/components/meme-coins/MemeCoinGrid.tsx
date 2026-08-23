@@ -5,7 +5,7 @@ import { cn, formatCompact, formatPercent } from "@/lib/utils";
 const SOURCE_LABELS: Record<MemeCoinRow["source"], string> = {
   trending: "Live Trending",
   onyx_generated: "ONYX Original",
-  admin_manual: "Admin Pick",
+  admin_manual: "Pick",
 };
 
 function formatMemePrice(value: number | null): string {
@@ -81,9 +81,7 @@ export function MemeCoinCard({ coin }: { coin: MemeCoinRow }) {
             "rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide",
             coin.source === "trending"
               ? "bg-brand/10 text-brand"
-              : coin.source === "admin_manual"
-                ? "bg-gold/10 text-gold"
-                : "bg-brand-light text-brand"
+              : "bg-brand-light text-brand"
           )}
         >
           {SOURCE_LABELS[coin.source]}

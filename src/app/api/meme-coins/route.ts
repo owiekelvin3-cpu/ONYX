@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     .select("*")
     .eq("list_date", date)
     .eq("status", "active")
+    .in("source", ["trending", "onyx_generated"])
     .order("featured", { ascending: false })
     .order("sort_order", { ascending: true })
     .limit(limit);

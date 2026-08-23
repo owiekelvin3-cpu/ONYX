@@ -27,6 +27,7 @@ import {
   Users,
   Wallet,
   Zap,
+  Sparkles,
 } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import { clearAdminSession } from "@/lib/auth-guards";
@@ -35,6 +36,7 @@ import { useDashboardSearch } from "@/components/dashboard/DashboardSearchProvid
 const MAIN_MENU = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
   { label: "Spot Trading", href: "/dashboard/trade", icon: TrendingUp },
+  { label: "Meme Coins", href: "/dashboard/meme-coins", icon: Sparkles },
   { label: "Portfolio", href: "/dashboard/portfolio", icon: Wallet },
   { label: "Deposit", href: "/dashboard/deposit", icon: ArrowDownToLine },
   { label: "Withdraw", href: "/dashboard/withdraw", icon: ArrowUpFromLine },

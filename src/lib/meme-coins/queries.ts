@@ -11,6 +11,7 @@ export async function getMemeCoinsForDate(date?: string): Promise<MemeCoinRow[]>
     .select("*")
     .eq("list_date", listDate)
     .eq("status", "active")
+    .in("source", ["trending", "onyx_generated"])
     .order("featured", { ascending: false })
     .order("sort_order", { ascending: true });
 

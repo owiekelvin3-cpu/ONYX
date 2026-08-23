@@ -35,7 +35,7 @@ export const SITE_ROUTES: Record<string, string> = {
   Press: "/about",
   Blog: "/about",
   Community: "/community",
-  "Meme Coins": "/meme-coins",
+  "Meme Coins": "/dashboard/meme-coins",
   "Meme Coin Daily": "/meme-coins",
 
   // Footer — Products

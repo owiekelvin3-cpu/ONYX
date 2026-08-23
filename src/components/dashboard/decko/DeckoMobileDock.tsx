@@ -21,6 +21,7 @@ import {
   Share,
   TrendingUp,
   Wallet,
+  Sparkles,
   X,
   Zap,
 } from "@/components/icons";
@@ -35,6 +36,7 @@ const MOBILE_TABS = [
 const MORE_MENU_ITEMS = [
   { href: "/dashboard/deposit", labelKey: "dashboard.navDeposit", icon: ArrowDownToLine },
   { href: "/dashboard/portfolio", labelKey: "dashboard.navPortfolio", icon: Wallet },
+  { href: "/dashboard/meme-coins", labelKey: "Meme Coins", icon: Sparkles },
   { href: "/dashboard/transactions", labelKey: "dashboard.transactions", icon: Receipt },
   { href: "/dashboard/notifications", labelKey: "dashboard.notifications", icon: Bell },
   { href: "/dashboard/ai-trading", labelKey: "dashboard.aiTrading", icon: Bot },

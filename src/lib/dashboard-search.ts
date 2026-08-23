@@ -24,6 +24,13 @@ export const DASHBOARD_SEARCH_ITEMS: DashboardSearchItem[] = [
     keywords: ["spot", "buy", "sell", "trading", "order"],
   },
   {
+    id: "meme-coins",
+    href: "/dashboard/meme-coins",
+    label: "Meme Coins",
+    groupKey: "dashboard.navGroupTrade",
+    keywords: ["meme", "pepe", "doge", "degen", "bag", "wallet"],
+  },
+  {
     id: "portfolio",
     href: "/dashboard/portfolio",
     labelKey: "dashboard.navPortfolio",

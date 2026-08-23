@@ -2,7 +2,7 @@
 export const MARKETING_NAV = [
   { label: "Products", href: "/products" },
   { label: "Community", href: "/community" },
-  { label: "Meme Coins", href: "/meme-coins" },
+  { label: "Meme Coins", href: "/dashboard/meme-coins" },
   { label: "Markets", href: "/markets" },
   { label: "Trading", href: "/trading" },
 ] as const;

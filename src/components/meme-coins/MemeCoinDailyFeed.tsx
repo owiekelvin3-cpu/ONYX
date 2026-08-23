@@ -6,13 +6,12 @@ import type { MemeCoinRow } from "@/lib/meme-coins/types";
 import { MemeCoinGrid } from "@/components/meme-coins/MemeCoinGrid";
 import { cn } from "@/lib/utils";
 
-type TabId = "all" | "trending" | "onyx" | "admin";
+type TabId = "all" | "trending" | "onyx";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "all", label: "Today" },
   { id: "trending", label: "Live Trending" },
   { id: "onyx", label: "ONYX Originals" },
-  { id: "admin", label: "Admin Picks" },
 ];
 
 export function MemeCoinDailyFeed({
@@ -26,31 +25,54 @@ export function MemeCoinDailyFeed({
 }) {
   const [tab, setTab] = useState<TabId>("all");
 
+  const visibleCoins = useMemo(
+    () => coins.filter((c) => c.source !== "admin_manual"),
+    [coins]
+  );
+
   const filtered = useMemo(() => {
-    if (tab === "trending") return coins.filter((c) => c.source === "trending");
-    if (tab === "onyx") return coins.filter((c) => c.source === "onyx_generated");
-    if (tab === "admin") return coins.filter((c) => c.source === "admin_manual");
-    return coins;
-  }, [coins, tab]);
+    if (tab === "trending") return visibleCoins.filter((c) => c.source === "trending");
+    if (tab === "onyx") return visibleCoins.filter((c) => c.source === "onyx_generated");
+    return visibleCoins;
+  }, [visibleCoins, tab]);
 
   const stats = useMemo(
     () => ({
-      total: coins.length,
-      trending: coins.filter((c) => c.source === "trending").length,
-      onyx: coins.filter((c) => c.source === "onyx_generated").length,
-      admin: coins.filter((c) => c.source === "admin_manual").length,
+      total: visibleCoins.length,
+      trending: visibleCoins.filter((c) => c.source === "trending").length,
+      onyx: visibleCoins.filter((c) => c.source === "onyx_generated").length,
     }),
-    [coins]
+    [visibleCoins]
   );
 
   return (
     <div className="space-y-8">
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="rounded-xl border border-brand/20 bg-brand/5 p-5 sm:p-6">
+        <h2 className="text-lg font-bold text-text-primary">Trade meme coins in your dashboard</h2>
+        <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+          Buy and hold today&apos;s meme picks in your ONYX meme wallet — same instant settlement from your main USD balance.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href="/dashboard/meme-coins"
+            className="fin-btn-primary inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold"
+          >
+            Open meme wallet
+          </Link>
+          <Link
+            href="/register"
+            className="inline-flex h-11 items-center rounded-full border border-border px-6 text-sm font-semibold text-text-primary hover:bg-bg-hover"
+          >
+            Create account
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-3">
         {[
           { label: "Today's list", value: stats.total },
           { label: "Live trending", value: stats.trending },
           { label: "ONYX originals", value: stats.onyx },
-          { label: "Admin picks", value: stats.admin },
         ].map((item) => (
           <div key={item.label} className="rounded-xl border border-border bg-bg-secondary p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">
@@ -63,17 +85,14 @@ export function MemeCoinDailyFeed({
 
       <section className="rounded-xl border border-gold/20 bg-gold/5 p-4 text-sm leading-relaxed text-text-secondary">
         <strong className="text-text-primary">High risk disclosure:</strong> Meme coins are extremely
-        volatile and may lose most or all value. Listings on this page are for discovery and
-        entertainment only — not financial advice. ONYX Originals are showcase concepts and are not
-        tradable spot assets unless explicitly listed elsewhere.
+        volatile and may lose most or all value. This is not financial advice. Only trade with funds
+        you can afford to lose.
       </section>
 
       <section>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text-primary sm:text-xl">
-              Daily meme coin picks
-            </h2>
+            <h2 className="text-lg font-bold text-text-primary sm:text-xl">Daily meme coin picks</h2>
             <p className="text-sm text-text-secondary">
               Updated for {new Date(`${listDate}T12:00:00Z`).toLocaleDateString(undefined, {
                 weekday: "long",
