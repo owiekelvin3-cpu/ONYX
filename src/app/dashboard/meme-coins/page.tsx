@@ -155,11 +155,6 @@ export default function DashboardMemeCoinsPage() {
 
   return (
     <div className="mx-auto min-w-0 max-w-6xl space-y-3 sm:space-y-4">
-      <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-sm leading-relaxed text-text-secondary">
-        Meme coins are high risk and can lose most or all value. This wallet is separate from spot
-        trading — buys use your main USD balance and settle instantly.
-      </div>
-
       <div
         className={cn(
           "grid gap-3 sm:gap-4",
