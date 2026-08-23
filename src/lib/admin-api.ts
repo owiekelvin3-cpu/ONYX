@@ -88,6 +88,30 @@ export async function adjustAdminUserProfit(params: {
   };
 }
 
+export async function adjustAdminMemeCoinProfit(params: {
+  memeCoinId: string;
+  priceUsd: number;
+  change24h: number;
+  lock?: boolean;
+  note?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc("admin_adjust_meme_coin_profit", {
+    p_meme_coin_id: params.memeCoinId,
+    p_price_usd: params.priceUsd,
+    p_change_24h: params.change24h,
+    p_lock: params.lock ?? true,
+    p_note: params.note?.trim() || null,
+  });
+  if (error) throw new Error(rpcError(error, "Could not update meme coin profit."));
+  return data as {
+    ok?: boolean;
+    symbol?: string;
+    price_usd?: number;
+    change_24h?: number;
+  };
+}
+
 export async function approveDeposit(
   depositId: string,
   userId: string,

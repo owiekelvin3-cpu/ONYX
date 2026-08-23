@@ -178,6 +178,7 @@ export type DailyMemeCoinRow = {
   tags: string[];
   featured: boolean;
   status: "active" | "archived";
+  admin_price_locked?: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;

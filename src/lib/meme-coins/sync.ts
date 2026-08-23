@@ -289,9 +289,10 @@ export async function refreshTrendingPrices(
 ): Promise<number> {
   const { data: rows, error } = await supabase
     .from("daily_meme_coins")
-    .select("id, coingecko_id")
+    .select("id, coingecko_id, admin_price_locked")
     .eq("list_date", listDate)
     .eq("source", "trending")
+    .eq("admin_price_locked", false)
     .not("coingecko_id", "is", null);
 
   if (error || !rows?.length) return 0;
