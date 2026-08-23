@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { tickMemeCoinPrices } from "@/lib/meme-coins/live-prices";
-import { refreshTrendingPrices, runDailyMemeCoinSync } from "@/lib/meme-coins/sync";
+import { utcToday } from "@/lib/meme-coins/sync";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 function authorizeCron(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -21,19 +21,16 @@ export async function GET(request: Request) {
 
   try {
     const supabase = createServiceClient();
-    const result = await runDailyMemeCoinSync(supabase);
-    const refreshed = await refreshTrendingPrices(supabase, result.listDate);
-    const ticked = await tickMemeCoinPrices(supabase, result.listDate);
+    const result = await tickMemeCoinPrices(supabase, utcToday());
 
     return NextResponse.json({
       ok: true,
+      listDate: utcToday(),
       ...result,
-      pricesRefreshed: refreshed,
-      priceTicks: ticked,
     });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Sync failed" },
+      { error: err instanceof Error ? err.message : "Tick failed" },
       { status: 500 }
     );
   }

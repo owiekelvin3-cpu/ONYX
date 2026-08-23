@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import type { MemeCoinRow } from "@/lib/meme-coins/types";
-import { MemeCoinGrid } from "@/components/meme-coins/MemeCoinGrid";
+import { MemeCoinLiveGrid } from "@/components/meme-coins/MemeCoinLiveGrid";
+import { useLiveMemeCoins } from "@/hooks/useLiveMemeCoins";
 import { cn } from "@/lib/utils";
 
 export function MemeCoinDailyFeed({
@@ -15,6 +16,7 @@ export function MemeCoinDailyFeed({
   recentDates: string[];
 }) {
   const visibleCoins = coins.filter((c) => c.source !== "admin_manual");
+  const liveCoins = useLiveMemeCoins(visibleCoins, { pollMs: 8_000, tickMs: 1_500 });
 
   return (
     <div className="space-y-8">
@@ -42,7 +44,7 @@ export function MemeCoinDailyFeed({
       <section className="grid gap-3 sm:grid-cols-2">
         {[
           { label: "Live coins today", value: visibleCoins.length },
-          { label: "Updated", value: listDate },
+          { label: "Market status", value: "Updating live" },
         ].map((item) => (
           <div key={item.label} className="rounded-xl border border-border bg-bg-secondary p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-text-tertiary">
@@ -64,12 +66,21 @@ export function MemeCoinDailyFeed({
           <div>
             <h2 className="text-lg font-bold text-text-primary sm:text-xl">Live meme coin market</h2>
             <p className="text-sm text-text-secondary">
-              Updated for {new Date(`${listDate}T12:00:00Z`).toLocaleDateString(undefined, {
+              Real-time prices for{" "}
+              {new Date(`${listDate}T12:00:00Z`).toLocaleDateString(undefined, {
                 weekday: "long",
                 month: "long",
                 day: "numeric",
                 year: "numeric",
               })}
+              {" · "}
+              <span className="inline-flex items-center gap-1 text-green">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green" />
+                </span>
+                Live
+              </span>
             </p>
           </div>
           {recentDates.length > 1 ? (
@@ -92,7 +103,7 @@ export function MemeCoinDailyFeed({
           ) : null}
         </div>
 
-        <MemeCoinGrid coins={visibleCoins} />
+        <MemeCoinLiveGrid coins={liveCoins} />
       </section>
     </div>
   );

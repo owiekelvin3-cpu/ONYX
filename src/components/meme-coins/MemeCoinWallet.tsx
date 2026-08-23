@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Loader2 } from "@/components/icons";
 import type { MemeCoinRow } from "@/lib/meme-coins/types";
 import type { MemeWalletItem } from "@/lib/api/meme-trading";
+import type { LiveMemeCoin } from "@/hooks/useLiveMemeCoins";
 import { cn, formatCurrency, formatNumber, formatPercent } from "@/lib/utils";
 
 export type MemeWalletTab = "bag" | "market" | "trade";
@@ -24,6 +25,12 @@ const SOURCE_LABEL: Record<MemeCoinRow["source"], string> = {
   admin_manual: "Live",
 };
 
+function priceFlashClass(direction?: "up" | "down" | "flat"): string {
+  if (direction === "up") return "text-green animate-pulse";
+  if (direction === "down") return "text-red animate-pulse";
+  return "text-text-primary";
+}
+
 export function MemeCoinOrderPanel({
   coin,
   side,
@@ -38,7 +45,7 @@ export function MemeCoinOrderPanel({
   success,
   onSubmit,
 }: {
-  coin: MemeCoinRow;
+  coin: MemeCoinRow | LiveMemeCoin;
   side: "buy" | "sell";
   onSideChange: (side: "buy" | "sell") => void;
   amount: string;
@@ -51,7 +58,9 @@ export function MemeCoinOrderPanel({
   success: string;
   onSubmit: () => void;
 }) {
-  const price = Number(coin.price_usd ?? 0);
+  const liveCoin = coin as LiveMemeCoin;
+  const price = liveCoin.livePriceUsd ?? Number(coin.price_usd ?? 0);
+  const direction = liveCoin.priceDirection;
   const maxBuyQty = price > 0 && cashBalance !== null ? cashBalance / price : 0;
 
   function setMax(fraction: number) {
@@ -78,8 +87,9 @@ export function MemeCoinOrderPanel({
         </div>
         <div>
           <p className="font-semibold text-text-primary">{coin.name}</p>
-          <p className="text-xs text-text-tertiary">
+          <p className={cn("text-xs font-mono transition-colors duration-300", priceFlashClass(direction))}>
             ${coin.symbol} · {formatMemePrice(price)}
+            {direction === "up" ? " ↑" : direction === "down" ? " ↓" : ""}
           </p>
         </div>
       </div>
@@ -158,7 +168,7 @@ export function MemeCoinOrderPanel({
       </Button>
 
       <p className="mt-3 text-[11px] leading-relaxed text-text-tertiary">
-        Meme trades settle instantly from your main USD balance. Minimum trade $1. High volatility — trade carefully.
+        Meme trades settle instantly from your main USD balance. Minimum trade $1. Prices update live — high volatility.
       </p>
     </div>
   );
@@ -168,17 +178,25 @@ function CoinListRow({
   coin,
   quantity,
   valueUsd,
+  unrealizedPnl,
+  unrealizedPnlPct,
   selected,
   onSelect,
 }: {
-  coin: MemeCoinRow;
+  coin: MemeCoinRow | LiveMemeCoin;
   quantity?: number;
   valueUsd?: number;
+  unrealizedPnl?: number;
+  unrealizedPnlPct?: number;
   selected?: boolean;
   onSelect: () => void;
 }) {
+  const liveCoin = coin as LiveMemeCoin;
+  const price = liveCoin.livePriceUsd ?? Number(coin.price_usd ?? 0);
+  const direction = liveCoin.priceDirection;
   const change = coin.change_24h ?? 0;
   const positive = change >= 0;
+  const showPnl = quantity != null && quantity > 0 && unrealizedPnl != null;
 
   return (
     <button
@@ -212,14 +230,21 @@ function CoinListRow({
         </p>
       </div>
       <div className="shrink-0 text-right">
-        <p className="text-sm font-semibold text-text-primary">
+        <p className={cn("text-sm font-semibold font-mono transition-colors duration-300", priceFlashClass(direction))}>
           {valueUsd != null && valueUsd > 0
             ? formatCurrency(valueUsd)
-            : formatMemePrice(Number(coin.price_usd ?? 0))}
+            : formatMemePrice(price)}
         </p>
-        <p className={cn("text-xs font-mono", positive ? "text-green" : "text-red")}>
-          {coin.change_24h != null ? formatPercent(change) : "—"}
-        </p>
+        {showPnl ? (
+          <p className={cn("text-xs font-mono", unrealizedPnl! >= 0 ? "text-green" : "text-red")}>
+            {unrealizedPnl! >= 0 ? "+" : ""}
+            {formatCurrency(unrealizedPnl!)} ({formatPercent(unrealizedPnlPct ?? 0)})
+          </p>
+        ) : (
+          <p className={cn("text-xs font-mono", positive ? "text-green" : "text-red")}>
+            {coin.change_24h != null ? formatPercent(change) : "—"}
+          </p>
+        )}
       </div>
     </button>
   );
@@ -228,6 +253,8 @@ function CoinListRow({
 export function MemeCoinWalletOverview({
   userName,
   bagValue,
+  bagPnl,
+  bagPnlPct,
   cashBalance,
   activeTab,
   onTabChange,
@@ -238,13 +265,15 @@ export function MemeCoinWalletOverview({
 }: {
   userName?: string;
   bagValue: number;
+  bagPnl: number;
+  bagPnlPct: number;
   cashBalance: number | null;
   activeTab: MemeWalletTab;
   onTabChange: (tab: MemeWalletTab) => void;
   bagItems: MemeWalletItem[];
-  marketCoins: MemeCoinRow[];
-  selectedCoin: MemeCoinRow | null;
-  onSelectCoin: (coin: MemeCoinRow) => void;
+  marketCoins: (MemeCoinRow | LiveMemeCoin)[];
+  selectedCoin: (MemeCoinRow | LiveMemeCoin) | null;
+  onSelectCoin: (coin: MemeCoinRow | LiveMemeCoin) => void;
 }) {
   const displayName = userName?.trim() || "Trader";
   const tabs: { id: MemeWalletTab; label: string }[] = [
@@ -262,10 +291,21 @@ export function MemeCoinWalletOverview({
     <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-[var(--shadow-card)]">
       <div className="spot-wallet-hero relative rounded-t-2xl px-5 pb-6 pt-5 sm:px-6 sm:pb-7 sm:pt-6">
         <div className="text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Meme bag</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Meme bag · Live</p>
           <p className="mt-2 text-[2rem] font-bold leading-none tracking-tight text-white sm:text-[2.35rem]">
             {formatCurrency(bagValue, "USD")}
           </p>
+          {bagItems.length > 0 ? (
+            <p
+              className={cn(
+                "mt-2 text-sm font-mono font-semibold transition-colors duration-300",
+                bagPnl >= 0 ? "text-green-300" : "text-red-300"
+              )}
+            >
+              {bagPnl >= 0 ? "+" : ""}
+              {formatCurrency(bagPnl)} ({formatPercent(bagPnlPct)}) unrealized
+            </p>
+          ) : null}
           <p className="mt-2 text-sm text-white/80">{displayName}</p>
           {cashBalance !== null ? (
             <p className="mt-1 text-xs text-white/60">
@@ -319,6 +359,8 @@ export function MemeCoinWalletOverview({
                   coin={item.coin}
                   quantity={Number(item.holding.quantity)}
                   valueUsd={item.valueUsd}
+                  unrealizedPnl={item.unrealizedPnl}
+                  unrealizedPnlPct={item.unrealizedPnlPct}
                   selected={selectedCoin?.id === item.coin.id}
                   onSelect={() => {
                     onSelectCoin(item.coin);

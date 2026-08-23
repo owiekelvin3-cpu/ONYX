@@ -27,6 +27,9 @@ export type MemeWalletItem = {
   coin: MemeCoinRow;
   priceUsd: number;
   valueUsd: number;
+  costBasis: number;
+  unrealizedPnl: number;
+  unrealizedPnlPct: number;
   change24h: number | null;
 };
 
@@ -71,11 +74,19 @@ export async function getMemeWalletItems(
       const coin = coinById.get(holding.meme_coin_id);
       if (!coin) return null;
       const priceUsd = memeCoinPrice(coin);
+      const quantity = Number(holding.quantity);
+      const costBasis = quantity * Number(holding.avg_cost_usd ?? priceUsd);
+      const valueUsd = quantity * priceUsd;
+      const unrealizedPnl = valueUsd - costBasis;
+      const unrealizedPnlPct = costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
       return {
         holding,
         coin,
         priceUsd,
-        valueUsd: Number(holding.quantity) * priceUsd,
+        valueUsd,
+        costBasis,
+        unrealizedPnl,
+        unrealizedPnlPct,
         change24h: coin.change_24h,
       } satisfies MemeWalletItem;
     })

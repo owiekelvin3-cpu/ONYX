@@ -7,13 +7,12 @@ import { Card } from "@/components/ui/Card";
 import { createClient } from "@/lib/supabase/client";
 import {
   executeMemeTrade,
-  getMemeWalletItems,
+  getMemeHoldings,
   heldMemeQuantity,
-  memeCoinPrice,
+  type MemeHoldingRow,
 } from "@/lib/api/meme-trading";
 import { getUsdBalance } from "@/lib/api/trading";
 import type { MemeCoinRow } from "@/lib/meme-coins/types";
-import type { MemeWalletItem } from "@/lib/api/meme-trading";
 import {
   MemeCoinOrderPanel,
   MemeCoinWalletOverview,
@@ -21,6 +20,7 @@ import {
 } from "@/components/meme-coins/MemeCoinWallet";
 import { emitDashboardRefresh } from "@/lib/dashboard-live-sync";
 import { DASHBOARD_REFRESH_EVENT } from "@/lib/dashboard-live-sync";
+import { buildWalletFromLiveCoins, useLiveMemeCoins, type LiveMemeCoin } from "@/hooks/useLiveMemeCoins";
 import { cn, formatPercent } from "@/lib/utils";
 
 export default function DashboardMemeCoinsPage() {
@@ -28,9 +28,10 @@ export default function DashboardMemeCoinsPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>();
   const [cashBalance, setCashBalance] = useState<number | null>(null);
-  const [bagItems, setBagItems] = useState<MemeWalletItem[]>([]);
+  const [holdings, setHoldings] = useState<MemeHoldingRow[]>([]);
+  const [holdingCoins, setHoldingCoins] = useState<MemeCoinRow[]>([]);
   const [marketCoins, setMarketCoins] = useState<MemeCoinRow[]>([]);
-  const [selectedCoin, setSelectedCoin] = useState<MemeCoinRow | null>(null);
+  const [selectedCoin, setSelectedCoin] = useState<LiveMemeCoin | null>(null);
   const [activeTab, setActiveTab] = useState<MemeWalletTab>("market");
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
@@ -38,34 +39,73 @@ export default function DashboardMemeCoinsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const bagValue = useMemo(
-    () => bagItems.reduce((sum, item) => sum + item.valueUsd, 0),
-    [bagItems]
+  const allBaseCoins = useMemo(() => {
+    const byId = new Map<string, MemeCoinRow>();
+    for (const coin of marketCoins) byId.set(coin.id, coin);
+    for (const coin of holdingCoins) byId.set(coin.id, coin);
+    return [...byId.values()];
+  }, [marketCoins, holdingCoins]);
+
+  const liveAllCoins = useLiveMemeCoins(allBaseCoins, { pollMs: 8_000, tickMs: 1_500 });
+
+  const liveMarketCoins = useMemo(
+    () => liveAllCoins.filter((coin) => marketCoins.some((m) => m.id === coin.id)),
+    [liveAllCoins, marketCoins]
   );
+
+  const bagItems = useMemo(() => {
+    const items = holdings
+      .map((holding) => {
+        const coin = holdingCoins.find((c) => c.id === holding.meme_coin_id);
+        if (!coin) return null;
+        return { holding, coin };
+      })
+      .filter(Boolean) as Array<{ holding: MemeHoldingRow; coin: MemeCoinRow }>;
+
+    return buildWalletFromLiveCoins(items, liveAllCoins);
+  }, [holdings, holdingCoins, liveAllCoins]);
+
+  const bagValue = useMemo(() => bagItems.reduce((sum, item) => sum + item.valueUsd, 0), [bagItems]);
+  const bagCost = useMemo(() => bagItems.reduce((sum, item) => sum + item.costBasis, 0), [bagItems]);
+  const bagPnl = bagValue - bagCost;
+  const bagPnlPct = bagCost > 0 ? (bagPnl / bagCost) * 100 : 0;
 
   const heldQuantity = useMemo(
     () => (selectedCoin ? heldMemeQuantity(bagItems, selectedCoin.id) : 0),
     [bagItems, selectedCoin]
   );
 
-  const price = selectedCoin ? memeCoinPrice(selectedCoin) : 0;
+  const price = selectedCoin?.livePriceUsd ?? 0;
   const qty = amount ? parseFloat(amount) : 0;
   const total = qty * price;
 
   const refreshWallet = useCallback(async (uid: string) => {
     const supabase = createClient();
-    const [cash, items, marketRes] = await Promise.all([
+    const [cash, userHoldings, marketRes] = await Promise.all([
       getUsdBalance(supabase, uid),
-      getMemeWalletItems(supabase, uid),
-      fetch("/api/meme-coins", { cache: "no-store" }),
+      getMemeHoldings(supabase, uid),
+      fetch("/api/meme-coins?live=1", { cache: "no-store" }),
     ]);
+
     setCashBalance(cash);
-    setBagItems(items);
+    setHoldings(userHoldings);
+
+    let market: MemeCoinRow[] = [];
     if (marketRes.ok) {
       const payload = (await marketRes.json()) as { coins?: MemeCoinRow[] };
-      setMarketCoins(payload.coins ?? []);
+      market = payload.coins ?? [];
+    }
+    setMarketCoins(market);
+
+    if (userHoldings.length > 0) {
+      const coinIds = userHoldings.map((h) => h.meme_coin_id);
+      const { data: coins } = await supabase
+        .from("daily_meme_coins")
+        .select("*")
+        .in("id", coinIds);
+      setHoldingCoins((coins ?? []) as MemeCoinRow[]);
     } else {
-      setMarketCoins([]);
+      setHoldingCoins([]);
     }
   }, []);
 
@@ -95,10 +135,16 @@ export default function DashboardMemeCoinsPage() {
   }, [refreshWallet, userId]);
 
   useEffect(() => {
-    if (!selectedCoin && marketCoins.length > 0) {
-      setSelectedCoin(marketCoins[0] ?? null);
+    if (!selectedCoin && liveMarketCoins.length > 0) {
+      setSelectedCoin(liveMarketCoins[0] ?? null);
     }
-  }, [marketCoins, selectedCoin]);
+  }, [liveMarketCoins, selectedCoin]);
+
+  useEffect(() => {
+    if (!selectedCoin) return;
+    const updated = liveAllCoins.find((c) => c.id === selectedCoin.id);
+    if (updated) setSelectedCoin(updated);
+  }, [liveAllCoins, selectedCoin]);
 
   async function handleTrade() {
     if (!selectedCoin || !userId) return;
@@ -165,14 +211,16 @@ export default function DashboardMemeCoinsPage() {
         <MemeCoinWalletOverview
           userName={userName}
           bagValue={bagValue}
+          bagPnl={bagPnl}
+          bagPnlPct={bagPnlPct}
           cashBalance={cashBalance}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           bagItems={bagItems}
-          marketCoins={marketCoins}
+          marketCoins={liveMarketCoins}
           selectedCoin={selectedCoin}
           onSelectCoin={(coin) => {
-            setSelectedCoin(coin);
+            setSelectedCoin(coin as LiveMemeCoin);
             setError("");
             setSuccess("");
           }}
@@ -195,10 +243,19 @@ export default function DashboardMemeCoinsPage() {
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <h2 className="text-lg font-bold text-text-primary">{selectedCoin.name}</h2>
-                    <p className="text-xs text-text-tertiary">${selectedCoin.symbol}</p>
+                    <p className="text-xs text-text-tertiary">${selectedCoin.symbol} · Live price</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold font-mono text-text-primary">
+                    <p
+                      className={cn(
+                        "text-lg font-bold font-mono transition-colors duration-300",
+                        selectedCoin.priceDirection === "up"
+                          ? "text-green"
+                          : selectedCoin.priceDirection === "down"
+                            ? "text-red"
+                            : "text-text-primary"
+                      )}
+                    >
                       ${price < 0.01 ? price.toFixed(8) : price.toFixed(price < 1 ? 6 : 4)}
                     </p>
                     {selectedCoin.change_24h != null ? (
@@ -208,7 +265,7 @@ export default function DashboardMemeCoinsPage() {
                           selectedCoin.change_24h >= 0 ? "text-green" : "text-red"
                         )}
                       >
-                        {formatPercent(selectedCoin.change_24h)}
+                        {formatPercent(selectedCoin.change_24h)} 24h
                       </p>
                     ) : null}
                   </div>
@@ -240,7 +297,7 @@ export default function DashboardMemeCoinsPage() {
       </div>
 
       <p className="text-center text-xs text-text-tertiary">
-        Browse the public daily feed at{" "}
+        Live prices update every few seconds. Browse the public feed at{" "}
         <Link href="/meme-coins" className="text-brand hover:underline">
           /meme-coins
         </Link>
