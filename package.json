@@ -11,7 +11,8 @@
     "setup-supabase": "node scripts/setup-new-supabase.mjs",
     "connect-mcp": "node scripts/connect-mcp.mjs",
     "create-admin": "node scripts/create-admin.mjs",
-    "seed-meme-coins": "node scripts/seed-meme-coins.mjs"
+    "seed-meme-coins": "node scripts/seed-meme-coins.mjs",
+    "sync-vercel-env": "node scripts/sync-vercel-env.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.1",

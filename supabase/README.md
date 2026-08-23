@@ -44,7 +44,20 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 Get URL and anon key from **Dashboard → Settings → API**.
 
-Also set the same variables on **Vercel** (Production + Preview).
+Also set the same variables on **Vercel** (Production + Preview):
+
+| Variable | Required | Where to get it |
+|----------|----------|-----------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Dashboard → Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Dashboard → Settings → API |
+| `NEXT_PUBLIC_APP_URL` | Yes (prod) | `https://onyxmarkets.site` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes (server) | Dashboard → Settings → API → **service_role** (secret) |
+| `CRON_SECRET` | Yes (prod) | Random string — Vercel cron sends `Authorization: Bearer <secret>` |
+| `COINGECKO_API_KEY` | Optional | [CoinGecko](https://www.coingecko.com/en/api) demo/pro key |
+
+Run `npm run sync-vercel-env` after filling server keys in `.env.local` to push them to Vercel.
+
+**Without `SUPABASE_SERVICE_ROLE_KEY` on Vercel:** meme coin live prices, daily sync, and auto-seed will fail.
 
 ### 4. Auth redirect URLs
 
