@@ -101,10 +101,10 @@ export default function AdminUsersPage() {
     setMessageTone(tone);
   }
 
-  async function openUser(id: string) {
+  async function openUser(id: string, options?: { keepMessage?: boolean }) {
     setSelectedId(id);
     setDetailLoading(true);
-    setMessage("");
+    if (!options?.keepMessage) setMessage("");
     setDeleteConfirm(false);
     setDeleteReason("");
     try {
@@ -172,7 +172,8 @@ export default function AdminUsersPage() {
       );
       setProfitAmount("");
       setProfitNote("");
-      await openUser(selectedId);
+      await openUser(selectedId, { keepMessage: true });
+      await load();
     } catch (e) {
       showFeedback(e instanceof Error ? e.message : "Profit adjustment failed", "error");
     }
@@ -180,19 +181,36 @@ export default function AdminUsersPage() {
   }
 
   async function handleBalance(direction: "credit" | "debit") {
-    if (!selectedId || !balanceAmount || !balanceReason.trim()) return;
+    if (!selectedId) return;
+
+    const amount = parseFloat(balanceAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      showFeedback("Enter a valid amount greater than zero.", "error");
+      return;
+    }
+
+    const reason = balanceReason.trim() || "Admin balance adjustment";
+    if (reason.length < 3) {
+      showFeedback("Enter a reason of at least 3 characters.", "error");
+      return;
+    }
+
     setActing(true);
     try {
-      await adjustAdminUserBalance({
+      const result = await adjustAdminUserBalance({
         userId: selectedId,
         direction,
-        amount: parseFloat(balanceAmount),
-        reason: balanceReason.trim(),
+        amount,
+        reason,
       });
-      showFeedback(`Balance ${direction}ed`);
+      const after = Number(result.balance_after ?? details?.balance ?? 0);
+      showFeedback(
+        `Balance ${direction === "credit" ? "credited" : "debited"} ${formatCurrency(amount)}. New balance: ${formatCurrency(after)}.`
+      );
       setBalanceAmount("");
       setBalanceReason("");
-      await openUser(selectedId);
+      await openUser(selectedId, { keepMessage: true });
+      await load();
     } catch (e) {
       showFeedback(e instanceof Error ? e.message : "Balance adjustment failed", "error");
     }
@@ -662,36 +680,82 @@ export default function AdminUsersPage() {
               </div>
 
               <div className="border-t border-border pt-4 space-y-2">
-                <p className="text-sm font-medium text-text-primary">Adjust balance</p>
+                <div>
+                  <p className="text-sm font-medium text-text-primary">Adjust balance</p>
+                  <p className="mt-1 text-xs text-text-tertiary">
+                    Credit adds funds to the user&apos;s main cash balance. Debit removes funds.
+                    Current balance: {formatCurrency(details.balance)}.
+                  </p>
+                </div>
                 <input
                   type="number"
-                  placeholder="Amount"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="Amount (USD)"
                   value={balanceAmount}
                   onChange={(e) => setBalanceAmount(e.target.value)}
                   className="w-full h-10 px-3 bg-bg-primary border border-border rounded text-sm"
                 />
                 <input
                   type="text"
-                  placeholder="Reason"
+                  placeholder="Reason (optional)"
                   value={balanceReason}
                   onChange={(e) => setBalanceReason(e.target.value)}
                   className="w-full h-10 px-3 bg-bg-primary border border-border rounded text-sm"
                 />
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <Button size="sm" disabled={acting} onClick={() => handleBalance("credit")} className="sm:flex-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={acting}
+                    onClick={() => void handleBalance("credit")}
+                    className="sm:flex-1"
+                  >
                     Credit
                   </Button>
                   <Button
+                    type="button"
                     size="sm"
                     variant="outline"
                     disabled={acting}
-                    onClick={() => handleBalance("debit")}
+                    onClick={() => void handleBalance("debit")}
                     className="sm:flex-1"
                   >
                     Debit
                   </Button>
                 </div>
               </div>
+
+              {(details.balance_adjustments?.length ?? 0) > 0 && (
+                <div className="border-t border-border pt-4 space-y-2">
+                  <p className="text-sm font-medium text-text-primary">Recent balance adjustments</p>
+                  <ul className="max-h-40 space-y-2 overflow-y-auto text-xs">
+                    {details.balance_adjustments?.map((row) => (
+                      <li
+                        key={row.id}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-border px-3 py-2"
+                      >
+                        <div className="min-w-0">
+                          <span
+                            className={
+                              row.direction === "credit"
+                                ? "text-green font-semibold"
+                                : "text-red font-semibold"
+                            }
+                          >
+                            {row.direction === "credit" ? "+" : "−"}
+                            {formatCurrency(row.amount)}
+                          </span>
+                          {row.reason ? (
+                            <p className="mt-0.5 truncate text-text-tertiary">{row.reason}</p>
+                          ) : null}
+                        </div>
+                        <span className="shrink-0 text-text-tertiary">{formatDate(row.created_at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {details.profile.role !== "admin" && (
                 <div className="border-t border-border pt-4 space-y-3">

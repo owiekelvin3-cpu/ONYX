@@ -59,14 +59,32 @@ export async function adjustAdminUserBalance(params: {
   amount: number;
   reason: string;
 }) {
+  const amount = Number(params.amount);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error("Amount must be greater than zero.");
+  }
+
+  const reason = params.reason.trim() || "Admin balance adjustment";
+  if (reason.length < 3) {
+    throw new Error("A reason of at least 3 characters is required.");
+  }
+
   const supabase = createClient();
-  const { error } = await supabase.rpc("admin_adjust_user_balance", {
+  const { data, error } = await supabase.rpc("admin_adjust_user_balance", {
     p_user_id: params.userId,
     p_direction: params.direction,
-    p_amount: params.amount,
-    p_reason: params.reason.trim(),
+    p_amount: amount,
+    p_reason: reason,
   });
   if (error) throw new Error(rpcError(error, "Could not adjust balance."));
+  return data as {
+    ok?: boolean;
+    direction?: AdminBalanceDirection;
+    amount?: number;
+    balance_before?: number;
+    balance_after?: number;
+    reason?: string;
+  };
 }
 
 export async function adjustAdminUserProfit(params: {

@@ -69,6 +69,17 @@ export interface AdminUserDetails {
     admin_email?: string | null;
     admin_name?: string | null;
   }>;
+  balance_adjustments?: Array<{
+    id: string;
+    direction: AdminBalanceDirection;
+    amount: number;
+    balance_before: number;
+    balance_after: number;
+    reason: string;
+    created_at: string;
+    admin_email?: string | null;
+    admin_name?: string | null;
+  }>;
   moderation_actions: Array<{
     id: string;
     action_type: string;
