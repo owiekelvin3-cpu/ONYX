@@ -32,6 +32,9 @@ export default function LoginForm() {
     if (searchParams.get("message") === "confirm-email") {
       setInfo("Check your email to confirm your account, then sign in.");
     }
+    if (searchParams.get("reset") === "1") {
+      setInfo("Password updated. Sign in with your new password.");
+    }
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
